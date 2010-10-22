@@ -1,8 +1,5 @@
 var sys = require('sys');
 
-var PACKAGES_ROOT = '/usr/local/lib/node/';
-var LIB_ROOT = __dirname + '/lib';
-
 var NO_OP = function() {};
 
 desc('Build the application.');
@@ -11,6 +8,8 @@ task('default', [], function () {
 });
 
 namespace('test', function() {
+    //TODO: Does not work; still uses npm
+    //require.paths.push(__dirname + '/deps/nodeunit/lib/nodeunit');
     var testrunner = require('nodeunit').reporters.default;
 
     desc('Runs all unit tests');
@@ -19,20 +18,30 @@ namespace('test', function() {
     desc('Runs all functional tests');
     task('functional', [], function() { testrunner.run(['test/functional']); });
 
+    //TODO: Does not work
     desc('Runs all tests');
-    task('all', ['unit', 'functional'], NO_OP);
+    task('all', ['test:unit', 'test:functional'], NO_OP);
 });
 
 namespace('package', function() {
     var exec = require('child_process').exec;
 
+    function packagePath(packageName) {
+        return '/usr/local/lib/node/.npm/' + packageName + '/active/package';
+    }
+
+    function localPath(packageName) {
+        return __dirname + '/deps/' + packageName;
+    }
+
     desc("Copies an npm package to the lib directory, so the application doesn't depend on preinstalled packages")
     task('unpack', [], function() {
+        exec('[ -d deps ] || mkdir deps ]', function() {});
         for (var i = 0; i < arguments.length; i++) {
-            var packagePath = PACKAGES_ROOT + arguments[i];
-            exec('cp -RL ' + packagePath + ' ' + LIB_ROOT, function(error, stdout, stderr) {
+            var command = 'cp -RL ' + packagePath(arguments[i]) + ' ' + localPath(arguments[i]);
+            exec(command, function(error, stdout, stderr) {
                 var message = (error == null)
-                    ? packagePath + ' => ' + LIB_ROOT
+                    ? packagePath(arguments[i]) + ' => ' + localPath(arguments[i])
                     : error + '\n' + stderr;
                 console.log(message);
             });
