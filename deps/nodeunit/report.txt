@@ -1,0 +1,46 @@
+
+[1mtest-base[22m
+✔ testCalled
+✔ testOk
+✔ testEquals
+✔ testSame
+✔ testEqual
+✔ testNotEqual
+✔ testDeepEqual
+✔ testNotDeepEqual
+✔ testStrictEqual
+✔ testNotStrictEqual
+✔ testThrows
+✔ testDoesNotThrows
+✔ testIfError
+✔ testExpect
+
+[1mtest-runmodule[22m
+✔ testRunModule
+✔ testRunModuleEmpty
+✔ testNestedTests
+
+[1mtest-runfiles[22m
+✔ testRunFiles
+✔ testRunFilesEmpty
+✔ testEmptyDir
+✔ testCoffeeScript
+
+[1mtest-sandbox[22m
+✔ testSimpleSandbox
+✔ testSandboxContext
+✔ testSandboxMultiple
+
+[1mtest-testcase[22m
+✔ testTestCase
+✔ tearDownAfterError
+
+[1mtest-runtest[22m
+✔ testArgs
+✔ testDoneCallback
+✔ testThrowError
+✔ testFailingLog
+✔ testFailingTestDone
+✔ testAssertionObj
+✔ testLogOptional
+✔ testExpectWithFailure

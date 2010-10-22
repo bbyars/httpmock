@@ -8,8 +8,7 @@ task('default', [], function () {
 });
 
 namespace('test', function() {
-    //TODO: Does not work; still uses npm
-    //require.paths.push(__dirname + '/deps/nodeunit/lib/nodeunit');
+    require.paths.unshift(__dirname + '/deps/nodeunit/lib');
     var testrunner = require('nodeunit').reporters.default;
 
     desc('Runs all unit tests');
