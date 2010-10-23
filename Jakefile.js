@@ -9,6 +9,7 @@ task('default', [], function () {
 
 namespace('test', function() {
     require.paths.unshift(__dirname + '/deps/nodeunit/lib');
+    require.paths.unshift(__dirname);
     var testrunner = require('nodeunit').reporters.default;
 
     desc('Runs all unit tests');
@@ -35,7 +36,7 @@ namespace('package', function() {
 
     desc("Copies an npm package to the lib directory, so the application doesn't depend on preinstalled packages")
     task('unpack', [], function() {
-        exec('[ -d deps ] || mkdir deps ]', function() {});
+        exec('[ -d deps ] || mkdir deps ]', NO_OP);
         for (var i = 0; i < arguments.length; i++) {
             var command = 'cp -RL ' + packagePath(arguments[i]) + ' ' + localPath(arguments[i]);
             exec(command, function(error, stdout, stderr) {

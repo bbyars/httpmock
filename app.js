@@ -2,7 +2,13 @@ var fs = require('fs');
 var http = require('http');
 var url = require('url');
 
+var Repository = function() {
+    save: function(request) {
+    }
+}
+
 http.createServer(function(request, response) {
+    var repository = Repository();
     response.writeHead(200, {'Content-type': 'text/plain'});
     var method = request.method;
     var pathname = '.' + url.parse(request.url).pathname;
@@ -12,6 +18,7 @@ http.createServer(function(request, response) {
         body += header + ': ' + request.headers[header] + '\n';
     }
 
+    repository.save(request);
     fs.mkdir(pathname, 0744, function(err) {
         if (err) throw err;
 
@@ -61,8 +68,8 @@ Takes in body, optional response headers, matcher for headers
 Same for body
 
 c# syntax
-var stub = new HttpMock("http://localhost:3000");
-stub.on("/prefix/endpoint").returns("body");
+var stub = HttpMock.for("http://localhost:3000/prefix"); // calls DELETE /_recordings/prefix
+stub.on("/prefix/endpoint").returns("body"); // calls PUT /_stubs/prefix/endpoint
 // shorthand for something like:
 var expectedRequest = new ExpectedRequest("GET", "/prefix/endpoint")
     .withHeader("accept", "test")
@@ -74,7 +81,7 @@ stub.on(expectedRequest).returns(stubResponse);
 
 actions();
 
-stub.assertCalled("/prefix/endpoint").atLeastOnce()
+stub.assertCalled("/prefix/endpoint").atLeastOnce() // GET /_recordings/prefix
     .withBodyMatching(@"regex");
 
 Story 1:
