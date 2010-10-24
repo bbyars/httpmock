@@ -5,6 +5,7 @@ exports.verify = function(testMethod, numberOfAsserts) {
         numberOfAsserts = numberOfAsserts || 1;
         test.expect(numberOfAsserts);
 
+        // Add additional asserts
         test.jsonEquals = function(spec) {
             test.strictEqual(sys.inspect(spec.actual), sys.inspect(spec.expected), spec.message);
         };

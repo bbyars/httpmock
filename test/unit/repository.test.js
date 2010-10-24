@@ -57,13 +57,13 @@ exports['Repository'] = TestFixture({
         test.jsonEquals({expected: [{path: 'test/sub'}], actual: requests});
     }),
 
-/*    'should handle paths matching prototype members': verify(function(test) {
+    'should handle paths matching prototype members': verify(function(test) {
         var repository = Repository.create();
         repository.save({path: 'constructor'});
 
         var requests = repository.load('constructor');
 
-        test.jsonEquals({expected: [{path: constructor}], actual: requests});
-    })*/
+        test.jsonEquals({expected: [{path: 'constructor'}], actual: requests});
+    })
 });
 
