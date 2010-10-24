@@ -1,33 +1,69 @@
-var TestFixture = require('nodeunit').testCase;
-var repository = require('lib/repository');
-var sys = require('sys');
-
-function assertEqual(test, spec) {
-    test.strictEqual(sys.inspect(spec.actual), sys.inspect(spec.expected), spec.message);
-}
-
-function verify(numberOfAsserts, testMethod) {
-    return function(test) {
-        test.expect(numberOfAsserts);
-        test.jsonEquals = function(spec) {
-            test.strictEqual(sys.inspect(spec.actual), sys.inspect(spec.expected), spec.message);
-        };
-        testMethod(test);
-        test.done();
-    };
-}
+var TestFixture = require('nodeunit').testCase,
+    Repository = require('../../lib/repository'),
+    verify = require('../testExtensions').verify;
 
 exports['Repository'] = TestFixture({
-    'should return empty array if nothing recorded': verify(1, function(test) {
+    'should return empty array if nothing recorded': verify(function(test) {
+        var repository = Repository.create();
+
         var requests = repository.load('path');
+
         test.jsonEquals({expected: [], actual: requests});
     }),
 
-    'should return request if under correct path': verify(1, function(test) {
-        var request = {path: 'test'};
-        repository.save(request);
+    'should return request if under correct path': verify(function(test) {
+        var repository = Repository.create();
+        repository.save({path: 'test'});
+
         var requests = repository.load('test');
-        test.jsonEquals({expected: [request], actual: requests});
-    })
+
+        test.jsonEquals({expected: [{path: 'test'}], actual: requests});
+    }),
+
+    'should not return request under different path': verify(function(test) {
+        var repository = Repository.create();
+        repository.save({path: 'not-test'});
+
+        var requests = repository.load('test');
+
+        test.jsonEquals({expected: [], actual: requests});
+    }),
+
+    'should return request under subpath': verify(function(test) {
+        var repository = Repository.create();
+        repository.save({path: 'test/sub'});
+
+        var requests = repository.load('test');
+
+        test.jsonEquals({expected: [{path: 'test/sub'}], actual: requests});
+    }),
+
+    'should only match full path part': verify(function(test) {
+        var repository = Repository.create();
+        repository.save({path: 'test2'});
+        repository.save({path: 'test'});
+
+        var requests = repository.load('test');
+
+        test.jsonEquals({expected: [{path: 'test'}], actual: requests});
+    }),
+
+    'should compare path case insensitive': verify(function(test) {
+        var repository = Repository.create();
+        repository.save({path: 'test/sub'});
+
+        var requests = repository.load('TEST');
+
+        test.jsonEquals({expected: [{path: 'test/sub'}], actual: requests});
+    }),
+
+/*    'should handle paths matching prototype members': verify(function(test) {
+        var repository = Repository.create();
+        repository.save({path: 'constructor'});
+
+        var requests = repository.load('constructor');
+
+        test.jsonEquals({expected: [{path: constructor}], actual: requests});
+    })*/
 });
 

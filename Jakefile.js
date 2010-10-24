@@ -9,7 +9,6 @@ task('default', [], function () {
 
 namespace('test', function() {
     require.paths.unshift(__dirname + '/deps/nodeunit/lib');
-    require.paths.unshift(__dirname);
     var testrunner = require('nodeunit').reporters.default;
 
     desc('Runs all unit tests');
