@@ -1,11 +1,11 @@
-var sys = require('sys');
+var sys = require('sys')
+    exec = require('child_process').exec,
+    spawn = require('child_process').spawn;
 
 var NO_OP = function() {};
 
 desc('Build the application.');
-task('default', [], function () {
-    console.log('Build successful.');
-});
+task('default', ['test:unit'], NO_OP);
 
 namespace('test', function() {
     require.paths.unshift(__dirname + '/deps/nodeunit/lib');
@@ -15,16 +15,23 @@ namespace('test', function() {
     task('unit', [], function() { testrunner.run(['test/unit']); });
 
     desc('Runs all functional tests');
-    task('functional', [], function() { testrunner.run(['test/functional']); });
+    task('functional', [], function() {
+        var app = spawn('node', ['app.js'], {cwd: __dirname, env: process.env, customFds: [-1, -1, -1]});
+        app.stdout.setEncoding('utf8');
+        app.stdout.on('data', function (data) {
+            if (data.indexOf('Server running') === 0) {
+                testrunner.run(['test/functional']);
+                app.kill();
+            }
+        });
+    });
 
-    //TODO: Does not work
+    //TODO: Does not work; it appears as though it does run test:functional, but doesn't wait for it to finish
     desc('Runs all tests');
     task('all', ['test:unit', 'test:functional'], NO_OP);
 });
 
 namespace('package', function() {
-    var exec = require('child_process').exec;
-
     function packagePath(packageName) {
         return '/usr/local/lib/node/.npm/' + packageName + '/active/package';
     }
