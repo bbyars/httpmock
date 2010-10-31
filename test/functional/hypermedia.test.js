@@ -1,8 +1,9 @@
 var TestFixture = require('nodeunit').testCase,
-    functionalTest = require('../testExtensions').functionalTest;
+    sys = require('sys'),
+    tests = require('../testExtensions');
 
 exports['Server'] = TestFixture({
-    'should send back json links': functionalTest({
+    'should send back json links': tests.functional({
         method: 'GET',
         endpoint: '/',
         headers: {'Accept': 'application/json'},

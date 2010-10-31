@@ -1,11 +1,11 @@
 var sys = require('sys'),
     http = require('http');
 
-function addCustomAsserts(test) {
-    var toJSON = function(obj) {
-        return typeof obj === 'string' ? obj : sys.inspect(obj);
-    };
+var toJSON = function(obj) {
+    return typeof obj === 'string' ? obj : sys.inspect(obj);
+};
 
+var addCustomAsserts = function(test) {
     test.jsonEquals = function(spec) {
         var message = spec.message ||
             'JSON not equal\nExpected:\n' + toJSON(spec.expected) + '\n\nActual:\n' + toJSON(spec.actual);
@@ -13,25 +13,25 @@ function addCustomAsserts(test) {
     };
 }
 
-exports.verify = function(testMethod, numberOfAsserts) {
+exports.unit = function(callback, numberOfAsserts) {
     return function(test) {
         addCustomAsserts(test);
         test.expect(numberOfAsserts || 1);
 
-        testMethod(test);
+        callback(test);
 
         test.done();
     };
 }
 
-exports.functionalTest = function(spec) {
+exports.functional = function(spec) {
     return function(test) {
         addCustomAsserts(test);
         test.expect(spec.numberOfAsserts || 1);
 
         var localhost = http.createClient(3000, 'localhost');
         var request = localhost.request(spec.method, spec.endpoint, spec.headers);
-        request.write(spec.body);
+        request.write(toJSON(spec.body));
         request.end();
 
         request.on('response', function(response) {

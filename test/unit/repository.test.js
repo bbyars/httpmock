@@ -1,9 +1,9 @@
 var TestFixture = require('nodeunit').testCase,
     Repository = require('../../lib/repository'),
-    verify = require('../testExtensions').verify;
+    tests.unit = require('../testExtensions').tests.unit;
 
 exports['Repository'] = TestFixture({
-    'should return empty array if nothing recorded': verify(function(test) {
+    'should return empty array if nothing recorded': tests.unit(function(test) {
         var repository = Repository.create();
 
         var requests = repository.load('path');
@@ -11,7 +11,7 @@ exports['Repository'] = TestFixture({
         test.jsonEquals({expected: [], actual: requests});
     }),
 
-    'should return request if under correct path': verify(function(test) {
+    'should return request if under correct path': tests.unit(function(test) {
         var repository = Repository.create();
         repository.save({path: 'test'});
 
@@ -20,7 +20,7 @@ exports['Repository'] = TestFixture({
         test.jsonEquals({expected: [{path: 'test'}], actual: requests});
     }),
 
-    'should not return request under different path': verify(function(test) {
+    'should not return request under different path': tests.unit(function(test) {
         var repository = Repository.create();
         repository.save({path: 'not-test'});
 
@@ -29,7 +29,7 @@ exports['Repository'] = TestFixture({
         test.jsonEquals({expected: [], actual: requests});
     }),
 
-    'should return request under subpath': verify(function(test) {
+    'should return request under subpath': tests.unit(function(test) {
         var repository = Repository.create();
         repository.save({path: 'test/sub'});
 
@@ -38,7 +38,7 @@ exports['Repository'] = TestFixture({
         test.jsonEquals({expected: [{path: 'test/sub'}], actual: requests});
     }),
 
-    'should only match full path part': verify(function(test) {
+    'should only match full path part': tests.unit(function(test) {
         var repository = Repository.create();
         repository.save({path: 'test2'});
         repository.save({path: 'test'});
@@ -48,7 +48,7 @@ exports['Repository'] = TestFixture({
         test.jsonEquals({expected: [{path: 'test'}], actual: requests});
     }),
 
-    'should compare path case insensitive': verify(function(test) {
+    'should compare path case insensitive': tests.unit(function(test) {
         var repository = Repository.create();
         repository.save({path: 'test/sub'});
 
@@ -57,7 +57,7 @@ exports['Repository'] = TestFixture({
         test.jsonEquals({expected: [{path: 'test/sub'}], actual: requests});
     }),
 
-    'should handle paths matching prototype members': verify(function(test) {
+    'should handle paths matching prototype members': tests.unit(function(test) {
         var repository = Repository.create();
         repository.save({path: 'constructor'});
 
