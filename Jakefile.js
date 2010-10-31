@@ -16,14 +16,18 @@ namespace('test', function() {
 
     desc('Runs all functional tests');
     task('functional', [], function() {
+        /*
         var app = spawn('node', ['app.js'], {cwd: __dirname, env: process.env, customFds: [-1, -1, -1]});
         app.stdout.setEncoding('utf8');
         app.stdout.on('data', function (data) {
             if (data.indexOf('Server running') === 0) {
+            */
                 testrunner.run(['test/functional']);
+                /*
                 app.kill();
             }
         });
+        */
     });
 
     //TODO: Does not work; it appears as though it does run test:functional, but doesn't wait for it to finish

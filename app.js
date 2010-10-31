@@ -1,31 +1,20 @@
 var http = require('http'),
     url = require('url'),
+    sys = require('sys'),
     repository = require('./lib/repository');
 
 http.createServer(function(request, response) {
-    response.writeHead(200, {'Content-type': 'text/plain'});
-    var method = request.method;
-    var pathname = '.' + url.parse(request.url).pathname;
-    var query = url.parse(request.url).query;
-    var body = method + ' ' + request.url + '\n';
-    for (var header in request.headers) {
-        body += header + ': ' + request.headers[header] + '\n';
-    }
+    response.writeHead(200, {'Content-type': 'application/json'});
+    var body = {
+                stubs: [
+                    {
+                        href: "http://localhost:3000/_stubs",
+                        rel: "http://localhost:3000/_relations/create"
+                    }
+                ]
+            };
 
-    repository.save(request);
-    fs.mkdir(pathname, 0744, function(err) {
-        if (err) throw err;
-
-        console.log('writing to ' + pathname + '/1.txt');
-        fs.writeFile(pathname + '/1.txt', body, function(err) {
-            if (err) throw err;
-        });
-    });
-
-    response.writeHead(200, {
-        'Content-Type': 'text/plain'
-    });
-    response.end(body);
+    response.end(sys.inspect(body));
 }).listen(3000);
 
 console.log('Server running at http://localhost:3000');
