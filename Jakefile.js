@@ -5,7 +5,7 @@ var sys = require('sys')
 var NO_OP = function() {};
 
 desc('Build the application.');
-task('default', ['test:unit'], NO_OP);
+task('default', ['test:all'], NO_OP);
 
 namespace('test', function() {
     require.paths.unshift(__dirname + '/deps/nodeunit/lib');
@@ -30,7 +30,6 @@ namespace('test', function() {
         */
     });
 
-    //TODO: Does not work; it appears as though it does run test:functional, but doesn't wait for it to finish
     desc('Runs all tests');
     task('all', ['test:unit', 'test:functional'], NO_OP);
 });
