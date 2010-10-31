@@ -35,20 +35,23 @@ namespace('test', function() {
 });
 
 namespace('package', function() {
+    var DEPENDENCIES_DIR = __dirname + '/deps';
+
     function packagePath(packageName) {
         return '/usr/local/lib/node/.npm/' + packageName + '/active/package';
     }
 
     function localPath(packageName) {
-        return __dirname + '/deps/' + packageName;
+        return DEPENDENCIES_DIR + '/' + packageName;
     }
 
     desc("Copies an npm package to the lib directory, so the application doesn't depend on preinstalled packages")
     task('unpack', [], function() {
-        exec('[ -d deps ] || mkdir deps ]', NO_OP);
+        var mkdir = '[ -d ' + DEPENDENCIES_DIR + ' ] || mkdir ' + DEPENDENCIES_DIR;
+        exec(mkdir, NO_OP);
         for (var i = 0; i < arguments.length; i++) {
-            var command = 'cp -RL ' + packagePath(arguments[i]) + ' ' + localPath(arguments[i]);
-            exec(command, function(error, stdout, stderr) {
+            var copy = 'cp -RL ' + packagePath(arguments[i]) + ' ' + localPath(arguments[i]);
+            exec(copy, function(error, stdout, stderr) {
                 var message = (error == null)
                     ? packagePath(arguments[i]) + ' => ' + localPath(arguments[i])
                     : error + '\n' + stderr;
