@@ -13,6 +13,27 @@ var addCustomAsserts = function(test) {
     };
 }
 
+var getResponse = function(spec) {
+    var localhost = http.createClient(3000, 'localhost');
+    var request = localhost.request(spec.method, spec.endpoint, spec.headers);
+    request.write(toJSON(spec.body));
+    request.end();
+
+    request.on('response', function(response) {
+        var responseBody = "";
+        response.setEncoding('utf8');
+
+        response.addListener("data", function(chunk) {
+            responseBody += chunk;
+        });
+
+        response.on('end', function() {
+            response.body = responseBody;
+            spec.callback(response);
+        });
+    });
+}
+
 exports.unit = function(callback, numberOfAsserts) {
     return function(test) {
         addCustomAsserts(test);
@@ -29,26 +50,13 @@ exports.functional = function(spec) {
         addCustomAsserts(test);
         test.expect(spec.numberOfAsserts || 1);
 
-        var localhost = http.createClient(3000, 'localhost');
-        var request = localhost.request(spec.method, spec.endpoint, spec.headers);
-        request.write(toJSON(spec.body));
-        request.end();
+        var testCallback = spec.callback;
+        spec.callback = function(response) {
+            testCallback(test, response);
+        };
 
-        request.on('response', function(response) {
-            var responseBody = "";
-            response.setEncoding('utf8');
-
-            response.addListener("data", function(chunk) {
-                responseBody += chunk;
-            });
-
-            response.on('end', function() {
-                response.body = responseBody;
-                spec.callback(test, response);
-                test.done();
-            });
-        });
+        getResponse(spec);
     };
 };
 
-
+exports.getResponse = getResponse;
