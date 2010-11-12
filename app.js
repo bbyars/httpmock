@@ -4,19 +4,60 @@ var http = require('http'),
     repository = require('./lib/repository');
 
 http.createServer(function(request, response) {
-    response.writeHead(200, {'Content-type': 'application/json'});
-    var body = {
-        servers: [],
-        link: {
-            href: "http://localhost:3000/servers",
-            rel: "http://localhost:3000/relations/create"
-        }
-    };
+    var resourceMethod;
 
-    response.end(sys.inspect(body));
+    resourceMethod = request.method + ' ' + url.parse(request.url).pathname;
+    switch (resourceMethod) {
+        case 'GET /':
+            sendBaseHypermedia(response);
+            break;
+        case 'POST /servers':
+            createServer(response);
+            break;
+    }
 }).listen(3000);
 
 console.log('HTTPMock running at http://localhost:3000');
+
+var sendBaseHypermedia = function(response) {
+    var body;
+
+    body = {
+        servers: [],
+        links: [
+            {
+                href: "http://localhost:3000/servers",
+                rel: "http://localhost:3000/relations/server"
+            }
+        ]
+    };
+
+    response.writeHead(200, {'Content-type': 'application/json'});
+    response.end(sys.inspect(body));
+};
+
+var createServer = function(response) {
+    var body;
+
+    body = {
+        links: [
+            {
+                href: "http://localhost:3000/servers/3001/requests",
+                rel: "http://localhost:3000/relations/request"
+            },
+            {
+                href: "http://localhost:3000/server/3001/stubs",
+                rel: "http://localhost:3000/relations/stub"
+            }
+        ]
+    };
+
+    response.writeHead(201, {
+        'Content-type': 'application/json',
+        'Location': 'http://localhost:3000/servers/3001'
+    });
+    response.end(sys.inspect(body));
+}
 
 /*
 Admin port only:

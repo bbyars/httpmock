@@ -11,27 +11,27 @@ var addCustomAsserts = function(test) {
             'JSON not equal\nExpected:\n' + toJSON(spec.expected) + '\n\nActual:\n' + toJSON(spec.actual);
         test.strictEqual(toJSON(spec.actual), toJSON(spec.expected), message);
     };
+
+    test.equals = function(spec) {
+        test.strictEqual(spec.actual, spec.expected, spec.message);
+    };
 }
 
 var getResponse = function(spec) {
-console.log("Got in getResponse...");
     var localhost = http.createClient(3000, 'localhost');
     var request = localhost.request(spec.method, spec.endpoint, spec.headers);
     request.write(toJSON(spec.body));
     request.end();
 
     request.on('response', function(response) {
-console.log("in response handler");
         var responseBody = "";
         response.setEncoding('utf8');
 
         response.addListener("data", function(chunk) {
-console.log("in data handler");
             responseBody += chunk;
         });
 
         response.on('end', function() {
-console.log("in end handler");
             response.body = responseBody;
             spec.callback(response);
         });
