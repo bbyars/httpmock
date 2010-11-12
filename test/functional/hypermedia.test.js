@@ -30,7 +30,7 @@ exports['Server'] = TestFixture({
             'Accept': 'application/json',
             'Content-type': 'application/json'
         },
-        body: { port: 3001 },
+        body: '{ "port": 3001 }',
         numberOfAsserts: 3,
         callback: function(test, response) {
             test.equals({expected: 201, actual: response.statusCode});

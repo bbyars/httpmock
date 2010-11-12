@@ -40,3 +40,14 @@ exports['Array'] = TestFixture({
         test.jsonEquals({expected: [1, 2, 3, 4, 5, 6], actual: original.flatten()});
     })
 });
+
+exports['String'] = TestFixture({
+    'format should do nothing if no placeholders': tests.unit(function(test) {
+        test.equals({expected: 'test', actual: 'test'.format('ignore')});
+    }),
+
+    'format should replace placeholders': tests.unit(function(test) {
+        test.equals({expected: 'test one two', actual: 'test {0} {1}'.format('one', 'two')});
+    })
+});
+

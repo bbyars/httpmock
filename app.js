@@ -4,22 +4,32 @@ var http = require('http'),
     repository = require('./lib/repository');
 
 http.createServer(function(request, response) {
-    var resourceMethod;
+    request.setEncoding('utf8');
+    request.body = '';
+    request.on('data', function(chunk) {
+        request.body += chunk;
+    });
 
-    resourceMethod = request.method + ' ' + url.parse(request.url).pathname;
-    switch (resourceMethod) {
-        case 'GET /':
-            sendBaseHypermedia(response);
-            break;
-        case 'POST /servers':
-            createServer(response);
-            break;
-    }
+    request.on('end', function() {
+        route(request, response);
+    });
 }).listen(3000);
 
 console.log('HTTPMock running at http://localhost:3000');
 
-var sendBaseHypermedia = function(response) {
+var route = function(request, response) {
+    resourceMethod = request.method + ' ' + url.parse(request.url).pathname;
+    switch (resourceMethod) {
+        case 'GET /':
+            sendBaseHypermedia(request, response);
+            break;
+        case 'POST /servers':
+            createServer(request, response);
+            break;
+    }
+};
+
+var sendBaseHypermedia = function(request, response) {
     var body;
 
     body = {
@@ -36,17 +46,20 @@ var sendBaseHypermedia = function(response) {
     response.end(sys.inspect(body));
 };
 
-var createServer = function(response) {
-    var body;
+var createServer = function(request, response) {
+    var body, port;
 
+console.log('BODY: ' + request.body);
+    port = JSON.parse(request.body).port;
+console.log("PORT: " + port);
     body = {
         links: [
             {
-                href: "http://localhost:3000/servers/3001/requests",
+                href: "http://localhost:3000/servers/{0}/requests".format(port),
                 rel: "http://localhost:3000/relations/request"
             },
             {
-                href: "http://localhost:3000/server/3001/stubs",
+                href: "http://localhost:3000/server/{0}/stubs".format(port),
                 rel: "http://localhost:3000/relations/stub"
             }
         ]
