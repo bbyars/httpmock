@@ -10,12 +10,11 @@ exports['Server'] = TestFixture({
         body: '',
         callback: function(test, response) {
             var expected = {
-                stubs: [
-                    {
-                        href: "http://localhost:3000/_stubs",
-                        rel: "http://localhost:3000/_relations/create"
-                    }
-                ]
+                servers: [],
+                link: {
+                    href: "http://localhost:3000/servers",
+                    rel: "http://localhost:3000/relations/create"
+                }
             };
             test.jsonEquals({expected: expected, actual: response.body});
             test.done();
@@ -42,6 +41,7 @@ exports['Server'] = TestFixture({
         },
         numberOfAsserts: 2,
         callback: function(test, response) {
+            console.log("Got here...");
             tests.getResponse({
                 method: 'GET',
                 endpoint: '/test',

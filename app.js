@@ -6,59 +6,67 @@ var http = require('http'),
 http.createServer(function(request, response) {
     response.writeHead(200, {'Content-type': 'application/json'});
     var body = {
-                stubs: [
-                    {
-                        href: "http://localhost:3000/_stubs",
-                        rel: "http://localhost:3000/_relations/create"
-                    }
-                ]
-            };
+        servers: [],
+        link: {
+            href: "http://localhost:3000/servers",
+            rel: "http://localhost:3000/relations/create"
+        }
+    };
 
     response.end(sys.inspect(body));
 }).listen(3000);
 
-console.log('Server running at http://localhost:3000');
+console.log('HTTPMock running at http://localhost:3000');
+
 /*
-Reset namespace:
-DELETE /prefix
-resets the record for any hits within that prefix (can be /)
+Admin port only:
+GET /
+  Shows all stubbed ports, with:
+    hyperlink to delete
+        stops process
+        deletes data store
+    hyperlink to get hits
+        reads data store
+        cannot send request, because that would steal a url
+    hyperlink to set stub
+        writes data store
+    hyperlink to delete stub
+    hyperlink to proxy?
+  Hyperlink to setup port
+    forks on different port, record-mode
+  Relations
+    HTML description of relationships, describing inputs and outputs
 
-Stub url generic:
-POST /prefix/url
-Takes in body, optional response headers
+Data store is file-based
+    /{port-number}
+        /requests
+            SHA-1   {records entire HTTP request, including headers}
+            SHA-1
+            ...
+        /stubs
+            SHA-1?
 
-Get requests:
-GET /prefix/url
-Gets all requests to everything under that prefix, with links to headers, bodies
+Example C# code:
+// calls GET /
+// setup has optional second parameter (share), which, if false, follows the 
+//   hyperlink to delete that URL if its there
+// if the URL is not there, follows hyperlink to create
+using (var remote = HttpMockServer.at("http://localhost:3000").setup("http://localhost:3001"))
+{
+    // calls GET/
+    // follows hyperlink to create stub
+    remote.stub("/endpoint?query").returns(body);
 
-Stub url with header matcher:
-POST /prefix/url
-Takes in body, optional response headers, matcher for headers
-Same for body
+    // Could be done locally at first, but would be nice to handle centrally
+    remote.proxy("/endpoint2").to("http://host/endpoint2");
 
-c# syntax
-var stub = HttpMock.for("http://localhost:3000/prefix"); 
-    // calls GET /, returns hyperlinks for recordings & stubs
-    // calls DELETE /_recordings/prefix
-stub.on("/prefix/endpoint").returns("body"); // calls POST /_stubs/prefix/endpoint
-// shorthand for something like:
-var expectedRequest = new ExpectedRequest("GET", "/prefix/endpoint")
-    .withHeader("accept", "test")
-    .withBodyContaining("test");
-var stubResponse = new StubResponse(201)
-    .withHeader("", "")
-    .withBody("");
-stub.on(expectedRequest).returns(stubResponse);
+    test();
 
-actions();
-
-stub.assertCalled("/prefix/endpoint").atLeastOnce() // GET /_recordings/prefix
-    .withBodyMatching(@"regex");
-
-Story 1:
-Record all requests and maintain request order.  Return 200
-
-Story 2:
-Reset all requests within a prefix
+    // Calls GET /
+    // follows hyperlink to get hits
+    // Matching could be done locally at first, with an eye on centralizing later
+    Assert.That(remote.WasCalledAt("/anotherEndpoint").WithHeader("Content-Type", "text/*")
+        .WithBodyContaining("text");
+}
 */
 
