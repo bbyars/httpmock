@@ -1,7 +1,16 @@
 var http = require('http'),
     url = require('url'),
     sys = require('sys'),
+    spawn = require('child_process').spawn,
     repository = require('./lib/repository');
+
+var servers = [];
+
+process.on('exit', function() {
+    for (var i = 0; i < servers.length; i++) {
+        servers[i].kill();
+    }
+});
 
 http.createServer(function(request, response) {
     request.setEncoding('utf8');
@@ -49,9 +58,11 @@ var sendBaseHypermedia = function(request, response) {
 var createServer = function(request, response) {
     var body, port;
 
-console.log('BODY: ' + request.body);
     port = JSON.parse(request.body).port;
-console.log("PORT: " + port);
+    server = spawn('node', ['stub.js', port]);
+    servers.push(server);
+    console.log('Spawned stub server at port ' + port);
+
     body = {
         links: [
             {

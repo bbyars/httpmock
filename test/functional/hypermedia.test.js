@@ -23,7 +23,7 @@ exports['Server'] = TestFixture({
         }
     }),
 
-    'creating a server should show it in hypermedia': tests.functional({
+    'creating a server should open up given port': tests.functional({
         method: 'POST',
         endpoint: '/servers',
         headers: {
@@ -31,7 +31,7 @@ exports['Server'] = TestFixture({
             'Content-type': 'application/json'
         },
         body: '{ "port": 3001 }',
-        numberOfAsserts: 3,
+        numberOfAsserts: 4,
         callback: function(test, response) {
             test.equals({expected: 201, actual: response.statusCode});
             test.equals({expected: "http://localhost:3000/servers/3001", actual: response.headers.location});
@@ -47,7 +47,18 @@ exports['Server'] = TestFixture({
                     }
                 ]
             }});
-            test.done();
+
+            tests.getResponse({
+                port: 3001,
+                method: 'GET',
+                endpoint: '/',
+                body: '',
+                callback: function(stubbedResponse) {
+                    console.log("hit stub server");
+                    test.equals({expected: 200, actual: stubbedResponse.statusCode});
+                    test.done();
+                }
+            });
         }
     })
 });

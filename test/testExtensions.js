@@ -18,7 +18,8 @@ var addCustomAsserts = function(test) {
 }
 
 var getResponse = function(spec) {
-    var localhost = http.createClient(3000, 'localhost');
+    var port = spec.port || 3000;
+    var localhost = http.createClient(port, 'localhost');
     var request = localhost.request(spec.method, spec.endpoint, spec.headers);
     request.write(toJSON(spec.body));
     request.end();
