@@ -6,7 +6,7 @@ var http = require('http'),
 
 var port = process.argv[2] || 3000
 
-var servers = [];
+var servers = {};
 
 http.createServer(function(request, response) {
     request.setEncoding('utf8');
@@ -31,6 +31,9 @@ var route = function(request, response) {
         case 'POST /servers':
             createServer(request, response);
             break;
+        case 'DELETE /servers/3001':
+            deleteServer(request, response);
+            break;
     }
 };
 
@@ -39,14 +42,14 @@ var sendBaseHypermedia = function(request, response) {
         servers: [],
         links: [
             {
-                href: "http://localhost:3000/servers",
-                rel: "http://localhost:3000/relations/server"
+                href: 'http://localhost:3000/servers',
+                rel: 'http://localhost:3000/relations/servers'
             }
         ]
     };
 
     response.writeHead(200, {'Content-type': 'application/json'});
-    response.end(sys.inspect(body));
+    response.end(JSON.stringify(body));
 };
 
 var createServer = function(request, response) {
@@ -54,7 +57,7 @@ var createServer = function(request, response) {
         port = JSON.parse(request.body).port,
         server = spawn('node', ['stub.js', port]);
 
-    servers.push(server);
+    servers[port] = server;
 
     server.stdout.setEncoding('utf8');
     server.stdout.on('data', function(data) {
@@ -68,21 +71,32 @@ var createServer = function(request, response) {
                 'Location': 'http://localhost:3000/servers/3001'
             });
 
-            response.end(sys.inspect({
+            response.end(JSON.stringify({
                 links: [
                     {
-                        href: "http://localhost:3000/servers/{0}/requests".format(port),
-                        rel: "http://localhost:3000/relations/request"
+                        href: 'http://localhost:3000/servers/{0}'.format(port),
+                        rel: 'http://localhost:3000/relations/server'
                     },
                     {
-                        href: "http://localhost:3000/server/{0}/stubs".format(port),
-                        rel: "http://localhost:3000/relations/stub"
+                        href: 'http://localhost:3000/servers/{0}/requests'.format(port),
+                        rel: 'http://localhost:3000/relations/request'
+                    },
+                    {
+                        href: 'http://localhost:3000/server/{0}/stubs'.format(port),
+                        rel: 'http://localhost:3000/relations/stub'
                     }
                 ]
             }));
         }
     });
-}
+};
+
+var deleteServer = function (request, response) {
+    console.log('Killing server at port {0}'.format(3001));
+    servers[3001].kill();
+    response.writeHead(200);
+    response.end();
+};
 
 /*
 Admin port only:

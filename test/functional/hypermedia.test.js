@@ -7,51 +7,56 @@ var TestFixture = require('nodeunit').testCase,
     tests = require('../testExtensions');
 
 exports['Server'] = TestFixture({
-    'getting / should return base hypermedia': function(test) {
-        get('http://localhost:3000/', function(response) {
+    'GET / returns base hypermedia': function (test) {
+        get('http://localhost:3000/', function (response) {
             var expected = {
                 servers: [],
                 links: [
                     {
-                        href: "http://localhost:3000/servers",
-                        rel: "http://localhost:3000/relations/server"
+                        href: 'http://localhost:3000/servers',
+                        rel: 'http://localhost:3000/relations/servers'
                     }
                 ]
             };
-            test.strictEqual(response.body, sys.inspect(expected));
+            test.strictEqual(response.body, JSON.stringify(expected));
             test.done();
         });
     },
 
-    'posting to /servers should create stub at given port': function(test) {
+    'POST /servers creates stub at given port': function (test) {
         post('http://localhost:3000/servers', {
             body: { port: 3001 },
-            callback: function(response) {
-console.log('in callback');
+            callback: function (response) {
                 test.strictEqual(response.statusCode, 201);
                 test.strictEqual(response.headers.location, 'http://localhost:3000/servers/3001');
-                test.strictEqual(response.body, sys.inspect({
+                test.strictEqual(response.body, JSON.stringify({
                     links: [
                         {
-                            href: "http://localhost:3000/servers/3001/requests",
-                            rel: "http://localhost:3000/relations/request"
+                            href: 'http://localhost:3000/servers/3001',
+                            rel: 'http://localhost:3000/relations/server'
                         },
                         {
-                            href: "http://localhost:3000/server/3001/stubs",
-                            rel: "http://localhost:3000/relations/stub"
+                            href: 'http://localhost:3000/servers/3001/requests',
+                            rel: 'http://localhost:3000/relations/request'
+                        },
+                        {
+                            href: 'http://localhost:3000/server/3001/stubs',
+                            rel: 'http://localhost:3000/relations/stub'
                         }
                     ]
                 }));
-console.log('got here..');
 
-                get('http://localhost:3001/', function(stubbedResponse) {
-console.log("hit stub server");
+                get('http://localhost:3001/', function (stubbedResponse) {
                     test.strictEqual(stubbedResponse.statusCode, 200);
-                    test.done();
+                    deleteServerAtPort(3001, function () {
+                        test.done();
+                    });
                 });
             }
         });
-    }/*,
+    }
+
+    /*,
 
     'should enable setting up stub response': verify(function(test) {
         test.expect(3);
@@ -81,7 +86,7 @@ console.log("hit stub server");
     },*/
 });
 
-var setDefaults = function(options) {
+var setDefaults = function (options) {
     return {
         method: 'GET',
         headers: {
@@ -92,7 +97,7 @@ var setDefaults = function(options) {
     }.merge(options);
 };
 
-var getResponse = function(options) {
+var getResponse = function (options) {
     var spec = setDefaults(options),
         urlParts = url.parse(spec.url),
         client = http.createClient(urlParts.port, urlParts.hostname),
@@ -101,38 +106,44 @@ var getResponse = function(options) {
     request.write(JSON.stringify(spec.body));
     request.end();
 
-    request.on('response', function(response) {
-console.log('in response handler');
+    request.on('response', function (response) {
         response.body = '';
         response.setEncoding('utf8');
 
-        response.addListener('data', function(chunk) {
-console.log('chunk: ' + chunk);
+        response.addListener('data', function (chunk) {
             response.body += chunk;
         });
 
-        response.on('end', function() {
+        response.on('end', function () {
             spec.callback(response);
         });
     });
 };
 
-var get = function(url, callback) {
+var get = function (url, callback) {
     getResponse({url: url, method: 'GET', callback: callback});
 };
 
-var post = function(url, options) {
+var post = function (url, options) {
     getResponse(options.merge({url: url, method: 'POST'}));
 };
 
-var createStubServerAtPort = function(port, callback) {
+var deleteServerAtPort = function(port, callback) {
+    getResponse({
+        url: 'http://localhost:3000/servers/3001',
+        method: 'DELETE',
+        callback: callback
+    });
+}
+
+var createStubServerAtPort = function (port, callback) {
     post('http://localhost:3000/servers', {
         body: {port: port},
         callback: callback
     });
 };
 
-var getStubUrl = function(hypermedia) {
+var getStubUrl = function (hypermedia) {
     var link;
     for (var i = 0; i < hypermedia.links.length; i++) {
         link = hypermedia.links[i];
@@ -142,10 +153,10 @@ var getStubUrl = function(hypermedia) {
     }
 };
 
-var setupStub = function(options) {
+var setupStub = function (options) {
     post(options.url, {
         body: options.stub,
-        callback: function(response) {
+        callback: function (response) {
             if (response.statusCode !== 201) {
                 throw { message: 'Unexpected response setting up stub: ' + response.statusCode };
             }
