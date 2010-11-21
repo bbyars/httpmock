@@ -9,8 +9,16 @@
  */
 
 var nodeunit = require('../nodeunit'),
+    fs = require('fs'),
     sys = require('sys'),
-    path = require('path');
+    path = require('path'),
+    AssertionError = require('assert').AssertionError;
+
+/**
+ * Reporter info string
+ */
+
+exports.info = "Skip passed tests output";
 
 /**
  * Run all tests within each module, reporting the results to the command-line.
@@ -20,6 +28,14 @@ var nodeunit = require('../nodeunit'),
  */
 
 exports.run = function (files, options) {
+
+    if (!options) {
+        // load default options
+        var content = fs.readFileSync(
+            __dirname + '/../../bin/nodeunit.json', 'utf8'
+        );
+        options = JSON.parse(content);
+    }
 
     var error = function (str) {
         return options.error_prefix + str + options.error_suffix;
@@ -46,14 +62,14 @@ exports.run = function (files, options) {
         testDone: function (name, assertions) {
             if (assertions.failures) {
                 sys.puts(error('✖ ' + name) + '\n');
-                assertions.forEach(function (assertion) {
-                    if (assertion.failed()) {
-                        if (assertion.message) {
+                assertions.forEach(function (a) {
+                    if (a.failed()) {
+                        if (a.error instanceof AssertionError && a.message) {
                             sys.puts(
-                                'Assertion Message: ' + assertion_message(assertion.message)
+                                'Assertion Message: ' + assertion_message(a.message)
                             );
                         }
-                        sys.puts(assertion.error.stack + '\n');
+                        sys.puts(a.error.stack + '\n');
                     }
                 });
             }
@@ -82,7 +98,11 @@ exports.run = function (files, options) {
                     ' assertions (' + assertions.duration + 'ms)'
                 );
             }
-            process.reallyExit(assertions.failures);
+            // should be able to flush stdout here, but doesn't seem to work,
+            // instead delay the exit to give enough to time flush.
+            setTimeout(function () {
+                process.reallyExit(assertions.failures);
+            }, 10);
         }
     });
 };

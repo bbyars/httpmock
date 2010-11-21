@@ -1,3 +1,11 @@
+exports.verify = function(f) {
+    return function(test) {
+        addCustomAsserts(test);
+        f(test);
+    };
+};
+
+
 var sys = require('sys'),
     http = require('http');
 

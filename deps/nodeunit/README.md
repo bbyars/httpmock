@@ -11,27 +11,21 @@ A simple unit testing tool based on the node.js assert module.
 
 __Contributors__
 
-* [alexkwolfe](http://github.com/alexkwolfe)
-  * HTML reporter
-* [azatoth](http://github.com/azatoth)
-  * debian-friendly Makefile, supports both 'node' and 'nodejs' executables
-  * sandbox utility
-  * minimal test reporter
-* [coffeemate](http://github.com/coffeemate)
-  * improvements to default test reporter
-* [Sannis](http://github.com/Sannis)
-  * adding 'make lint' and fixing nodelint errors
-  * skip passed reporter
-  * option parsing, --help text and config file support
-  * reporters option for command-line tool
-* [sstephenson](http://github.com/sstephenson)
-  * coffee-script support
-* and thanks to [cjohansen](http://github.com/cjohansen) for input and advice
+* [alexgorbatchev](https://github.com/alexgorbatchev)
+* [alexkwolfe](https://github.com/alexkwolfe)
+* [azatoth](https://github.com/azatoth)
+* [coffeemate](https://github.com/coffeemate)
+* [Sannis](https://github.com/Sannis)
+* [sstephenson](https://github.com/sstephenson)
+* [thegreatape](https://github.com/thegreatape)
+* and thanks to [cjohansen](https://github.com/cjohansen) for input and advice
   on implementing setUp and tearDown functions. See
-  [cjohansen's fork](http://github.com/cjohansen/nodeunit).
+  [cjohansen's fork](https://github.com/cjohansen/nodeunit).
 
-Also, check out gerad's [nodeunit-dsl](http://github.com/gerad/nodeunit-dsl)
+Also, check out gerad's [nodeunit-dsl](https://github.com/gerad/nodeunit-dsl)
 project, which implements a 'pretty dsl on top of nodeunit'.
+
+More contributor information can be found in the CONTRIBUTORS.md file.
 
 Usage
 -----
@@ -51,14 +45,14 @@ Here is an example unit test module:
 
 When run using the included test runner, this will output the following:
 
-<img src="http://github.com/caolan/nodeunit/raw/master/img/example_fail.png" />
+<img src="https://github.com/caolan/nodeunit/raw/master/img/example_fail.png" />
 
 Installation
 ------------
 
 There are two options for installing nodeunit:
 
-1. Clone / download nodeunit from [github](http://github.com/caolan/nodeunit),
+1. Clone / download nodeunit from [github](https://github.com/caolan/nodeunit),
    then:
 
     make && sudo make install
@@ -186,11 +180,13 @@ function, which is run after each test calls test.done():
     var testCase = require('nodeunit').testCase;
 
     module.exports = testCase({
-        setUp: function () {
+        setUp: function (callback) {
             this.foo = 'bar';
+            callback();
         },
-        tearDown: function () {
+        tearDown: function (callback) {
             // clean up
+            callback();
         },
         test1: function (test) {
             test.equals(this.foo, 'bar');
@@ -214,7 +210,7 @@ The default test reporter uses color output, because I think that's more fun :) 
 intend to add a no-color option in future. To give you a feeling of the fun you'll
 be having writing tests, lets fix the example at the start of the README:
 
-<img src="http://github.com/caolan/nodeunit/raw/master/img/example_pass.png" />
+<img src="https://github.com/caolan/nodeunit/raw/master/img/example_pass.png" />
 
 Ahhh, Doesn't that feel better?
 
@@ -227,6 +223,7 @@ assertions as the exit code. Exiting with 0 when all tests pass.
 * __--reporter FILE__ - you can set the test reporter to a custom module or
 on of the modules in nodeunit/lib/reporters, when omitted, the default test runner
 is used.
+* __--list-reporters__ - list available build-in reporters.
 * __--config FILE__ - load config options from a JSON file, allows
 the customisation of color schemes for the default test reporter etc. See
 bin/nodeunit.json for current available options.
@@ -362,10 +359,7 @@ to v0.2.1 fixes this.
 Contributing
 ------------
 
-Contributions to the project are most welcome, so feel free to fork and
-improve. When submitting a pull request, please run 'make lint' first to ensure
+Contributions to the project are most welcome, so feel free to fork and improve.
+When submitting a pull request, please run 'make lint' first to ensure
 we're following a consistent coding style.
 
-When running 'make lint', you can ignore errors about 'global' and
-'console.log', they are prerequired variables not yet included in nodelint.
-[Sannis](http://github.com/Sannis) has sent a patch to include them.

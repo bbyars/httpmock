@@ -23,6 +23,21 @@ exports['Object'] = TestFixture({
             fn: function() {}
         };
         test.jsonEquals({expected: ['key'], actual: obj.ownProperties()});
+    }),
+
+    'merge should combine sender and receivers properties': tests.unit(function(test) {
+        test.jsonEquals({expected: {first: 1, second: 2}, actual: {first: 1}.merge({second: 2})});
+    }),
+
+    'merge should overwrite property': tests.unit(function(test) {
+        test.jsonEquals({expected: {key: 'other'}, actual: {key: 'this'}.merge({key: 'other'})});
+    }),
+
+    'merge should keep own functions': tests.unit(function(test) {
+        var obj = {
+            fn: function() { return 'true'; }
+        };
+        test.strictEqual({}.merge(obj).fn(), 'true');
     })
 });
 

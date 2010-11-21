@@ -9,9 +9,16 @@
  */
 
 var nodeunit = require('../nodeunit'),
+    fs = require('fs'),
     sys = require('sys'),
-    path = require('path');
+    path = require('path'),
+    AssertionError = require('assert').AssertionError;
 
+/**
+ * Reporter info string
+ */
+
+exports.info = "Pretty minimal output";
 
 /**
  * Run all tests within each module, reporting the results to the command-line.
@@ -20,19 +27,27 @@ var nodeunit = require('../nodeunit'),
  * @api public
  */
 
-exports.run = function (files) {
+exports.run = function (files, options) {
+
+    if (!options) {
+        // load default options
+        var content = fs.readFileSync(
+            __dirname + '/../../bin/nodeunit.json', 'utf8'
+        );
+        options = JSON.parse(content);
+    }
 
     var red   = function (str) {
-        return "\u001B[31m" + str + "\u001B[39m";
+        return options.error_prefix + str + options.error_suffix;
     };
     var green = function (str) {
-        return "\u001B[32m" + str + "\u001B[39m";
+        return options.ok_prefix + str + options.ok_suffix;
     };
     var magenta = function (str) {
-        return "\u001B[35m" + str + "\u001B[39m";
+        return options.assertion_prefix + str + options.assertion_suffix;
     };
     var bold  = function (str) {
-        return "\u001B[1m" + str + "\u001B[22m";
+        return options.bold_prefix + str + options.bold_suffix;
     };
 
     var start = new Date().getTime();
@@ -42,25 +57,25 @@ exports.run = function (files) {
 
     nodeunit.runFiles(paths, {
         moduleStart: function (name) {
-            sys.print(bold(name)+': ');
+            sys.print(bold(name) + ': ');
         },
-        moduleDone: function (name,assertions) {
+        moduleDone: function (name, assertions) {
             sys.puts('');
             if (assertions.failures) {
-                assertions.forEach(function (assertion) {
-                    if (assertion.failed()) {
-                        if (assertion.message) {
+                assertions.forEach(function (a) {
+                    if (a.failed()) {
+                        if (a.error instanceof AssertionError && a.message) {
                             sys.puts(
-                                'Assertion in test '+bold(assertion.testname)+': ' + magenta(assertion.message)
+                                'Assertion in test ' + bold(a.testname) + ': ' + magenta(a.message)
                             );
                         }
-                        sys.puts(assertion.error.stack + '\n');
+                        sys.puts(a.error.stack + '\n');
                     }
                 });
             }
 
         },
-        testStart: function(){
+        testStart: function () {
         },
         testDone: function (name, assertions) {
             if (!assertions.failures) {
@@ -89,7 +104,11 @@ exports.run = function (files) {
                     ' assertions (' + assertions.duration + 'ms)'
                 );
             }
-            process.reallyExit(assertions.failures);
+            // should be able to flush stdout here, but doesn't seem to work,
+            // instead delay the exit to give enough to time flush.
+            setTimeout(function () {
+                process.reallyExit(assertions.failures);
+            }, 10);
         }
     });
 };

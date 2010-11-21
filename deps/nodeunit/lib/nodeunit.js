@@ -12,6 +12,8 @@ var async = require('../deps/async'),
     types = require('./types'),
     utils = require('./utils'),
     reporters = require('./reporters'),
+    sys = require('sys'),
+    events = require('events'),
     path = require('path');
 
 
@@ -80,14 +82,20 @@ exports.runSuite = function (name, suite, opt, callback) {
     var keys = Object.keys(suite);
 
     async.concatSeries(keys, function (k, cb) {
-        var prop = suite[k];
-        var n = name ? name + ' - ' + k: k;
+        var prop = suite[k], _name;
+
+        _name = name ? [].concat(name, k) : [k];
+
+        _name.toString = function () {
+            // fallback for old one
+            return this.join(' - ');
+        };
 
         if (typeof prop === 'function') {
-            exports.runTest(n, suite[k], opt, cb);
+            exports.runTest(_name, suite[k], opt, cb);
         }
         else {
-            exports.runSuite(n, suite[k], opt, cb);
+            exports.runSuite(_name, suite[k], opt, cb);
         }
     }, callback);
 };
@@ -171,17 +179,36 @@ exports.testCase = function (suite) {
     return keys.reduce(function (tests, k) {
         tests[k] = function (test) {
             var context = {};
-            if (setUp) {
-                setUp.call(context);
-            }
             if (tearDown) {
                 var done = test.done;
                 test.done = function (err) {
-                    tearDown.call(context);
-                    done(err);
+                    try {
+                        tearDown.call(context, function (err2) {
+                            if (err && err2) {
+                                test._assertion_list.push(
+                                    types.assertion({error: err})
+                                );
+                                return done(err2);
+                            }
+                            done(err || err2);
+                        });
+                    }
+                    catch (e) {
+                        done(e);
+                    }
                 };
             }
-            suite[k].call(context, test);
+            if (setUp) {
+                setUp.call(context, function (err) {
+                    if (err) {
+                        return test.done(err);
+                    }
+                    suite[k].call(context, test);
+                });
+            }
+            else {
+                suite[k].call(context, test);
+            }
         };
 
         return tests;

@@ -78,8 +78,9 @@ var assertWrapper = function (callback) {
                 if (Object.getOwnPropertyDescriptor(e, 'actual') &&
                     Object.getOwnPropertyDescriptor(e, 'expected')) {
 
-                    var actual = sys.inspect(e.actual).replace(/\n$/, '');
-                    var expected = sys.inspect(e.expected).replace(/\n$/, '');
+                    // alexgorbatchev 2010-10-22 :: Added a bit of depth to object inspection
+                    var actual = sys.inspect(e.actual, false, 10).replace(/\n$/, '');
+                    var expected = sys.inspect(e.expected, false, 10).replace(/\n$/, '');
                     var multiline = (
                         actual.indexOf('\n') !== -1 ||
                         expected.indexOf('\n') !== -1
@@ -155,7 +156,8 @@ exports.test = function (name, start, options, callback) {
         equals: wrapAssert('equals', 'equal'),
         expect: function (num) {
             expecting = num;
-        }
+        },
+        _assertion_list: a_list
     };
     // add all functions from the assert module
     for (var k in assert) {

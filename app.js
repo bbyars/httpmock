@@ -4,13 +4,9 @@ var http = require('http'),
     spawn = require('child_process').spawn,
     repository = require('./lib/repository');
 
-var servers = [];
+var port = process.argv[2] || 3000
 
-process.on('exit', function() {
-    for (var i = 0; i < servers.length; i++) {
-        servers[i].kill();
-    }
-});
+var servers = [];
 
 http.createServer(function(request, response) {
     request.setEncoding('utf8');
@@ -22,7 +18,7 @@ http.createServer(function(request, response) {
     request.on('end', function() {
         route(request, response);
     });
-}).listen(3000);
+}).listen(port);
 
 console.log('HTTPMock running at http://localhost:3000');
 
@@ -39,9 +35,7 @@ var route = function(request, response) {
 };
 
 var sendBaseHypermedia = function(request, response) {
-    var body;
-
-    body = {
+    var body = {
         servers: [],
         links: [
             {
@@ -56,31 +50,38 @@ var sendBaseHypermedia = function(request, response) {
 };
 
 var createServer = function(request, response) {
-    var body, port;
+    var responseSent = false,
+        port = JSON.parse(request.body).port,
+        server = spawn('node', ['stub.js', port]);
 
-    port = JSON.parse(request.body).port;
-    server = spawn('node', ['stub.js', port]);
     servers.push(server);
-    console.log('Spawned stub server at port ' + port);
 
-    body = {
-        links: [
-            {
-                href: "http://localhost:3000/servers/{0}/requests".format(port),
-                rel: "http://localhost:3000/relations/request"
-            },
-            {
-                href: "http://localhost:3000/server/{0}/stubs".format(port),
-                rel: "http://localhost:3000/relations/stub"
-            }
-        ]
-    };
+    server.stdout.setEncoding('utf8');
+    server.stdout.on('data', function(data) {
+        console.log('[{0}]: {1}'.format(port, data));
 
-    response.writeHead(201, {
-        'Content-type': 'application/json',
-        'Location': 'http://localhost:3000/servers/3001'
+        if (!responseSent) {
+            responseSent = true;
+
+            response.writeHead(201, {
+                'Content-type': 'application/json',
+                'Location': 'http://localhost:3000/servers/3001'
+            });
+
+            response.end(sys.inspect({
+                links: [
+                    {
+                        href: "http://localhost:3000/servers/{0}/requests".format(port),
+                        rel: "http://localhost:3000/relations/request"
+                    },
+                    {
+                        href: "http://localhost:3000/server/{0}/stubs".format(port),
+                        rel: "http://localhost:3000/relations/stub"
+                    }
+                ]
+            }));
+        }
     });
-    response.end(sys.inspect(body));
 }
 
 /*
