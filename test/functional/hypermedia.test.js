@@ -54,6 +54,49 @@ exports['Server'] = TestFixture({
                 });
             }
         });
+    },
+
+    /*'POST /servers returns 409 if server already created': function (test) {
+        createServerAtPort(3001, function (createResponse) {
+            test.strictEqual(createResponse.statusCode, 200);
+
+            createServerAtPort(3001, function (conflictResponse) {
+                test.strictEqual(conflictResponse.statusCode, 409);
+                deleteServerAtPort(3001, function () {
+                    test.done();
+                });
+            });
+        });
+    },*/
+
+    'DELETE /servers/{port} deletes stub at given port': function (test) {
+        createServerAtPort(3002, function (createResponse) {
+            del('http://localhost:3000/servers/3002', function (deleteResponse) {
+                test.strictEqual(deleteResponse.statusCode, 200);
+                //TODO: How do I test that I can't hit the stub server?
+                // get() throws an error, but asynchronously
+                test.done();
+            });
+        });
+    },
+
+    'DELETE /servers/{port} returns 404 if server never created': function (test) {
+        del('http://localhost:3000/servers/5000', function (response) {
+            test.strictEqual(response.statusCode, 404);
+            test.done();
+        });
+    },
+/*
+    'GET /servers/{port}/requests returns empty array if no requests to given url': function (test) {
+        createServerAtPort(3003, function (createResponse) {
+            get('http://localhost:3000/servers/3003/requests', function (response) {
+                test.strictEqual(response.body, JSON.stringify(
+                ));
+                deleteServerAtPort(3003, function () {
+                    test.done();
+                });
+            }
+        });
     }
 
 /*    'should enable setting up stub response': verify(function(test) {
@@ -91,7 +134,8 @@ var setDefaults = function (options) {
             'Accept': 'application/json',
             'Content-type': 'application/json'
         },
-        body: ''
+        body: '',
+        callback: function (response) {}
     }.merge(options);
 };
 
@@ -126,40 +170,17 @@ var post = function (url, options) {
     getResponse(options.merge({url: url, method: 'POST'}));
 };
 
+var del = function (url, callback) {
+    getResponse({url: url, method: 'DELETE', callback: callback});
+};
+
 var deleteServerAtPort = function(port, callback) {
-    getResponse({
-        url: 'http://localhost:3000/servers/3001',
-        method: 'DELETE',
-        callback: callback
-    });
+    del('http://localhost:3000/servers/{0}'.format(port), callback);
 }
 
-var createStubServerAtPort = function (port, callback) {
+var createServerAtPort = function (port, callback) {
     post('http://localhost:3000/servers', {
-        body: {port: port},
+        body: { port: port },
         callback: callback
     });
 };
-
-var getStubUrl = function (hypermedia) {
-    var link;
-    for (var i = 0; i < hypermedia.links.length; i++) {
-        link = hypermedia.links[i];
-        if (link.rel === 'http://localhost:3000/relations/stub') {
-            return link.href;
-        }
-    }
-};
-
-var setupStub = function (options) {
-    post(options.url, {
-        body: options.stub,
-        callback: function (response) {
-            if (response.statusCode !== 201) {
-                throw { message: 'Unexpected response setting up stub: ' + response.statusCode };
-            }
-            options.callback();
-        }
-    });
-};
-

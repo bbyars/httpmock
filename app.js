@@ -1,3 +1,5 @@
+require('./lib/extensions');
+
 var http = require('http'),
     url = require('url'),
     sys = require('sys'),
@@ -20,9 +22,11 @@ http.createServer(function(request, response) {
     });
 }).listen(port);
 
-console.log('HTTPMock running at http://localhost:3000');
+console.log('HTTPMock running at http://localhost:{0}'.format(port));
 
 var route = function(request, response) {
+    var matches;
+
     resourceMethod = request.method + ' ' + url.parse(request.url).pathname;
     switch (resourceMethod) {
         case 'GET /':
@@ -31,9 +35,11 @@ var route = function(request, response) {
         case 'POST /servers':
             createServer(request, response);
             break;
-        case 'DELETE /servers/3001':
-            deleteServer(request, response);
-            break;
+    }
+
+    matches = resourceMethod.match(/DELETE \/servers\/(\d+)/i);
+    if (matches) {
+        deleteServerAtPort(matches[1], request, response);
     }
 };
 
@@ -91,11 +97,17 @@ var createServer = function(request, response) {
     });
 };
 
-var deleteServer = function (request, response) {
-    console.log('Killing server at port {0}'.format(3001));
-    servers[3001].kill();
-    response.writeHead(200);
-    response.end();
+var deleteServerAtPort = function (port, request, response) {
+    if (!servers[port]) {
+        response.writeHead(404);
+        response.end();
+    }
+    else {
+        console.log('Killing server at port {0}'.format(port));
+        servers[port].kill();
+        response.writeHead(200);
+        response.end();
+    }
 };
 
 /*
