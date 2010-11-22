@@ -56,9 +56,7 @@ exports['Server'] = TestFixture({
         });
     }
 
-    /*,
-
-    'should enable setting up stub response': verify(function(test) {
+/*    'should enable setting up stub response': verify(function(test) {
         test.expect(3);
         createStubServerAtPort(3002, function(response) {
             setupStub({

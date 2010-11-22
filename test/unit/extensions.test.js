@@ -1,68 +1,66 @@
 require('../../lib/extensions');
 var TestFixture = require('nodeunit').testCase,
-    tests = require('../testExtensions');
+    unitTest = require('../testExtensions').unitTest;
 
 exports['Object'] = TestFixture({
-    'ownProperties should be empty for empty object': tests.unit(function(test) {
-        test.jsonEquals({expected: [], actual: {}.ownProperties()});
+    'ownProperties should be empty for empty object': unitTest(function (test) {
+        test.jsonEquals({}.ownProperties(), []);
     }),
 
-    'ownProperties should contain only properties defined directly on the object': tests.unit(function(test) {
-        var obj = {key: 0};
-        test.jsonEquals({expected: ['key'], actual: obj.ownProperties()});
+    'ownProperties should contain only properties defined directly on the object': unitTest(function (test) {
+        test.jsonEquals({key: 0}.ownProperties(), ['key']);
     }),
 
-    'ownProperties should only contained prototype members if they are redefined': tests.unit(function(test) {
-        var obj = {constructor: 0};
-        test.jsonEquals({expected: ['constructor'], actual: obj.ownProperties()});
+    'ownProperties should only contained prototype members if they are redefined': unitTest(function (test) {
+        test.jsonEquals({constructor: 0}.ownProperties(), ['constructor']);
     }),
 
-    'ownProperties should exclude functions': tests.unit(function(test) {
+    'ownProperties should exclude functions': unitTest(function (test) {
         var obj = {
             key: 0,
-            fn: function() {}
+            fn: function () {}
         };
-        test.jsonEquals({expected: ['key'], actual: obj.ownProperties()});
+        test.jsonEquals(obj.ownProperties(), ['key']);
     }),
 
-    'merge should combine sender and receivers properties': tests.unit(function(test) {
-        test.jsonEquals({expected: {first: 1, second: 2}, actual: {first: 1}.merge({second: 2})});
+    'merge should combine sender and receivers properties': unitTest(function (test) {
+        test.jsonEquals({first: 1}.merge({second: 2}), {first: 1, second: 2});
     }),
 
-    'merge should overwrite property': tests.unit(function(test) {
-        test.jsonEquals({expected: {key: 'other'}, actual: {key: 'this'}.merge({key: 'other'})});
+    'merge should overwrite property': unitTest(function (test) {
+        test.jsonEquals({key: 'this'}.merge({key: 'other'}), {key: 'other'});
     }),
 
-    'merge should keep own functions': tests.unit(function(test) {
+    'merge should keep own functions': unitTest(function (test) {
         var obj = {
-            fn: function() { return 'true'; }
+            fn: function () { return 'true'; }
         };
         test.strictEqual({}.merge(obj).fn(), 'true');
     })
 });
 
 exports['Array'] = TestFixture({
-    'flatten should return empty array if provided an empty array': tests.unit(function(test) {
-        test.jsonEquals({expected: [], actual: [].flatten()});
+    'flatten should return empty array if provided an empty array': unitTest(function (test) {
+        test.jsonEquals([].flatten(), []);
     }),
 
-    'flatten should return array if no sub-arrays': tests.unit(function(test) {
-        test.jsonEquals({expected: [1, 'two', 3], actual: [1, 'two', 3].flatten()});
+    'flatten should return array if no sub-arrays': unitTest(function (test) {
+        test.jsonEquals([1, 'two', 3].flatten(), [1, 'two', 3]);
     }),
 
-    'flatten should flatten sub-arrays': tests.unit(function(test) {
+    'flatten should flatten sub-arrays': unitTest(function (test) {
         var original = [1, [2, 3], [4, 5, 6]];
-        test.jsonEquals({expected: [1, 2, 3, 4, 5, 6], actual: original.flatten()});
+        test.jsonEquals(original.flatten(), [1, 2, 3, 4, 5, 6]);
     })
 });
 
 exports['String'] = TestFixture({
-    'format should do nothing if no placeholders': tests.unit(function(test) {
-        test.equals({expected: 'test', actual: 'test'.format('ignore')});
+    'format should do nothing if no placeholders': unitTest(function (test) {
+        test.strictEqual('test'.format('ignore'), 'test');
     }),
 
-    'format should replace placeholders': tests.unit(function(test) {
-        test.equals({expected: 'test one two', actual: 'test {0} {1}'.format('one', 'two')});
+    'format should replace placeholders': unitTest(function (test) {
+        test.strictEqual('test {0} {1}'.format('one', 'two'), 'test one two');
     })
 });
 
