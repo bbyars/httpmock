@@ -10,14 +10,14 @@ var port = process.argv[2] || 3000
 
 var servers = {};
 
-http.createServer(function(request, response) {
+http.createServer(function (request, response) {
     request.setEncoding('utf8');
     request.body = '';
-    request.on('data', function(chunk) {
+    request.on('data', function (chunk) {
         request.body += chunk;
     });
 
-    request.on('end', function() {
+    request.on('end', function () {
         route(request, response);
     });
 }).listen(port);
@@ -60,13 +60,17 @@ var sendBaseHypermedia = function(request, response) {
 
 var createServer = function(request, response) {
     var responseSent = false,
-        port = JSON.parse(request.body).port,
-        server = spawn('node', ['stub.js', port]);
+        port = JSON.parse(request.body).port;
 
-    servers[port] = server;
+    if (servers[port]) {
+        response.writeHead(409);
+        response.end();
+        return;
+    }
 
-    server.stdout.setEncoding('utf8');
-    server.stdout.on('data', function(data) {
+    servers[port] = spawn('node', ['stub.js', port]);
+    servers[port].stdout.setEncoding('utf8');
+    servers[port].stdout.on('data', function(data) {
         console.log('[{0}]: {1}'.format(port, data));
 
         if (!responseSent) {
@@ -103,8 +107,8 @@ var deleteServerAtPort = function (port, request, response) {
         response.end();
     }
     else {
-        console.log('Killing server at port {0}'.format(port));
-        servers[port].kill();
+        servers[port].kill('SIGINT');
+        delete servers[port];
         response.writeHead(200);
         response.end();
     }

@@ -56,18 +56,18 @@ exports['Server'] = TestFixture({
         });
     },
 
-    /*'POST /servers returns 409 if server already created': function (test) {
-        createServerAtPort(3001, function (createResponse) {
-            test.strictEqual(createResponse.statusCode, 200);
+    'POST /servers returns 409 if server already created': function (test) {
+        createServerAtPort(3002, function (createResponse) {
+            test.strictEqual(createResponse.statusCode, 201);
 
-            createServerAtPort(3001, function (conflictResponse) {
+            createServerAtPort(3002, function (conflictResponse) {
                 test.strictEqual(conflictResponse.statusCode, 409);
-                deleteServerAtPort(3001, function () {
+                deleteServerAtPort(3002, function () {
                     test.done();
                 });
             });
         });
-    },*/
+    },
 
     'DELETE /servers/{port} deletes stub at given port': function (test) {
         createServerAtPort(3002, function (createResponse) {
