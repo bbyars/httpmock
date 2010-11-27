@@ -4,6 +4,7 @@ var TestFixture = require('nodeunit').testCase,
     sys = require('sys'),
     url = require('url'),
     http = require('http'),
+    exec  = require('child_process').exec,
     tests = require('../testExtensions');
 
 exports['Server'] = TestFixture({
@@ -132,7 +133,8 @@ var setDefaults = function (options) {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
-            'Content-type': 'application/json'
+            'Content-type': 'application/json',
+            'Host': url.parse(options.url).host
         },
         body: '',
         callback: function (response) {}

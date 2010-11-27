@@ -48,8 +48,8 @@ var sendBaseHypermedia = function(request, response) {
         servers: [],
         links: [
             {
-                href: 'http://localhost:3000/servers',
-                rel: 'http://localhost:3000/relations/servers'
+                href: absoluteUrl('/servers', request),
+                rel: absoluteUrl('/relations/servers', request)
             }
         ]
     };
@@ -78,22 +78,22 @@ var createServer = function(request, response) {
 
             response.writeHead(201, {
                 'Content-type': 'application/json',
-                'Location': 'http://localhost:3000/servers/3001'
+                'Location': absoluteUrl('/servers/' + port, request)
             });
 
             response.end(JSON.stringify({
                 links: [
                     {
-                        href: 'http://localhost:3000/servers/{0}'.format(port),
-                        rel: 'http://localhost:3000/relations/server'
+                        href: absoluteUrl('/servers/{0}'.format(port), request),
+                        rel: absoluteUrl('/relations/server', request)
                     },
                     {
-                        href: 'http://localhost:3000/servers/{0}/requests'.format(port),
-                        rel: 'http://localhost:3000/relations/request'
+                        href: absoluteUrl('/servers/{0}/requests'.format(port), request),
+                        rel: absoluteUrl('/relations/request', request)
                     },
                     {
-                        href: 'http://localhost:3000/server/{0}/stubs'.format(port),
-                        rel: 'http://localhost:3000/relations/stub'
+                        href: absoluteUrl('/server/{0}/stubs'.format(port), request),
+                        rel: absoluteUrl('/relations/stub', request)
                     }
                 ]
             }));
@@ -114,6 +114,10 @@ var deleteServerAtPort = function (port, request, response) {
     }
 };
 
+var absoluteUrl = function (endpoint, request) {
+    var host = request.headers['Host'] || 'localhost:' + port;
+    return 'http://{0}{1}'.format(host, endpoint);
+};
 /*
 Admin port only:
 GET /
