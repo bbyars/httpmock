@@ -6,9 +6,8 @@ var http = require('http'),
     spawn = require('child_process').spawn,
     repository = require('./lib/repository');
 
-var port = process.argv[2] || 3000
-
-var servers = {};
+var port = process.argv[2] || 3000,
+    servers = {};
 
 http.createServer(function (request, response) {
     request.setEncoding('utf8');
@@ -40,6 +39,12 @@ var route = function(request, response) {
     matches = resourceMethod.match(/DELETE \/servers\/(\d+)/i);
     if (matches) {
         deleteServerAtPort(matches[1], request, response);
+    }
+    else {
+        matches = resourceMethod.match(/GET \/servers\/(\d+)\/requests/i);
+        if (matches) {
+            sendRequests(matches[1], request, response);
+        }
     }
 };
 
@@ -112,6 +117,11 @@ var deleteServerAtPort = function (port, request, response) {
         response.writeHead(200);
         response.end();
     }
+};
+
+var sendRequests = function (port, request, response) {
+    response.writeHead(200, {'Content-type': 'application/json'});
+    response.end(JSON.stringify([]));
 };
 
 var absoluteUrl = function (endpoint, request) {

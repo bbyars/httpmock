@@ -58,12 +58,12 @@ exports['Server'] = TestFixture({
     },
 
     'POST /servers returns 409 if server already created': function (test) {
-        createServerAtPort(3002, function (createResponse) {
+        createServerAtPort(3003, function (createResponse) {
             test.strictEqual(createResponse.statusCode, 201);
 
-            createServerAtPort(3002, function (conflictResponse) {
+            createServerAtPort(3003, function (conflictResponse) {
                 test.strictEqual(conflictResponse.statusCode, 409);
-                deleteServerAtPort(3002, function () {
+                deleteServerAtPort(3003, function () {
                     test.done();
                 });
             });
@@ -71,8 +71,8 @@ exports['Server'] = TestFixture({
     },
 
     'DELETE /servers/{port} deletes stub at given port': function (test) {
-        createServerAtPort(3002, function (createResponse) {
-            del('http://localhost:3000/servers/3002', function (deleteResponse) {
+        createServerAtPort(3004, function (createResponse) {
+            del('http://localhost:3000/servers/3004', function (deleteResponse) {
                 test.strictEqual(deleteResponse.statusCode, 200);
                 //TODO: How do I test that I can't hit the stub server?
                 // get() throws an error, but asynchronously
@@ -87,20 +87,22 @@ exports['Server'] = TestFixture({
             test.done();
         });
     },
-/*
+
     'GET /servers/{port}/requests returns empty array if no requests to given url': function (test) {
-        createServerAtPort(3003, function (createResponse) {
-            get('http://localhost:3000/servers/3003/requests', function (response) {
-                test.strictEqual(response.body, JSON.stringify(
-                ));
-                deleteServerAtPort(3003, function () {
+        createServerAtPort(3005, function (createResponse) {
+            get('http://localhost:3000/servers/3005/requests', function (response) {
+                test.strictEqual(response.body, JSON.stringify([]));
+                deleteServerAtPort(3005, function () {
                     test.done();
                 });
-            }
+            });
         });
     }
 
-/*    'should enable setting up stub response': verify(function(test) {
+/*    
+'adding a server updates hypermedia GET /'
+'getting hypermedia about a server GET /servers/{port}
+'should enable setting up stub response': verify(function(test) {
         test.expect(3);
         createStubServerAtPort(3002, function(response) {
             setupStub({
