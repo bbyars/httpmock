@@ -13,13 +13,15 @@ var http = require('http'),
 var port = process.argv[2] || 3000,
     servers = {};
 
-var app = express.createServer();
+var app = express.createServer(
+    express.bodyDecoder(),
+    express.logger({format: ':method :url'})
+);
 app.listen(port);
-app.use(express.bodyDecoder());
 console.log('HTTPMock running at http://localhost:{0}'.format(port));
 
 app.get('/', function (request, response) {
-    var body = {
+    response.send({
         servers: [],
         links: [
             {
@@ -27,19 +29,16 @@ app.get('/', function (request, response) {
                 rel: absoluteUrl('/relations/servers', request)
             }
         ]
-    };
-
-    response.writeHead(200, {'Content-type': 'application/json'});
-    response.end(JSON.stringify(body));
+    });
 });
 
 app.post('/servers', function (request, response) {
     var responseSent = false,
-        port = request.body.port;
+        port = request.body.port,
+        body;
 
     if (servers[port]) {
-        response.writeHead(409);
-        response.end();
+        response.send(409);
         return;
     }
 
@@ -51,12 +50,7 @@ app.post('/servers', function (request, response) {
         if (!responseSent) {
             responseSent = true;
 
-            response.writeHead(201, {
-                'Content-type': 'application/json',
-                'Location': absoluteUrl('/servers/' + port, request)
-            });
-
-            response.end(JSON.stringify({
+            body = {
                 links: [
                     {
                         href: absoluteUrl('/servers/{0}'.format(port), request),
@@ -71,7 +65,8 @@ app.post('/servers', function (request, response) {
                         rel: absoluteUrl('/relations/stub', request)
                     }
                 ]
-            }));
+            };
+            response.send(body, {'Location': absoluteUrl('/servers/' + port, request)}, 201);
         }
     });
 });
@@ -79,20 +74,17 @@ app.post('/servers', function (request, response) {
 app.del('/servers/:port', function (request, response) {
     var port = request.params.port;
     if (!servers[port]) {
-        response.writeHead(404);
-        response.end();
+        response.send(404);
     }
     else {
         servers[port].kill('SIGINT');
         delete servers[port];
-        response.writeHead(200);
-        response.end();
+        response.send(200);
     }
 });
 
 app.get('servers/:port/requests', function (request, response) {
-    response.writeHead(200, {'Content-type': 'application/json'});
-    response.end(JSON.stringify([]));
+    response.send([]);
 });
 
 var absoluteUrl = function (endpoint, request) {
