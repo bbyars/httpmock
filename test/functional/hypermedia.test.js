@@ -73,7 +73,7 @@ exports['Server'] = TestFixture({
     'DELETE /servers/:port deletes stub at given port': function (test) {
         createServerAtPort(3004, function (createResponse) {
             del('http://localhost:3000/servers/3004', function (deleteResponse) {
-                test.strictEqual(deleteResponse.statusCode, 200);
+                test.strictEqual(deleteResponse.statusCode, 204);
                 //TODO: How do I test that I can't hit the stub server?
                 // get() throws an error, but asynchronously
                 test.done();

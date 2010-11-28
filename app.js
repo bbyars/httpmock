@@ -79,7 +79,7 @@ app.del('/servers/:port', function (request, response) {
     else {
         servers[port].kill('SIGINT');
         delete servers[port];
-        response.send(200);
+        response.send();
     }
 });
 
