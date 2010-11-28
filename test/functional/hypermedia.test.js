@@ -70,7 +70,7 @@ exports['Server'] = TestFixture({
         });
     },
 
-    'DELETE /servers/{port} deletes stub at given port': function (test) {
+    'DELETE /servers/:port deletes stub at given port': function (test) {
         createServerAtPort(3004, function (createResponse) {
             del('http://localhost:3000/servers/3004', function (deleteResponse) {
                 test.strictEqual(deleteResponse.statusCode, 200);
@@ -81,20 +81,21 @@ exports['Server'] = TestFixture({
         });
     },
 
-    'DELETE /servers/{port} returns 404 if server never created': function (test) {
+    'DELETE /servers/:port returns 404 if server never created': function (test) {
         del('http://localhost:3000/servers/5000', function (response) {
             test.strictEqual(response.statusCode, 404);
             test.done();
         });
-    }/*,
+    },
 
-    'GET /servers/{port}/requests returns empty array if no requests to given url': function (test) {
+    'GET /servers/:port/requests returns empty array if no requests to given url': function (test) {
         createServerAtPort(3005, function (createResponse) {
             get('http://localhost:3000/servers/3005/requests', function (response) {
                 test.strictEqual(response.body, JSON.stringify([]));
-                deleteServerAtPort(3005, function () {
+                /*deleteServerAtPort(3005, function () {
                     test.done();
-                });
+                });*/
+                test.done();
             });
         });
     }

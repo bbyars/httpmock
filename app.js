@@ -83,7 +83,7 @@ app.del('/servers/:port', function (request, response) {
     }
 });
 
-app.get('servers/:port/requests', function (request, response) {
+app.get('/servers/:port/requests', function (request, response) {
     response.send([]);
 });
 
