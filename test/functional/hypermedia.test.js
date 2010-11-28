@@ -86,7 +86,7 @@ exports['Server'] = TestFixture({
             test.strictEqual(response.statusCode, 404);
             test.done();
         });
-    },
+    }/*,
 
     'GET /servers/{port}/requests returns empty array if no requests to given url': function (test) {
         createServerAtPort(3005, function (createResponse) {

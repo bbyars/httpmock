@@ -1,54 +1,24 @@
 require('./lib/extensions');
 
+// Needed to require express locally
+require.paths.unshift(__dirname + '/deps/express/support/connect/lib');
+
 var http = require('http'),
     url = require('url'),
     sys = require('sys'),
     spawn = require('child_process').spawn,
+    express = require('./deps/express/lib/express'),
     repository = require('./lib/repository');
 
 var port = process.argv[2] || 3000,
     servers = {};
 
-http.createServer(function (request, response) {
-    request.setEncoding('utf8');
-    request.body = '';
-    request.on('data', function (chunk) {
-        request.body += chunk;
-    });
-
-    request.on('end', function () {
-        route(request, response);
-    });
-}).listen(port);
-
+var app = express.createServer();
+app.listen(port);
+app.use(express.bodyDecoder());
 console.log('HTTPMock running at http://localhost:{0}'.format(port));
 
-var route = function(request, response) {
-    var matches;
-
-    resourceMethod = request.method + ' ' + url.parse(request.url).pathname;
-    switch (resourceMethod) {
-        case 'GET /':
-            sendBaseHypermedia(request, response);
-            break;
-        case 'POST /servers':
-            createServer(request, response);
-            break;
-    }
-
-    matches = resourceMethod.match(/DELETE \/servers\/(\d+)/i);
-    if (matches) {
-        deleteServerAtPort(matches[1], request, response);
-    }
-    else {
-        matches = resourceMethod.match(/GET \/servers\/(\d+)\/requests/i);
-        if (matches) {
-            sendRequests(matches[1], request, response);
-        }
-    }
-};
-
-var sendBaseHypermedia = function(request, response) {
+app.get('/', function (request, response) {
     var body = {
         servers: [],
         links: [
@@ -61,11 +31,11 @@ var sendBaseHypermedia = function(request, response) {
 
     response.writeHead(200, {'Content-type': 'application/json'});
     response.end(JSON.stringify(body));
-};
+});
 
-var createServer = function(request, response) {
+app.post('/servers', function (request, response) {
     var responseSent = false,
-        port = JSON.parse(request.body).port;
+        port = request.body.port;
 
     if (servers[port]) {
         response.writeHead(409);
@@ -104,9 +74,10 @@ var createServer = function(request, response) {
             }));
         }
     });
-};
+});
 
-var deleteServerAtPort = function (port, request, response) {
+app.del('/servers/:port', function (request, response) {
+    var port = request.params.port;
     if (!servers[port]) {
         response.writeHead(404);
         response.end();
@@ -117,12 +88,12 @@ var deleteServerAtPort = function (port, request, response) {
         response.writeHead(200);
         response.end();
     }
-};
+});
 
-var sendRequests = function (port, request, response) {
+app.get('servers/:port/requests', function (request, response) {
     response.writeHead(200, {'Content-type': 'application/json'});
     response.end(JSON.stringify([]));
-};
+});
 
 var absoluteUrl = function (endpoint, request) {
     var host = request.headers['Host'] || 'localhost:' + port;
