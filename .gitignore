@@ -1,3 +1,4 @@
 *.swp
 .monitor
 *.swo
+data/
