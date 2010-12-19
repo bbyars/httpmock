@@ -67,33 +67,29 @@ exports['Server'] = TestFixture({
     },
 
     'GET /servers shows servers created': function (test) {
-        get('http://localhost:3000/servers', function (firstResponse) {
-            test.strictEqual(firstResponse.statusCode, 200);
-            test.strictEqual(firstResponse.body, JSON.stringify({ servers: [] }));
-
-            withServerAtPort(3002, test, function () {
-                get('http://localhost:3000/servers', function (secondResponse) {
-                    test.strictEqual(secondResponse.body, JSON.stringify({
-                        servers: [{
-                            url: 'http://localhost:3002/',
-                            port: 3002,
-                            links: [
-                                {
-                                    href: 'http://localhost:3000/servers/3002',
-                                    rel: 'http://localhost:3000/relations/server'
-                                },
-                                {
-                                    href: 'http://localhost:3000/servers/3002/requests',
-                                    rel: 'http://localhost:3000/relations/request'
-                                },
-                                {
-                                    href: 'http://localhost:3000/server/3002/stubs',
-                                    rel: 'http://localhost:3000/relations/stub'
-                                }
-                            ]
-                        }]
-                    }));
-                });
+        createServerAtPort(3002, function () {
+            get('http://localhost:3000/servers', function (response) {
+                test.strictEqual(response.body, JSON.stringify({
+                    servers: [{
+                        url: 'http://localhost:3002/',
+                        port: 3002,
+                        links: [
+                            {
+                                href: 'http://localhost:3000/servers/3002',
+                                rel: 'http://localhost:3000/relations/server'
+                            },
+                            {
+                                href: 'http://localhost:3000/servers/3002/requests',
+                                rel: 'http://localhost:3000/relations/request'
+                            },
+                            {
+                                href: 'http://localhost:3000/server/3002/stubs',
+                                rel: 'http://localhost:3000/relations/stub'
+                            }
+                        ]
+                    }]
+                }));
+                finish(3002, test);
             });
         });
     },
@@ -106,7 +102,7 @@ exports['Server'] = TestFixture({
     },
 
     'GET /servers/:port gets hypermedia for server': function (test) {
-        withServerAtPort(3001, test, function () {
+        createServerAtPort(3001, function () {
             get('http://localhost:3000/servers/3001', function (response) {
                 test.strictEqual(response.statusCode, 200);
                 test.strictEqual(response.body, JSON.stringify({
@@ -127,6 +123,7 @@ exports['Server'] = TestFixture({
                         }
                     ]
                 }));
+                finish(3001, test);
             });
         });
     },
@@ -151,17 +148,49 @@ exports['Server'] = TestFixture({
     },
 
     'GET /servers/:port/requests returns empty array if no requests to given url': function (test) {
-        createServerAtPort(3005, function (createResponse) {
+        createServerAtPort(3005, function () {
             get('http://localhost:3000/servers/3005/requests', function (response) {
                 test.strictEqual(response.body, JSON.stringify([]));
-                deleteServerAtPort(3005, function () {
-                    test.done();
-                });
+                finish(3005, test);
+            });
+        });
+    }/*,
+
+    'GET /servers/:port/requests returns requests to server': function (test) {
+        createServerAtPort(3006, test, function() {
+            getResponse({
+                method: 'GET',
+                url: 'http://localhost/3006/test',
+                headers: {
+                    'Accept': 'text/plain'
+                },
+                callback: function () {
+                    get('http://localhost:3000/servers/3006/requests', function (response) {
+                        test.strictEqual(response.body, JSON.stringify([
+                            {
+                                request: {
+                                    path: '/first',
+                                    headers: {
+                                        'Accept': 'text/plain'
+                                    },
+                                    body: ''
+                                },
+                                response: {
+                                    statusCode: 200,
+                                    headers: {
+                                    },
+                                    body: ''
+                                }
+                            }
+                        ]));
+                    });
+                    finish(3006, test);
+                }
             });
         });
     },
 
-    /*'should enable setting up stub response': function (test) {
+    /*'POST /servers/:port/stubs sets up stub response': function (test) {
         createStubServerAtPort(3002, function (createResponse) {
             post('http://localhost:3000/servers/3002/stubs', {
                 body: {
@@ -186,12 +215,8 @@ exports['Server'] = TestFixture({
                     }
                 }
             });
-        });*/
-
-/*
-'adding a server updates hypermedia GET /'
-'getting hypermedia about a server GET /servers/{port}
-*/
+        });
+    })*/
 });
 
 var setDefaults = function (options) {
@@ -253,11 +278,8 @@ var createServerAtPort = function (port, callback) {
     });
 };
 
-var withServerAtPort = function (port, test, callback) {
-    createServerAtPort(port, function () {
-        callback();
-        deleteServerAtPort(port, function () {
-            test.done();
-        });
+var finish = function (port, test) {
+    deleteServerAtPort(port, function () {
+        test.done();
     });
-};
+}
