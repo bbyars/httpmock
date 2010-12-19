@@ -56,11 +56,9 @@ exports['Server'] = TestFixture({
     },
 
     'POST /servers returns 409 if server already created': function (test) {
-        createServerAtPort(3003, function (createResponse) {
-            test.strictEqual(createResponse.statusCode, 201);
-
-            createServerAtPort(3003, function (conflictResponse) {
-                test.strictEqual(conflictResponse.statusCode, 409);
+        createServerAtPort(3003, function () {
+            createServerAtPort(3003, function (response) {
+                test.strictEqual(response.statusCode, 409);
                 deleteServerAtPort(3003, function () {
                     test.done();
                 });
@@ -73,7 +71,7 @@ exports['Server'] = TestFixture({
             test.strictEqual(firstResponse.statusCode, 200);
             test.strictEqual(firstResponse.body, JSON.stringify({ servers: [] }));
 
-            createServerAtPort(3002, function (createResponse) {
+            withServerAtPort(3002, test, function () {
                 get('http://localhost:3000/servers', function (secondResponse) {
                     test.strictEqual(secondResponse.body, JSON.stringify({
                         servers: [{
@@ -95,9 +93,6 @@ exports['Server'] = TestFixture({
                             ]
                         }]
                     }));
-                    deleteServerAtPort(3002, function () {
-                        test.done();
-                    });
                 });
             });
         });
@@ -111,7 +106,7 @@ exports['Server'] = TestFixture({
     },
 
     'GET /servers/:port gets hypermedia for server': function (test) {
-        createServerAtPort(3001, function (createResponse) {
+        withServerAtPort(3001, test, function () {
             get('http://localhost:3000/servers/3001', function (response) {
                 test.strictEqual(response.statusCode, 200);
                 test.strictEqual(response.body, JSON.stringify({
@@ -132,21 +127,18 @@ exports['Server'] = TestFixture({
                         }
                     ]
                 }));
-
-                deleteServerAtPort(3001, function () {
-                    test.done();
-                });
             });
         });
     },
 
     'DELETE /servers/:port deletes stub at given port': function (test) {
-        createServerAtPort(3004, function (createResponse) {
-            del('http://localhost:3000/servers/3004', function (deleteResponse) {
-                test.strictEqual(deleteResponse.statusCode, 204);
-                //TODO: How do I test that I can't hit the stub server?
-                // get() throws an error, but asynchronously
-                test.done();
+        createServerAtPort(3004, function () {
+            del('http://localhost:3000/servers/3004', function (response) {
+                test.strictEqual(response.statusCode, 204);
+                exec('netstat -an | grep 3004 | grep LISTEN', function (error, stdout, stderr) {
+                    test.strictEqual(stdout, '');
+                    test.done();
+                });
             });
         });
     },
@@ -258,5 +250,14 @@ var createServerAtPort = function (port, callback) {
     post('http://localhost:3000/servers', {
         body: { port: port },
         callback: callback
+    });
+};
+
+var withServerAtPort = function (port, test, callback) {
+    createServerAtPort(port, function () {
+        callback();
+        deleteServerAtPort(port, function () {
+            test.done();
+        });
     });
 };
