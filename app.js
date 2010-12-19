@@ -22,7 +22,6 @@ console.log('HTTPMock running at http://localhost:{0}'.format(port));
 
 app.get('/', function (request, response) {
     response.send({
-        servers: [],
         links: [
             {
                 href: absoluteUrl('/servers', request),
@@ -31,6 +30,20 @@ app.get('/', function (request, response) {
         ]
     });
 });
+
+app.get('/servers', function (request, response) {
+    var result = servers.ownProperties().reduce(function (accumulator, port) {
+        return accumulator.concat({
+            url: 'http://localhost:{0}/'.format(port),
+            port: parseInt(port),
+            links: [{
+                href: 'http://localhost:3000/servers/' + port,
+                rel: 'http://localhost:3000/relations/server'
+            }]
+        });
+    }, []);
+    response.send({ servers: result });
+}),
 
 app.post('/servers', function (request, response) {
     var responseSent = false,

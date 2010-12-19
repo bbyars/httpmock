@@ -11,7 +11,6 @@ exports['Server'] = TestFixture({
     'GET / returns base hypermedia': function (test) {
         get('http://localhost:3000/', function (response) {
             var expected = {
-                servers: [],
                 links: [
                     {
                         href: 'http://localhost:3000/servers',
@@ -70,6 +69,59 @@ exports['Server'] = TestFixture({
         });
     },
 
+    'GET /servers shows servers created': function (test) {
+        get('http://localhost:3000/servers', function (firstResponse) {
+            test.strictEqual(firstResponse.statusCode, 200);
+            test.strictEqual(firstResponse.body, JSON.stringify({ servers: [] }));
+
+            createServerAtPort(3002, function (createResponse) {
+                get('http://localhost:3000/servers', function (secondResponse) {
+                    test.strictEqual(secondResponse.body, JSON.stringify({
+                        servers: [{
+                            url: 'http://localhost:3002/',
+                            port: 3002,
+                            links: [{
+                                href: 'http://localhost:3000/servers/3002',
+                                rel: 'http://localhost:3000/relations/server'
+                            }]
+                        }]
+                    }));
+                    deleteServerAtPort(3002, function () {
+                        test.done();
+                    });
+                });
+            });
+        });
+    },
+
+    /*'GET / gets hypermedia for server': function (test) {
+        createServerAtPort(3001, function (createResponse) {
+            get('http://localhost:3000/servers', function (rootResponse) {
+                var expectedRootHypermedia = {
+                    servers: [{
+                        port: 3001,
+                        url: 'http://localhost:3001/',
+                        links: [
+                            {
+                                href: 'http://localhost:3000/servers/3001',
+                                rel: 'http://localhost:3000/relations/server'
+                            },
+                            {
+                                href: 'http://localhost:3000/servers/3001/requests',
+                                rel: 'http://localhost:3000/relations/request'
+                            },
+                            {
+                                href: 'http://localhost:3000/server/3001/stubs',
+                                rel: 'http://localhost:3000/relations/stub'
+                            }
+                        ]
+                    }],
+                };
+                test.strictEqual(rootResponse.body, JSON.stringify(expectedRootHypermedia));
+            });
+        });
+    },*/
+
     'DELETE /servers/:port deletes stub at given port': function (test) {
         createServerAtPort(3004, function (createResponse) {
             del('http://localhost:3000/servers/3004', function (deleteResponse) {
@@ -92,25 +144,19 @@ exports['Server'] = TestFixture({
         createServerAtPort(3005, function (createResponse) {
             get('http://localhost:3000/servers/3005/requests', function (response) {
                 test.strictEqual(response.body, JSON.stringify([]));
-                /*deleteServerAtPort(3005, function () {
+                deleteServerAtPort(3005, function () {
                     test.done();
-                });*/
-                test.done();
+                });
             });
         });
-    }
+    },
 
-/*    
-'adding a server updates hypermedia GET /'
-'getting hypermedia about a server GET /servers/{port}
-'should enable setting up stub response': verify(function(test) {
-        test.expect(3);
-        createStubServerAtPort(3002, function(response) {
-            setupStub({
-                url: getStubEndpoint(JSON.parse(response.body)),
-                stub: {
+    /*'should enable setting up stub response': function (test) {
+        createStubServerAtPort(3002, function (createResponse) {
+            post('http://localhost:3000/servers/3002/stubs', {
+                body: {
                     request: {
-                        path: "/test"
+                        path: '/test'
                     },
                     response: {
                         statusCode: 400,
@@ -118,17 +164,24 @@ exports['Server'] = TestFixture({
                         body: 'Testing 1..2..3..'
                     }
                 },
-                callback: function() {
-                    get('http://localhost:3002/test', function(response) {
+                callback: function (postResponse) {
+                    test.strictEqual(postResponse.statusCode, 200);
+                    get('http://localhost:3002/test', function (response) {
                         test.strictEqual(response.statusCode, 400);
                         test.strictEqual(response.headers['Content-type'], 'text/plain');
                         test.strictEqual(response.body, 'Testing 1..2..3..');
-                        test.done();
-                    });
+                        deleteServerAtPort(3002, function () {
+                            test.done();
+                        }
+                    }
                 }
             });
-        }));
-    },*/
+        });*/
+
+/*
+'adding a server updates hypermedia GET /'
+'getting hypermedia about a server GET /servers/{port}
+*/
 });
 
 var setDefaults = function (options) {
