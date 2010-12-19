@@ -10,15 +10,12 @@ var TestFixture = require('nodeunit').testCase,
 exports['Server'] = TestFixture({
     'GET / returns base hypermedia': function (test) {
         get('http://localhost:3000/', function (response) {
-            var expected = {
-                links: [
-                    {
-                        href: 'http://localhost:3000/servers',
-                        rel: 'http://localhost:3000/relations/servers'
-                    }
-                ]
-            };
-            test.strictEqual(response.body, JSON.stringify(expected));
+            test.strictEqual(response.body, JSON.stringify({
+                links: [{
+                    href: 'http://localhost:3000/servers',
+                    rel: 'http://localhost:3000/relations/servers'
+                }]
+            }));
             test.done();
         });
     },
@@ -30,6 +27,8 @@ exports['Server'] = TestFixture({
                 test.strictEqual(response.statusCode, 201);
                 test.strictEqual(response.headers.location, 'http://localhost:3000/servers/3001');
                 test.strictEqual(response.body, JSON.stringify({
+                    url: 'http://localhost:3001/',
+                    port: 3001,
                     links: [
                         {
                             href: 'http://localhost:3000/servers/3001',
@@ -80,10 +79,20 @@ exports['Server'] = TestFixture({
                         servers: [{
                             url: 'http://localhost:3002/',
                             port: 3002,
-                            links: [{
-                                href: 'http://localhost:3000/servers/3002',
-                                rel: 'http://localhost:3000/relations/server'
-                            }]
+                            links: [
+                                {
+                                    href: 'http://localhost:3000/servers/3002',
+                                    rel: 'http://localhost:3000/relations/server'
+                                },
+                                {
+                                    href: 'http://localhost:3000/servers/3002/requests',
+                                    rel: 'http://localhost:3000/relations/request'
+                                },
+                                {
+                                    href: 'http://localhost:3000/server/3002/stubs',
+                                    rel: 'http://localhost:3000/relations/stub'
+                                }
+                            ]
                         }]
                     }));
                     deleteServerAtPort(3002, function () {
@@ -94,33 +103,42 @@ exports['Server'] = TestFixture({
         });
     },
 
-    /*'GET / gets hypermedia for server': function (test) {
+    'GET /servers:port returns 404 if server not created': function (test) {
+        get('http://localhost:3000/servers/4000', function (response) {
+            test.strictEqual(response.statusCode, 404);
+            test.done();
+        });
+    },
+
+    'GET /servers/:port gets hypermedia for server': function (test) {
         createServerAtPort(3001, function (createResponse) {
-            get('http://localhost:3000/servers', function (rootResponse) {
-                var expectedRootHypermedia = {
-                    servers: [{
-                        port: 3001,
-                        url: 'http://localhost:3001/',
-                        links: [
-                            {
-                                href: 'http://localhost:3000/servers/3001',
-                                rel: 'http://localhost:3000/relations/server'
-                            },
-                            {
-                                href: 'http://localhost:3000/servers/3001/requests',
-                                rel: 'http://localhost:3000/relations/request'
-                            },
-                            {
-                                href: 'http://localhost:3000/server/3001/stubs',
-                                rel: 'http://localhost:3000/relations/stub'
-                            }
-                        ]
-                    }],
-                };
-                test.strictEqual(rootResponse.body, JSON.stringify(expectedRootHypermedia));
+            get('http://localhost:3000/servers/3001', function (response) {
+                test.strictEqual(response.statusCode, 200);
+                test.strictEqual(response.body, JSON.stringify({
+                    url: 'http://localhost:3001/',
+                    port: 3001,
+                    links: [
+                        {
+                            href: 'http://localhost:3000/servers/3001',
+                            rel: 'http://localhost:3000/relations/server'
+                        },
+                        {
+                            href: 'http://localhost:3000/servers/3001/requests',
+                            rel: 'http://localhost:3000/relations/request'
+                        },
+                        {
+                            href: 'http://localhost:3000/server/3001/stubs',
+                            rel: 'http://localhost:3000/relations/stub'
+                        }
+                    ]
+                }));
+
+                deleteServerAtPort(3001, function () {
+                    test.done();
+                });
             });
         });
-    },*/
+    },
 
     'DELETE /servers/:port deletes stub at given port': function (test) {
         createServerAtPort(3004, function (createResponse) {

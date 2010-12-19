@@ -33,14 +33,7 @@ app.get('/', function (request, response) {
 
 app.get('/servers', function (request, response) {
     var result = servers.ownProperties().reduce(function (accumulator, port) {
-        return accumulator.concat({
-            url: 'http://localhost:{0}/'.format(port),
-            port: parseInt(port),
-            links: [{
-                href: 'http://localhost:3000/servers/' + port,
-                rel: 'http://localhost:3000/relations/server'
-            }]
-        });
+        return accumulator.concat(serverHypermedia(port, request));
     }, []);
     response.send({ servers: result });
 }),
@@ -62,27 +55,22 @@ app.post('/servers', function (request, response) {
 
         if (!responseSent) {
             responseSent = true;
-
-            body = {
-                links: [
-                    {
-                        href: absoluteUrl('/servers/{0}'.format(port), request),
-                        rel: absoluteUrl('/relations/server', request)
-                    },
-                    {
-                        href: absoluteUrl('/servers/{0}/requests'.format(port), request),
-                        rel: absoluteUrl('/relations/request', request)
-                    },
-                    {
-                        href: absoluteUrl('/server/{0}/stubs'.format(port), request),
-                        rel: absoluteUrl('/relations/stub', request)
-                    }
-                ]
-            };
-            response.send(body, {'Location': absoluteUrl('/servers/' + port, request)}, 201);
+            response.send(serverHypermedia(port, request),
+                {'Location': absoluteUrl('/servers/' + port, request)}, 201);
         }
     });
 });
+
+app.get('/servers/:port', function (request, response) {
+    var port = request.params.port;
+
+    if (servers[port]) {
+        response.send(serverHypermedia(port, request));
+    }
+    else {
+        response.send(404);
+    }
+}),
 
 app.del('/servers/:port', function (request, response) {
     var port = request.params.port;
@@ -99,6 +87,27 @@ app.del('/servers/:port', function (request, response) {
 app.get('/servers/:port/requests', function (request, response) {
     response.send([]);
 });
+
+var serverHypermedia = function (port, request) {
+    return {
+        url: absoluteUrl('/', request).replace(/:\d+/, ':' + port),
+        port: parseInt(port),
+        links: [
+            {
+                href: absoluteUrl('/servers/{0}'.format(port), request),
+                rel: absoluteUrl('/relations/server', request)
+            },
+            {
+                href: absoluteUrl('/servers/{0}/requests'.format(port), request),
+                rel: absoluteUrl('/relations/request', request)
+            },
+            {
+                href: absoluteUrl('/server/{0}/stubs'.format(port), request),
+                rel: absoluteUrl('/relations/stub', request)
+            }
+        ]
+    };
+};
 
 var absoluteUrl = function (endpoint, request) {
     var host = request.headers['Host'] || 'localhost:' + port;

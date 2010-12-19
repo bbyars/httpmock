@@ -1,1 +1,5 @@
-Change String.format to a more interpolation style ala ruby
+* Change String.format to a more interpolation style ala ruby
+* Abstract the deleteServerAtPort(test.done()) idiom
+* Abstract the hypermedia for a single server; reuse for servers
+* Accept HTML; allow QA's to manually set up tests
+* Change content-type to something more specific
