@@ -1,6 +1,6 @@
 var TestFixture = require('nodeunit').testCase,
     verify = require('../testExtensions').verify,
-    repository = require('../../lib/repository');
+    repository = require('../../lib/repository').forServer(2000);
 
 exports['Repository'] = TestFixture({
     setUp: function (callback) {
