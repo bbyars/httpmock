@@ -5,10 +5,11 @@ require.paths.unshift(__dirname + '/deps/express/support/connect/lib');
 
 var http = require('http'),
     url = require('url'),
-    sys = require('sys'),
     spawn = require('child_process').spawn,
     express = require('./deps/express/lib/express'),
-    repository = require('./lib/repository');
+    repository = require('./lib/repository'),
+    isValidPortNumber = require('./lib/helpers').isValidPortNumber,
+    isPortInUse = require('./lib/helpers').isPortInUse;
 
 var port = process.argv[2] || 3000,
     servers = {};
@@ -43,21 +44,33 @@ app.post('/servers', function (request, response) {
         port = request.body.port,
         body;
 
-    if (servers[port]) {
-        response.send(409);
+    if (!port) {
+        response.send({ message: 'port is a required field' }, 400);
         return;
     }
 
-    servers[port] = spawn('node', ['stub.js', port]);
-    servers[port].stdout.setEncoding('utf8');
-    servers[port].stdout.on('data', function(data) {
-        console.log('[{0}]: {1}'.format(port, data));
+    if (!isValidPortNumber(port)) {
+        response.send({ message: 'port must be a valid integer between 1 and 65535' }, 400);
+        return;
+    }
 
-        if (!responseSent) {
-            responseSent = true;
-            response.send(serverHypermedia(port, request),
-                {'Location': absoluteUrl('/servers/' + port, request)}, 201);
+    isPortInUse(port, function (isInUse) {
+        if (isInUse) {
+            response.send(409);
+            return;
         }
+
+        servers[port] = spawn('node', ['stub.js', port]);
+        servers[port].stdout.setEncoding('utf8');
+        servers[port].stdout.on('data', function(data) {
+            console.log('[{0}]: {1}'.format(port, data));
+
+            if (!responseSent) {
+                responseSent = true;
+                response.send(serverHypermedia(port, request),
+                    {'Location': absoluteUrl('/servers/' + port, request)}, 201);
+            }
+        });
     });
 });
 
@@ -113,6 +126,7 @@ var absoluteUrl = function (endpoint, request) {
     var host = request.headers['Host'] || 'localhost:' + port;
     return 'http://{0}{1}'.format(host, endpoint);
 };
+
 /*
 Admin port only:
 GET /

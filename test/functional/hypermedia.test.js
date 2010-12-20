@@ -1,11 +1,9 @@
 require('../../lib/extensions');
 
 var TestFixture = require('nodeunit').testCase,
-    sys = require('sys'),
     url = require('url'),
     http = require('http'),
-    exec  = require('child_process').exec,
-    tests = require('../testExtensions');
+    exec  = require('child_process').exec;
 
 exports['Server'] = TestFixture({
     'GET / returns base hypermedia': function (test) {
@@ -55,14 +53,36 @@ exports['Server'] = TestFixture({
         });
     },
 
-    'POST /servers returns 409 if server already created': function (test) {
-        createServerAtPort(3003, function () {
-            createServerAtPort(3003, function (response) {
-                test.strictEqual(response.statusCode, 409);
-                deleteServerAtPort(3003, function () {
-                    test.done();
-                });
-            });
+    'POST /servers returns 409 if port already in use': function (test) {
+        createServerAtPort(3000, function (response) {
+            test.strictEqual(response.statusCode, 409);
+            test.done();
+        });
+    },
+
+    'POST /servers returns 400 if port missing': function (test) {
+        post('http://localhost:3000/servers', {
+            body: { },
+            callback: function (response) {
+                test.strictEqual(response.statusCode, 400);
+                test.strictEqual(response.body, JSON.stringify({
+                    message: 'port is a required field'
+                }));
+                test.done();
+            }
+        });
+    },
+
+    'POST /servers returns 400 if port is not a number': function (test) {
+        post('http://localhost:3000/servers', {
+            body: { port: 'test' },
+            callback: function (response) {
+                test.strictEqual(response.statusCode, 400);
+                test.strictEqual(response.body, JSON.stringify({
+                    message: 'port must be a valid integer between 1 and 65535'
+                }));
+                test.done();
+            }
         });
     },
 
@@ -157,10 +177,10 @@ exports['Server'] = TestFixture({
     }/*,
 
     'GET /servers/:port/requests returns requests to server': function (test) {
-        createServerAtPort(3006, test, function() {
+        createServerAtPort(3006, function () {
             getResponse({
                 method: 'GET',
-                url: 'http://localhost/3006/test',
+                url: 'http://localhost:3006/test',
                 headers: {
                     'Accept': 'text/plain'
                 },
@@ -169,7 +189,7 @@ exports['Server'] = TestFixture({
                         test.strictEqual(response.body, JSON.stringify([
                             {
                                 request: {
-                                    path: '/first',
+                                    path: '/test',
                                     headers: {
                                         'Accept': 'text/plain'
                                     },
@@ -188,7 +208,7 @@ exports['Server'] = TestFixture({
                 }
             });
         });
-    },
+    }/*,
 
     /*'POST /servers/:port/stubs sets up stub response': function (test) {
         createStubServerAtPort(3002, function (createResponse) {

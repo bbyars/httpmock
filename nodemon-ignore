@@ -1,6 +1,8 @@
 /test/*
+*.swo
 *.swp
 ./.git/*
+/data/*
 TODO
 README
 LICENSE

@@ -1,20 +1,22 @@
 var http = require('http'),
-    sys = require('sys'),
     url = require('url'),
-    repository = require('./lib/repository');
-
-var port = process.argv[2];
+    port = process.argv[2],
+    repository = require('./lib/repository').forServer(port);
 
 http.createServer(function(request, response) {
     var resourceMethod = request.method + ' ' + url.parse(request.url).pathname;
     console.log(resourceMethod);
-    response.writeHead(200);
-    response.end();
+
+    //repository.save(request, function () {
+        response.writeHead(200);
+        response.end();
+    //});
 }).listen(port);
 
 console.log('Open for business...');
 
 process.on('SIGINT', function () {
+    //repository.clear....
     console.log('Ciao...');
     process.exit();
 });

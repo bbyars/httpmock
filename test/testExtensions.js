@@ -20,4 +20,8 @@ var addCustomAsserts = function (test) {
         );
         test.strictEqual(JSON.stringify(actual), JSON.stringify(expected), message);
     };
+
+    test.notOk = function (actual, message) {
+        test.ok(!actual, message);
+    };
 };
