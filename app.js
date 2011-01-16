@@ -60,25 +60,10 @@ app.post('/servers', function (request, response) {
             return;
         }
 
-        servers[port] = http.createServer(function(request, response) {
-            var resourceMethod = request.method + ' ' + url.parse(request.url).pathname;
-            console.log(resourceMethod);
-            console.log(logPrefix + resourceMethod);
-
-            //repository.save(request, function () {
-                response.writeHead(200);
-                response.end();
-            //});
-        });
-        servers[port].listen(port, function () {
-            console.log(logPrefix + 'Open for business...');
+        createStub(port, function (server) {
+            servers[port] = server;
             response.send(serverHypermedia(port, request),
                 {'Location': absoluteUrl('/servers/' + port, request)}, 201);
-        });
-
-        servers[port].on('close', function () {
-            //repository.clear....
-            console.log(logPrefix + 'Ciao...');
         });
     });
 });
@@ -134,6 +119,29 @@ var serverHypermedia = function (port, request) {
 var absoluteUrl = function (endpoint, request) {
     var host = request.headers['Host'] || 'localhost:' + port;
     return 'http://{0}{1}'.format(host, endpoint);
+};
+
+var createStub = function (port, callback) {
+    var logPrefix = '[{0}]: '.format(port),
+        server;
+
+    server = http.createServer(function(request, response) {
+        var resourceMethod = request.method + ' ' + url.parse(request.url).pathname;
+        console.log(logPrefix + resourceMethod);
+
+        //repository.save(request, function () {
+            response.writeHead(200);
+            response.end();
+        //});
+    });
+    server.on('close', function () {
+        //repository.clear....
+        console.log(logPrefix + 'Ciao...');
+    });
+    server.listen(port, function () {
+        console.log(logPrefix + 'Open for business...');
+        callback(server);
+    });
 };
 
 /*
