@@ -40,8 +40,8 @@ app.get('/servers', function (request, response) {
 }),
 
 app.post('/servers', function (request, response) {
-    var responseSent = false,
-        port = request.body.port,
+    var port = request.body.port,
+        logPrefix = '[{0}]: '.format(port),
         body;
 
     if (!port) {
@@ -56,20 +56,29 @@ app.post('/servers', function (request, response) {
 
     isPortInUse(port, function (isInUse) {
         if (isInUse) {
-            response.send(409);
+            response.send({ message: 'port in use' }, 409);
             return;
         }
 
-        servers[port] = spawn('node', ['stub.js', port]);
-        servers[port].stdout.setEncoding('utf8');
-        servers[port].stdout.on('data', function(data) {
-            console.log('[{0}]: {1}'.format(port, data));
+        servers[port] = http.createServer(function(request, response) {
+            var resourceMethod = request.method + ' ' + url.parse(request.url).pathname;
+            console.log(resourceMethod);
+            console.log(logPrefix + resourceMethod);
 
-            if (!responseSent) {
-                responseSent = true;
-                response.send(serverHypermedia(port, request),
-                    {'Location': absoluteUrl('/servers/' + port, request)}, 201);
-            }
+            //repository.save(request, function () {
+                response.writeHead(200);
+                response.end();
+            //});
+        });
+        servers[port].listen(port, function () {
+            console.log(logPrefix + 'Open for business...');
+            response.send(serverHypermedia(port, request),
+                {'Location': absoluteUrl('/servers/' + port, request)}, 201);
+        });
+
+        servers[port].on('close', function () {
+            //repository.clear....
+            console.log(logPrefix + 'Ciao...');
         });
     });
 });
@@ -91,7 +100,7 @@ app.del('/servers/:port', function (request, response) {
         response.send(404);
     }
     else {
-        servers[port].kill('SIGINT');
+        servers[port].close();
         delete servers[port];
         response.send();
     }
