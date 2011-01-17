@@ -5,11 +5,11 @@ require.paths.unshift(__dirname + '/deps/express/support/connect/lib');
 
 var http = require('http'),
     url = require('url'),
-    spawn = require('child_process').spawn,
     express = require('./deps/express/lib/express'),
     repository = require('./lib/repository'),
     isValidPortNumber = require('./lib/helpers').isValidPortNumber,
-    isPortInUse = require('./lib/helpers').isPortInUse;
+    isPortInUse = require('./lib/helpers').isPortInUse,
+    stub = require('./lib/stub');
 
 var port = process.argv[2] || 3000,
     servers = {};
@@ -60,7 +60,7 @@ app.post('/servers', function (request, response) {
             return;
         }
 
-        createStub(port, function (server) {
+        stub.create(port, function (server) {
             servers[port] = server;
             response.send(serverHypermedia(port, request),
                 {'Location': absoluteUrl('/servers/' + port, request)}, 201);
@@ -119,29 +119,6 @@ var serverHypermedia = function (port, request) {
 var absoluteUrl = function (endpoint, request) {
     var host = request.headers['Host'] || 'localhost:' + port;
     return 'http://{0}{1}'.format(host, endpoint);
-};
-
-var createStub = function (port, callback) {
-    var logPrefix = '[{0}]: '.format(port),
-        server;
-
-    server = http.createServer(function(request, response) {
-        var resourceMethod = request.method + ' ' + url.parse(request.url).pathname;
-        console.log(logPrefix + resourceMethod);
-
-        //repository.save(request, function () {
-            response.writeHead(200);
-            response.end();
-        //});
-    });
-    server.on('close', function () {
-        //repository.clear....
-        console.log(logPrefix + 'Ciao...');
-    });
-    server.listen(port, function () {
-        console.log(logPrefix + 'Open for business...');
-        callback(server);
-    });
 };
 
 /*
