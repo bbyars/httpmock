@@ -1,12 +1,12 @@
 require('./lib/extensions');
 
-// Needed to require express locally
-require.paths.unshift(__dirname + '/deps/express/support/connect/lib');
+// Needed to require express locally; it does a require('connect')
+require.paths.unshift(__dirname + '/deps/connect/lib');
 
 var http = require('http'),
     url = require('url'),
     express = require('./deps/express/lib/express'),
-    repository = require('./lib/repository'),
+    repositories = require('./lib/repository'),
     isValidPortNumber = require('./lib/helpers').isValidPortNumber,
     isPortInUse = require('./lib/helpers').isPortInUse,
     stub = require('./lib/stub');
@@ -16,7 +16,7 @@ var port = process.argv[2] || 3000,
 
 var app = express.createServer(
     express.bodyDecoder(),
-    express.logger({format: ':method :url'})
+    express.logger({format: '[ROOT]: :method :url'})
 );
 app.listen(port);
 console.log('HTTPMock running at http://localhost:{0}'.format(port));
@@ -92,7 +92,15 @@ app.del('/servers/:port', function (request, response) {
 });
 
 app.get('/servers/:port/requests', function (request, response) {
-    response.send([]);
+    var port = request.params.port;
+    if (!servers[port]) {
+        response.send(404);
+    }
+    else {
+        servers[port].loadRequests(function (results) {
+            response.send(results);
+        });
+    }
 });
 
 var serverHypermedia = function (port, request) {

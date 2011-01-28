@@ -167,6 +167,13 @@ exports['Server'] = TestFixture({
         });
     },
 
+    'GET /servers/:port/requests returns 404 if server not created': function (test) {
+        get('http://localhost:3000/servers/1234/requests', function (response) {
+            test.strictEqual(response.statusCode, 404);
+            test.done();
+        });
+    }/*,
+
     'GET /servers/:port/requests returns empty array if no requests to given url': function (test) {
         createServerAtPort(3005, function () {
             get('http://localhost:3000/servers/3005/requests', function (response) {
@@ -174,9 +181,9 @@ exports['Server'] = TestFixture({
                 finish(3005, test);
             });
         });
-    }/*,
+    },
 
-    'GET /servers/:port/requests returns requests to server': function (test) {
+    /*'GET /servers/:port/requests returns requests to server': function (test) {
         createServerAtPort(3006, function () {
             getResponse({
                 method: 'GET',
@@ -203,12 +210,12 @@ exports['Server'] = TestFixture({
                                 }
                             }
                         ]));
+                        finish(3006, test);
                     });
-                    finish(3006, test);
                 }
             });
         });
-    }/*,
+    },
 
     /*'POST /servers/:port/stubs sets up stub response': function (test) {
         createStubServerAtPort(3002, function (createResponse) {
