@@ -181,9 +181,11 @@ exports['Server'] = TestFixture({
                 finish(3005, test);
             });
         });
-    }/*,
+    },
 
     'GET /servers/:port/requests returns requests to server': function (test) {
+        var result;
+
         createServerAtPort(3006, function () {
             getResponse({
                 method: 'GET',
@@ -193,23 +195,11 @@ exports['Server'] = TestFixture({
                 },
                 callback: function () {
                     get('http://localhost:3000/servers/3006/requests', function (response) {
-                        test.strictEqual(response.body, JSON.stringify([
-                            {
-                                request: {
-                                    path: '/test',
-                                    headers: {
-                                        'Accept': 'text/plain'
-                                    },
-                                    body: ''
-                                },
-                                response: {
-                                    statusCode: 200,
-                                    headers: {
-                                    },
-                                    body: ''
-                                }
-                            }
-                        ]));
+                        test.strictEqual(response.parsedBody.length, 1);
+                        result = response.parsedBody[0];
+                        test.strictEqual(result.path, '/test');
+                        test.strictEqual(result.request.headers['accept'], 'text/plain');
+                        test.strictEqual(result.response.statusCode, 200);
                         finish(3006, test);
                     });
                 }
@@ -217,7 +207,11 @@ exports['Server'] = TestFixture({
         });
     },
 
-    /*'POST /servers/:port/stubs sets up stub response': function (test) {
+    /*
+    add querystring filtering:
+    http://localhost:3000/servers/3006/requests?path=/test/1
+
+    'POST /servers/:port/stubs sets up stub response': function (test) {
         createStubServerAtPort(3002, function (createResponse) {
             post('http://localhost:3000/servers/3002/stubs', {
                 body: {
@@ -277,6 +271,9 @@ var getResponse = function (options) {
         });
 
         response.on('end', function () {
+            if (response.headers['content-type'] === 'application/json') {
+                response.parsedBody = JSON.parse(response.body);
+            }
             spec.callback(response);
         });
     });

@@ -92,14 +92,15 @@ app.del('/servers/:port', function (request, response) {
 });
 
 app.get('/servers/:port/requests', function (request, response) {
-    var port = request.params.port;
+    var port = request.params.port,
+        results;
+
     if (!servers[port]) {
         response.send(404);
     }
     else {
-        servers[port].loadRequests(function (results) {
-            response.send(results);
-        });
+        results = servers[port].loadRequests();
+        response.send(results);
     }
 });
 

@@ -1,73 +1,54 @@
 var TestFixture = require('nodeunit').testCase,
-    verify = require('../testExtensions').verify,
-    repository = require('../../lib/repository').forServer(2000);
+    unitTest = require('../testExtensions').unitTest,
+    createRepository = require('../../lib/repository').create;
 
 exports['Repository'] = TestFixture({
-    setUp: function (callback) {
-        repository.clear(callback);
-    },
-
-    'should return empty array if nothing recorded': verify(function (test) {
-        repository.load('path', function (requests) {
-            test.jsonEquals(requests, []);
-            test.done();
-        });
+    'should return empty array if nothing recorded': unitTest(function (test) {
+        var repository = createRepository();
+        test.jsonEquals(repository.load('/path'), []);
     }),
 
-    'should return request if under correct path': verify(function (test) {
-        repository.save({path: 'test'}, function () {
-            repository.load('test', function (requests) {
-                test.jsonEquals(requests, [{path: 'test'}]);
-                test.done();
-            });
-        });
+    'should return request if under correct path': unitTest(function (test) {
+        var repository = createRepository();
+        repository.save({path: '/test'});
+        test.jsonEquals(repository.load('/test'), [{path: '/test'}]);
     }),
 
-    'should not return request under different path': verify(function (test) {
-        repository.save({path: 'not-test'}, function () {
-            repository.load('test', function (requests) {
-                test.jsonEquals(requests, []);
-                test.done();
-            });
-        });
+    'should not return request under different path': unitTest(function (test) {
+        var repository = createRepository();
+        repository.save({path: '/not-test'});
+        test.jsonEquals(repository.load('/test'), []);
     }),
 
-    'should return request under subpath': verify(function (test) {
-        repository.save({path: 'test/sub'}, function () {
-            repository.load('test', function (requests) {
-                test.jsonEquals(requests, [{path: 'test/sub'}]);
-                test.done();
-            });
-        });
+    'should return request under subpath': unitTest(function (test) {
+        var repository = createRepository();
+        repository.save({path: '/test/sub'});
+        test.jsonEquals(repository.load('/test'), [{path: '/test/sub'}]);
     }),
 
-    'should only match full path part': verify(function (test) {
-        repository.save({path: 'test2'}, function () {
-            repository.save({path: 'test'}, function () {
-                repository.load('test', function (requests) {
-                    test.jsonEquals(requests, [{path: 'test'}]);
-                    test.done();
-                });
-            });
-        });
+    'should only match full path part': unitTest(function (test) {
+        var repository = createRepository();
+        repository.save({path: '/test2'});
+        repository.save({path: '/test'});
+        test.jsonEquals(repository.load('/test'), [{path: '/test'}]);
     }),
 
-    'should compare path case insensitive': verify(function (test) {
-        repository.save({path: 'test/sub'}, function () {
-            repository.load('TEST', function (requests) {
-                test.jsonEquals(requests, [{path: 'test/sub'}]);
-                test.done();
-            });
-        });
+    'should compare path case insensitive': unitTest(function (test) {
+        var repository = createRepository();
+        repository.save({path: '/test/sub'});
+        test.jsonEquals(repository.load('/TEST'), [{path: '/test/sub'}]);
     }),
 
-    'should handle paths matching prototype members': verify(function (test) {
-        repository.save({path: 'constructor'}, function () {
-            repository.load('constructor', function (requests) {
-                test.jsonEquals(requests, [{path: 'constructor'}]);
-                test.done();
-            });
-        });
+    'should handle paths matching prototype members': unitTest(function (test) {
+        var repository = createRepository();
+        repository.save({path: '/constructor'});
+        test.jsonEquals(repository.load('/constructor'), [{path: '/constructor'}]);
+    }),
+
+    'should return all if loading /': unitTest(function (test) {
+        var repository = createRepository();
+        repository.save({path: '/test'});
+        test.jsonEquals(repository.load('/'), [{path: '/test'}]);
     })
 });
 
