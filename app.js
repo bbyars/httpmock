@@ -33,7 +33,7 @@ app.get('/', function (request, response) {
 });
 
 app.get('/servers', function (request, response) {
-    var result = servers.ownProperties().reduce(function (accumulator, port) {
+    var result = Object.keys(servers).reduce(function (accumulator, port) {
         return accumulator.concat(serverHypermedia(port, request));
     }, []);
     response.send({ servers: result });
