@@ -9,7 +9,7 @@ var http = require('http'),
     repositories = require('./lib/repository'),
     isValidPortNumber = require('./lib/helpers').isValidPortNumber,
     isPortInUse = require('./lib/helpers').isPortInUse,
-    stub = require('./lib/stub');
+    server = require('./lib/server');
 
 var port = process.argv[2] || 3000,
     servers = {};
@@ -60,7 +60,7 @@ app.post('/servers', function (request, response) {
             return;
         }
 
-        stub.create(port, function (server) {
+        server.create(port, function (server) {
             servers[port] = server;
             response.send(serverHypermedia(port, request),
                 {'Location': absoluteUrl('/servers/' + port, request)}, 201);
