@@ -2,7 +2,6 @@
 * Accept HTML; allow QA's to manually set up tests
 * Add HTML pages for the different rel urls
 * Use verify in functional tests
-* Split functional tests (request saving, stubbing)
 * Allow retrieving stubs per server, deleting some
 * Allow ordering stub calls to same path to simulate state change
 
