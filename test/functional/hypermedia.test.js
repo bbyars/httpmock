@@ -207,10 +207,27 @@ exports['Server'] = TestFixture({
         });
     },
 
-    /*
-    add querystring filtering:
-    http://localhost:3000/servers/3006/requests?path=/test/1
+    'GET /servers/:port/requests?path=:filter filters requests sent back': function (test) {
+        var result;
 
+        createServerAtPort(3007, function () {
+            get('http://localhost:3007/first', function () {
+                get ('http://localhost:3007/second', function () {
+                    get('http://localhost:3007/second/again', function () {
+                        get('http://localhost:3000/servers/3007/requests?path=/second', function (response) {
+                            result = JSON.stringify(response.parsedBody.map(function (item) {
+                                return item.path;
+                            }));
+                            test.strictEqual(result, JSON.stringify(['/second', '/second/again']));
+                            finish(3007, test);
+                        });
+                    });
+                });
+            });
+        });
+    },
+
+    /*
     'POST /servers/:port/stubs sets up stub response': function (test) {
         createStubServerAtPort(3002, function (createResponse) {
             post('http://localhost:3000/servers/3002/stubs', {
@@ -256,8 +273,9 @@ var setDefaults = function (options) {
 var getResponse = function (options) {
     var spec = setDefaults(options),
         urlParts = url.parse(spec.url),
+        path = urlParts.pathname + (urlParts.search || ''),
         client = http.createClient(urlParts.port, urlParts.hostname),
-        request = client.request(spec.method, urlParts.pathname, spec.headers);
+        request = client.request(spec.method, path, spec.headers);
 
     request.write(JSON.stringify(spec.body));
     request.end();

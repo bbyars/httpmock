@@ -93,13 +93,14 @@ app.del('/servers/:port', function (request, response) {
 
 app.get('/servers/:port/requests', function (request, response) {
     var port = request.params.port,
+        path = request.query.path,
         results;
 
     if (!servers[port]) {
         response.send(404);
     }
     else {
-        results = servers[port].loadRequests();
+        results = servers[port].loadRequests(path);
         response.send(results);
     }
 });
