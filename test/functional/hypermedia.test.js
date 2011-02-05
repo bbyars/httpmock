@@ -8,6 +8,7 @@ var TestFixture = require('nodeunit').testCase,
 exports['Server'] = TestFixture({
     'GET / returns base hypermedia': function (test) {
         get('http://localhost:3000/', function (response) {
+            test.strictEqual(response.headers['content-type'], 'application/vnd.httpmock+json');
             test.strictEqual(response.body, JSON.stringify({
                 links: [{
                     href: 'http://localhost:3000/servers',
@@ -257,8 +258,8 @@ var setDefaults = function (options) {
     return {
         method: 'GET',
         headers: {
-            'Accept': 'application/json',
-            'Content-type': 'application/json',
+            'Accept': 'application/vnd.httpmock+json',
+            'Content-type': 'application/vnd.httpmock+json',
             'Host': url.parse(options.url).host
         },
         body: '',
@@ -285,7 +286,7 @@ var getResponse = function (options) {
         });
 
         response.on('end', function () {
-            if (response.headers['content-type'] === 'application/json') {
+            if (response.headers['content-type'] === 'application/vnd.httpmock+json') {
                 response.parsedBody = JSON.parse(response.body);
             }
             spec.callback(response);

@@ -3,6 +3,8 @@ require('./lib/extensions');
 // Needed to require express locally; it does a require('connect')
 require.paths.unshift(__dirname + '/deps/connect/lib');
 
+var CONTENT_TYPE = 'application/vnd.httpmock+json';
+
 var http = require('http'),
     url = require('url'),
     express = require('./deps/express/lib/express'),
@@ -12,11 +14,17 @@ var http = require('http'),
     server = require('./lib/server');
 
 var port = process.argv[2] || 3000,
-    servers = {};
+    servers = {},
+    contentHeader = {
+        'Content-Type': CONTENT_TYPE
+    };
+
+
+require('connect/middleware/bodyDecoder').decode[CONTENT_TYPE] = JSON.parse;
 
 var app = express.createServer(
-    express.bodyDecoder(),
-    express.logger({format: '[ROOT]: :method :url'})
+    express.logger({format: '[ROOT]: :method :url'}),
+    express.bodyDecoder()
 );
 app.listen(port);
 console.log('HTTPMock running at http://localhost:{0}'.format(port));
@@ -29,14 +37,14 @@ app.get('/', function (request, response) {
                 rel: absoluteUrl('/relations/servers', request)
             }
         ]
-    });
+    }, contentHeader);
 });
 
 app.get('/servers', function (request, response) {
     var result = Object.keys(servers).reduce(function (accumulator, port) {
         return accumulator.concat(serverHypermedia(port, request));
     }, []);
-    response.send({ servers: result });
+    response.send({ servers: result }, contentHeader);
 }),
 
 app.post('/servers', function (request, response) {
@@ -63,7 +71,8 @@ app.post('/servers', function (request, response) {
         server.create(port, function (server) {
             servers[port] = server;
             response.send(serverHypermedia(port, request),
-                {'Location': absoluteUrl('/servers/' + port, request)}, 201);
+                contentHeader.merge({'Location': absoluteUrl('/servers/' + port, request)}),
+                201);
         });
     });
 });
@@ -72,7 +81,7 @@ app.get('/servers/:port', function (request, response) {
     var port = request.params.port;
 
     if (servers[port]) {
-        response.send(serverHypermedia(port, request));
+        response.send(serverHypermedia(port, request), contentHeader);
     }
     else {
         response.send(404);
@@ -101,7 +110,7 @@ app.get('/servers/:port/requests', function (request, response) {
     }
     else {
         results = servers[port].loadRequests(path);
-        response.send(results);
+        response.send(results, contentHeader);
     }
 });
 
