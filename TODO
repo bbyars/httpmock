@@ -1,7 +1,6 @@
 * Remove string.format for something more javascript like
 * Accept HTML; allow QA's to manually set up tests
 * Add HTML pages for the different rel urls
-* Use verify in functional tests
 * Allow retrieving stubs per server, deleting some
 * Allow ordering stub calls to same path to simulate state change
 

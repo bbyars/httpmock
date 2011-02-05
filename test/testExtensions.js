@@ -1,6 +1,7 @@
 var url = require('url'),
     http = require('http');
 
+// Allows async
 exports.verify = function (f) {
     return function (test) {
         addCustomAsserts(test);
@@ -8,6 +9,7 @@ exports.verify = function (f) {
     };
 };
 
+// No async
 exports.unitTest = function (f) {
     return function (test) {
         addCustomAsserts(test);
@@ -19,10 +21,7 @@ exports.unitTest = function (f) {
 var addCustomAsserts = function (test) {
     test.jsonEquals = function (actual, expected, message) {
         var json = function (obj) {
-            if (typeof obj === 'object') {
-                return JSON.stringify(obj);
-            }
-            return obj;
+            return (typeof obj === 'object') ? JSON.stringify(obj) : obj;
         };
 
         message = message || 'JSON not equal\nExpected:\n{0}\n\nActual:\n{1}'.format(
