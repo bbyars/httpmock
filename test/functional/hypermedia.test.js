@@ -227,34 +227,30 @@ exports['Server'] = TestFixture({
         });
     },
 
-    /*
     'POST /servers/:port/stubs sets up stub response': function (test) {
-        createStubServerAtPort(3002, function (createResponse) {
+        createServerAtPort(3002, function () {
             post('http://localhost:3000/servers/3002/stubs', {
                 body: {
-                    request: {
-                        path: '/test'
-                    },
+                    path: '/test',
                     response: {
                         statusCode: 400,
-                        headers: { 'Content-type': 'text/plain' },
+                        headers: { 'Content-Type': 'text/plain' },
                         body: 'Testing 1..2..3..'
                     }
                 },
                 callback: function (postResponse) {
-                    test.strictEqual(postResponse.statusCode, 200);
+                    test.strictEqual(postResponse.statusCode, 204);
+
                     get('http://localhost:3002/test', function (response) {
                         test.strictEqual(response.statusCode, 400);
-                        test.strictEqual(response.headers['Content-type'], 'text/plain');
+                        test.strictEqual(response.headers['content-type'], 'text/plain');
                         test.strictEqual(response.body, 'Testing 1..2..3..');
-                        deleteServerAtPort(3002, function () {
-                            test.done();
-                        }
-                    }
+                        finish(3002, test);
+                    });
                 }
             });
         });
-    })*/
+    }
 });
 
 var setDefaults = function (options) {

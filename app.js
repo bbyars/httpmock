@@ -105,6 +105,14 @@ app.get('/servers/:port/requests', function (request, response) {
     }
 });
 
+app.post('/servers/:port/stubs', function (request, response) {
+    var port = request.params.port;
+//TODO: 404, 400, 409
+
+    servers[port].addStub(request.body);
+    response.send();
+});
+
 var serverHypermedia = function (port, request) {
     return {
         url: absoluteUrl('/', request).replace(/:\d+/, ':' + port),

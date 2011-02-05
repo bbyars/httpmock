@@ -2,4 +2,6 @@
 * Accept HTML; allow QA's to manually set up tests
 * Change content-type to something more specific
 * Add HTML pages for the different rel urls
+* Allow retrieving stubs per server, deleting some
+* Allow ordering stub calls to same path to simulate state change
 
