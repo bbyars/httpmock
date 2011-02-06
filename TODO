@@ -1,4 +1,5 @@
 * Remove string.format for something more javascript like
+* add jslint
 * Accept HTML; allow QA's to manually set up tests
 * Add HTML pages for the different rel urls
 * Allow retrieving stubs per server, deleting some
