@@ -1,4 +1,5 @@
 *.swp
-.monitor
+server/.monitor
 *.swo
-data/
+server/data/
+clients/java/httpmock-bindings/out/
