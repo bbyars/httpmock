@@ -9,9 +9,15 @@ import static junit.framework.Assert.assertEquals;
 
 public class StubRequestTest {
     @Test
-    public void shouldRetrieveURL() {
+    public void shouldRetrievePath() {
         StubRequest request = requestFrom("{'path': 'test'}");
-        assertEquals("test", request.getURL());
+        assertEquals("test", request.getPath());
+    }
+
+    @Test
+    public void shouldRetrieveRequestMethod() {
+        StubRequest request = requestFrom("{'method': 'POST'}");
+        assertEquals("POST", request.getRequestMethod());
     }
 
     @Test

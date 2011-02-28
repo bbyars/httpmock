@@ -31,7 +31,7 @@ public class ControlServer {
     }
 
     private JSONObject jsonForPort(int port) {
-        Map map = new HashMap();
+        Map<String, Integer> map = new HashMap<String, Integer>();
         map.put("port", port);
         return JSONObject.fromObject(map);
     }

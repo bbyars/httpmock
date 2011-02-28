@@ -25,10 +25,6 @@ public class StubServer {
         return collectRequests(response.getBodyAsJSONArray());
     }
 
-    public void stub() {
-
-    }
-
     public void close() {
         HttpResponse response = http.delete(serverURL);
         response.assertStatusIs(204);

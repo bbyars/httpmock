@@ -38,6 +38,7 @@ exports['Recording'] = TestFixture({
                     http.get('http://localhost:3000/servers/3006/requests', function (response) {
                         test.strictEqual(response.parsedBody.length, 1);
                         result = response.parsedBody[0];
+                        test.strictEqual(result.method, 'GET');
                         test.strictEqual(result.path, '/test');
                         test.strictEqual(result.request.headers['accept'], 'text/plain');
                         test.strictEqual(result.response.statusCode, 200);

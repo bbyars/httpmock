@@ -13,7 +13,11 @@ public class StubRequest {
         this.data = data;
     }
 
-    public String getURL() {
+    public String getRequestMethod() {
+        return data.getString("method");
+    }
+    
+    public String getPath() {
         return data.getString("path");
     }
 

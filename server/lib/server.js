@@ -9,6 +9,7 @@ exports.create = function (port, callback) {
     var recorder = function (request, response, next) {
         var data = {
             path: request.url,
+            method: request.method,
             request: {
                 headers: request.headers,
                 body: '' //request.rawBody
