@@ -44,8 +44,8 @@ public class Expectation {
     public boolean matches(StubRequest request) {
         return request.getRequestMethod().equals(requestMethod)
             && request.getPath().equals(path)
-            && headersMatch(request.getRequestHeaders())
-            && bodyMatches(request.getRequestBody());
+            && headersMatch(request.getHeaders())
+            && bodyMatches(request.getBody());
     }
 
     private boolean headersMatch(Map<String, String> actualHeaders) {

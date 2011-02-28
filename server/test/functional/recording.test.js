@@ -25,8 +25,6 @@ exports['Recording'] = TestFixture({
     }),
 
     'GET /servers/:port/requests returns requests to server': verify(function (test) {
-        var result;
-
         api.createServerAtPort(3006, function () {
             http.getResponse({
                 method: 'GET',
@@ -36,12 +34,15 @@ exports['Recording'] = TestFixture({
                 },
                 callback: function () {
                     http.get('http://localhost:3000/servers/3006/requests', function (response) {
-                        test.strictEqual(response.parsedBody.length, 1);
-                        result = response.parsedBody[0];
-                        test.strictEqual(result.method, 'GET');
-                        test.strictEqual(result.path, '/test');
-                        test.strictEqual(result.request.headers['accept'], 'text/plain');
-                        test.strictEqual(result.response.statusCode, 200);
+                        test.jsonEquals(response.body, [{
+                            path: '/test',
+                            method: 'GET',
+                            headers: {
+                                accept: 'text/plain',
+                                connection: 'close'
+                            },
+                            body: ''
+                        }]);
                         test.finish(3006);
                     });
                 }
@@ -68,5 +69,22 @@ exports['Recording'] = TestFixture({
             });
         });
     }),
+
+    'GET /servers/:port/requests records request body': verify(function (test) {
+        var result;
+
+        api.createServerAtPort(3008, function () {
+            http.post('http://localhost:3008/', {
+                body: {key: 0},
+                callback: function () {
+                    http.get('http://localhost:3000/servers/3008/requests', function (response) {
+                        result = response.parsedBody[0];
+                        test.strictEqual(result.body, '{"key":0}');
+                        test.finish(3008);
+                    });
+                }
+            });
+        });
+    })
 });
 

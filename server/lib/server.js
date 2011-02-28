@@ -7,22 +7,24 @@ exports.create = function (port, callback) {
         logPrefix = '[{0}]: '.format(port);
 
     var recorder = function (request, response, next) {
-        var data = {
-            path: request.url,
-            method: request.method,
-            request: {
-                headers: request.headers,
-                body: '' //request.rawBody
-            },
-            response: {
-                statusCode: response.statusCode,
-                headers: response.headers,
-                body: ''
-            }
-        };
+        var body = '';
+        request.setEncoding('utf8');
 
-        requests.save(data);
-        next();
+        request.addListener('data', function (chunk) {
+            body += chunk;
+        });
+
+        request.addListener('end', function () {
+            var data = {
+                path: request.url,
+                method: request.method,
+                headers: request.headers,
+                body: body
+            };
+
+            requests.save(data);
+            next();
+        });
     };
 
     var server = connect.createServer(

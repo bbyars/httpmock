@@ -55,7 +55,7 @@ public class WasCalled extends TypeSafeMatcher<StubServer> {
         for (StubRequest request : stubRequests) {
             description.appendText("\n\t" + descriptionOf(
                     request.getRequestMethod(), request.getPath(),
-                    request.getRequestHeaders(), request.getRequestBody()));
+                    request.getHeaders(), request.getBody()));
         }
     }
 

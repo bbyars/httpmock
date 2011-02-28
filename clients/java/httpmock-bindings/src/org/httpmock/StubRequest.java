@@ -21,42 +21,18 @@ public class StubRequest {
         return data.getString("path");
     }
 
-    public Map<String, String> getRequestHeaders() {
-        return getHeaders(getRequest());
-    }
-
-    public String getRequestBody() {
-        return getRequest().getString("body");
-    }
-
-    public int getResponseCode() {
-        return getResponse().getInt("statusCode");
-    }
-
-    public Map<String, String> getResponseHeaders() {
-        return getHeaders(getResponse());
-    }
-
-    public String getResponseBody() {
-        return getResponse().getString("body");
-    }
-
-    private JSONObject getRequest() {
-        return data.getJSONObject("request");
-    }
-
-    private JSONObject getResponse() {
-        return data.getJSONObject("response");
-    }
-
-    private Map<String, String> getHeaders(JSONObject container) {
+    public Map<String, String> getHeaders() {
         Map<String, String> result = new HashMap<String, String>();
-        JSONObject headers = container.getJSONObject("headers");
+        JSONObject headers = data.getJSONObject("headers");
         Iterator iterator = headers.keys();
         while (iterator.hasNext()) {
             String header = (String) iterator.next();
             result.put(header, headers.getString(header));
         }
         return result;
+    }
+
+    public String getBody() {
+        return data.getString("body");
     }
 }

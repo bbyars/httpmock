@@ -34,15 +34,16 @@ public class StubServerFunctionalTest {
 
         assertEquals(2, requests.size());
         assertEquals("/first", requests.get(0).getPath());
-//        assertEquals("GET", requests.get(0).getRequestMethod());
+        assertEquals("GET", requests.get(0).getRequestMethod());
         assertEquals("/second?with=query", requests.get(1).getPath());
-//        assertEquals("TEST", requests.get(1).getRequestBody());
-//        assertEquals("POST", requests.get(1).getRequestMethod());
+        assertEquals("TEST", requests.get(1).getBody());
+        assertEquals("POST", requests.get(1).getRequestMethod());
     }
 
     @Test
     public void wasCalledShouldMatchPath() {
-        new HttpRequest("GET", "http://localhost:3001/first").send().waitForClose();
+        HttpResponse response = new HttpRequest("GET", "http://localhost:3001/first").send();
+        response.waitForClose();
 
         assertThat(stub, wasCalled("GET", "/first"));
         assertThat(stub, not(wasCalled("GET", "/second")));

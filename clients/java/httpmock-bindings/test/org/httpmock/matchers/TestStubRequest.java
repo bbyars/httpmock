@@ -42,12 +42,12 @@ public class TestStubRequest extends StubRequest {
     }
 
     @Override
-    public Map<String, String> getRequestHeaders() {
+    public Map<String, String> getHeaders() {
         return headers;
     }
 
     @Override
-    public String getRequestBody() {
+    public String getBody() {
         return body;
     }
 }
