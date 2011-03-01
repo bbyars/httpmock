@@ -1,7 +1,6 @@
 package org.httpmock;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ public class HttpRequest {
             addHeaders(connection);
             addBody(connection);
             connection.connect();
-            return new HttpResponse(connection);
+            return new HttpResponse(connection, readBody(connection));
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -56,5 +55,27 @@ public class HttpRequest {
             output.flush();
             output.close();
         }
+    }
+
+    public String readBody(HttpURLConnection connection) throws IOException {
+        try {
+            return readStream(connection.getInputStream());
+        }
+        catch (IOException e) {
+            return readStream(connection.getErrorStream());
+        }
+    }
+
+    private String readStream(InputStream inputStream) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        StringBuffer buffer = new StringBuffer();
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        reader.close();
+
+        return buffer.toString();
     }
 }

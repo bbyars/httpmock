@@ -1,3 +1,5 @@
+'use strict';
+
 Object.prototype.merge = function(other) {
     for (var prop in other) {
         if (other.hasOwnProperty(prop)) {

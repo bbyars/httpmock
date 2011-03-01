@@ -7,26 +7,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StubServer {
-    private final Http http;
+    private final HttpMock httpMock;
     final String serverURL;
     final String requestsURL;
     final String stubURL;
 
-    StubServer(Http http, String serverURL, String requestsURL, String stubURL) {
-        this.http = http;
+    StubServer(HttpMock httpMock, String serverURL, String requestsURL, String stubURL) {
+        this.httpMock = httpMock;
         this.serverURL = serverURL;
         this.requestsURL = requestsURL;
         this.stubURL = stubURL;
     }
 
     public List<StubRequest> getRequests() {
-        HttpResponse response = http.get(requestsURL);
+        HttpResponse response = httpMock.get(requestsURL);
         response.assertStatusIs(200);
         return collectRequests(response.getBodyAsJSONArray());
     }
 
     public void close() {
-        HttpResponse response = http.delete(serverURL);
+        HttpResponse response = httpMock.delete(serverURL);
         response.assertStatusIs(204);
     }
 

@@ -60,61 +60,21 @@
   <component name="FileColors" enabled="true" enabledForTabs="true" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="StubServerFunctionalTest.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="StubServerFunctionalTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/functional-test/org/httpmock/StubServerFunctionalTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="47" column="0" selection-start="1502" selection-end="1502" vertical-scroll-proportion="0.45454547">
-              <folding />
+            <state line="23" column="18" selection-start="582" selection-end="587" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="HttpResponse.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="HttpResponse.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/org/httpmock/HttpResponse.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="42" column="47" selection-start="1069" selection-end="1069" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WasCalledTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/org/httpmock/matchers/WasCalledTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="148" column="8" selection-start="4939" selection-end="4939" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ExpectationTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/org/httpmock/matchers/ExpectationTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="74" column="40" selection-start="2421" selection-end="2421" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Expectation.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/httpmock/matchers/Expectation.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="65" column="21" selection-start="1882" selection-end="1882" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WasCalled.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/httpmock/matchers/WasCalled.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="34" column="20" selection-start="1024" selection-end="1024" vertical-scroll-proportion="0.0">
+            <state line="15" column="5" selection-start="395" selection-end="395" vertical-scroll-proportion="0.26049203">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -125,7 +85,43 @@
       <file leaf-file-name="ControlServerFunctionalTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/functional-test/org/httpmock/ControlServerFunctionalTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="8" column="13" selection-start="197" selection-end="197" vertical-scroll-proportion="0.0">
+            <state line="15" column="19" selection-start="559" selection-end="559" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="StubServer.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/httpmock/StubServer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="28" column="45" selection-start="807" selection-end="807" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HttpMock.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/httpmock/HttpMock.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="19" column="48" selection-start="600" selection-end="600" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ControlServer.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/httpmock/ControlServer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="7" column="13" selection-start="117" selection-end="117" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HttpRequest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/httpmock/HttpRequest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="48" column="38" selection-start="1346" selection-end="1346" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -145,21 +141,21 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/test/org/httpmock/matchers/WithHeader.java" />
-        <option value="$PROJECT_DIR$/src/org/httpmock/matchers/WithHeader.java" />
-        <option value="$PROJECT_DIR$/test/org/httpmock/matchers/WithHeaderTest.java" />
-        <option value="$PROJECT_DIR$/src/org/httpmock/ControlServer.java" />
-        <option value="$PROJECT_DIR$/src/org/httpmock/StubServer.java" />
-        <option value="$PROJECT_DIR$/src/org/httpmock/HttpResponse.java" />
         <option value="$PROJECT_DIR$/src/org/httpmock/matchers/WasCalledAt.java" />
         <option value="$PROJECT_DIR$/test/org/httpmock/matchers/WasCalledAtTest.java" />
         <option value="$PROJECT_DIR$/test/org/httpmock/matchers/TestStubRequest.java" />
-        <option value="$PROJECT_DIR$/src/org/httpmock/matchers/WasCalled.java" />
         <option value="$PROJECT_DIR$/test/org/httpmock/matchers/WasCalledTest.java" />
-        <option value="$PROJECT_DIR$/test/org/httpmock/matchers/ExpectationTest.java" />
         <option value="$PROJECT_DIR$/src/org/httpmock/matchers/Expectation.java" />
         <option value="$PROJECT_DIR$/src/org/httpmock/StubRequest.java" />
         <option value="$PROJECT_DIR$/test/org/httpmock/StubRequestTest.java" />
+        <option value="$PROJECT_DIR$/test/org/httpmock/matchers/ExpectationTest.java" />
+        <option value="$PROJECT_DIR$/test/org/httpmock/HttpResponseTest.java" />
+        <option value="$PROJECT_DIR$/src/org/httpmock/matchers/WasCalled.java" />
+        <option value="$PROJECT_DIR$/functional-test/org/httpmock/ControlServerFunctionalTest.java" />
+        <option value="$PROJECT_DIR$/src/org/httpmock/Http.java" />
+        <option value="$PROJECT_DIR$/src/org/httpmock/HttpMock.java" />
+        <option value="$PROJECT_DIR$/src/org/httpmock/HttpRequest.java" />
+        <option value="$PROJECT_DIR$/src/org/httpmock/HttpResponse.java" />
         <option value="$PROJECT_DIR$/functional-test/org/httpmock/StubServerFunctionalTest.java" />
       </list>
     </option>
@@ -388,7 +384,7 @@
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="recentsLimit" value="5" />
     <property name="MemberChooser.sorted" value="false" />
-    <property name="options.lastSelected" value="preferences.lookFeel" />
+    <property name="options.lastSelected" value="preferences.sourceCode" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
@@ -407,11 +403,11 @@
       <recent name="$PROJECT_DIR$/lib/junit" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.StubServerFunctionalTest">
-    <configuration default="false" name="ExpectationTest" type="JUnit" factoryName="JUnit" temporary="true">
+  <component name="RunManager" selected="JUnit.StubServerFunctionalTest.wasCalledShouldMatchHeaderAndBody">
+    <configuration default="false" name="ControlServerFunctionalTest.shouldStartAndCloseServer" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
-          <option name="PATTERN" value="org.httpmock.matchers.*" />
+          <option name="PATTERN" value="org.httpmock.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -419,10 +415,38 @@
       <module name="httpmock-bindings" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="PACKAGE_NAME" value="org.httpmock.matchers" />
-      <option name="MAIN_CLASS_NAME" value="org.httpmock.matchers.ExpectationTest" />
-      <option name="METHOD_NAME" value="" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="PACKAGE_NAME" value="org.httpmock" />
+      <option name="MAIN_CLASS_NAME" value="org.httpmock.ControlServerFunctionalTest" />
+      <option name="METHOD_NAME" value="shouldStartAndCloseServer" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="StubServerFunctionalTest.wasCalledShouldMatchBodyExactly" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="org.httpmock.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="snapshooter" />
+      <module name="httpmock-bindings" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="PACKAGE_NAME" value="org.httpmock" />
+      <option name="MAIN_CLASS_NAME" value="org.httpmock.StubServerFunctionalTest" />
+      <option name="METHOD_NAME" value="wasCalledShouldMatchBodyExactly" />
+      <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="" />
       <option name="PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
@@ -464,63 +488,7 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <configuration default="false" name="ExpectationTest.shouldNotMatchBodyIfNoBodyRequested" type="JUnit" factoryName="JUnit" temporary="true">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
-        <pattern>
-          <option name="PATTERN" value="org.httpmock.matchers.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <extension name="snapshooter" />
-      <module name="httpmock-bindings" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="PACKAGE_NAME" value="org.httpmock.matchers" />
-      <option name="MAIN_CLASS_NAME" value="org.httpmock.matchers.ExpectationTest" />
-      <option name="METHOD_NAME" value="shouldNotMatchBodyIfNoBodyRequested" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <envs />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="ExpectationTest.shouldMatchHeaderKeyCaseInsensitive" type="JUnit" factoryName="JUnit" temporary="true">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
-        <pattern>
-          <option name="PATTERN" value="org.httpmock.matchers.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <extension name="snapshooter" />
-      <module name="httpmock-bindings" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="PACKAGE_NAME" value="org.httpmock.matchers" />
-      <option name="MAIN_CLASS_NAME" value="org.httpmock.matchers.ExpectationTest" />
-      <option name="METHOD_NAME" value="shouldMatchHeaderKeyCaseInsensitive" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <envs />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="StubRequestTest" type="JUnit" factoryName="JUnit" temporary="true">
+    <configuration default="false" name="StubServerFunctionalTest.wasCalledShouldMatchBodySubstring" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
           <option name="PATTERN" value="org.httpmock.*" />
@@ -532,9 +500,37 @@
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
       <option name="PACKAGE_NAME" value="org.httpmock" />
-      <option name="MAIN_CLASS_NAME" value="org.httpmock.StubRequestTest" />
-      <option name="METHOD_NAME" value="" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="MAIN_CLASS_NAME" value="org.httpmock.StubServerFunctionalTest" />
+      <option name="METHOD_NAME" value="wasCalledShouldMatchBodySubstring" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="StubServerFunctionalTest.wasCalledShouldMatchHeaderAndBody" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="org.httpmock.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="snapshooter" />
+      <module name="httpmock-bindings" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="PACKAGE_NAME" value="org.httpmock" />
+      <option name="MAIN_CLASS_NAME" value="org.httpmock.StubServerFunctionalTest" />
+      <option name="METHOD_NAME" value="wasCalledShouldMatchHeaderAndBody" />
+      <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="" />
       <option name="PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
@@ -702,11 +698,11 @@
       </method>
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="JUnit.ExpectationTest" />
-      <item index="1" class="java.lang.String" itemvalue="JUnit.StubServerFunctionalTest" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.ExpectationTest.shouldNotMatchBodyIfNoBodyRequested" />
-      <item index="3" class="java.lang.String" itemvalue="JUnit.ExpectationTest.shouldMatchHeaderKeyCaseInsensitive" />
-      <item index="4" class="java.lang.String" itemvalue="JUnit.StubRequestTest" />
+      <item index="0" class="java.lang.String" itemvalue="JUnit.ControlServerFunctionalTest.shouldStartAndCloseServer" />
+      <item index="1" class="java.lang.String" itemvalue="JUnit.StubServerFunctionalTest.wasCalledShouldMatchBodyExactly" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.StubServerFunctionalTest" />
+      <item index="3" class="java.lang.String" itemvalue="JUnit.StubServerFunctionalTest.wasCalledShouldMatchBodySubstring" />
+      <item index="4" class="java.lang.String" itemvalue="JUnit.StubServerFunctionalTest.wasCalledShouldMatchHeaderAndBody" />
     </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
@@ -758,7 +754,7 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24945295" sideWeight="0.6608108" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32972974" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32972974" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
@@ -808,82 +804,10 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/test/org/httpmock/HttpResponseTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="0" selection-start="1417" selection-end="1417" vertical-scroll-proportion="0.8173913" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/httpmock/HttpRequest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="29" selection-start="1048" selection-end="1048" vertical-scroll-proportion="1.0090909" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/httpmock/ControlServer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="62" selection-start="1060" selection-end="1060" vertical-scroll-proportion="0.53636366">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test/org/httpmock/StubServerTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="46" column="7" selection-start="1562" selection-end="1562" vertical-scroll-proportion="0.23636363">
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/httpmock/StubServer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="13" selection-start="707" selection-end="707" vertical-scroll-proportion="0.57391304">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/httpmock/Http.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="25" selection-start="100" selection-end="100" vertical-scroll-proportion="0.13043478">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/httpmock/HttpResponse.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="47" selection-start="1069" selection-end="1069" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/org/httpmock/matchers/WasCalledTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="148" column="8" selection-start="4939" selection-end="4939" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/httpmock/matchers/WasCalled.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="20" selection-start="1024" selection-end="1024" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/functional-test/org/httpmock/ControlServerFunctionalTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="13" selection-start="197" selection-end="197" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/httpmock/matchers/Expectation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="65" column="21" selection-start="1882" selection-end="1882" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -914,17 +838,97 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test/org/httpmock/matchers/ExpectationTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="74" column="40" selection-start="2421" selection-end="2421" vertical-scroll-proportion="0.0">
+        <state line="82" column="89" selection-start="2700" selection-end="2700" vertical-scroll-proportion="0.6826087">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/test/org/httpmock/matchers/WasCalledTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="148" column="8" selection-start="4939" selection-end="4939" vertical-scroll-proportion="3.8608696">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/httpmock/matchers/Expectation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="65" column="21" selection-start="1882" selection-end="1882" vertical-scroll-proportion="1.0970464">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/org/httpmock/HttpResponseTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="73" selection-start="549" selection-end="549" vertical-scroll-proportion="0.16363636">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/httpmock/matchers/WasCalled.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="41" column="62" selection-start="1204" selection-end="1204" vertical-scroll-proportion="0.30454546">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/httpmock/ControlServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="13" selection-start="117" selection-end="117" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/httpmock/StubServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="45" selection-start="807" selection-end="807" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/httpmock/HttpMock.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="48" selection-start="600" selection-end="600" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/httpmock/HttpRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="48" column="38" selection-start="1346" selection-end="1346" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/functional-test/org/httpmock/ControlServerFunctionalTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="19" selection-start="559" selection-end="559" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/functional-test/org/httpmock/StubServerFunctionalTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="47" column="0" selection-start="1502" selection-end="1502" vertical-scroll-proportion="0.45454547">
-          <folding />
+        <state line="23" column="18" selection-start="582" selection-end="587" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/httpmock/HttpResponse.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="5" selection-start="395" selection-end="395" vertical-scroll-proportion="0.26049203">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

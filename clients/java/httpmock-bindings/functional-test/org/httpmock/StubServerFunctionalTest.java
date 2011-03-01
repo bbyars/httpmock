@@ -12,8 +12,7 @@ import static org.httpmock.matchers.WasCalled.wasCalled;
 import static org.junit.Assert.assertThat;
 
 public class StubServerFunctionalTest {
-    private final Http http = new Http();
-    private StubServer stub;
+    private static StubServer stub;
 
     @Before
     public void connectToServer() {
@@ -27,8 +26,8 @@ public class StubServerFunctionalTest {
 
     @Test
     public void shouldReturnAllRequestsToStub() {
-        new HttpRequest("GET", "http://localhost:3001/first").send().waitForClose();
-        new HttpRequest("POST", "http://localhost:3001/second?with=query").withBody("TEST").send().waitForClose();
+        new HttpRequest("GET", "http://localhost:3001/first").send();
+        new HttpRequest("POST", "http://localhost:3001/second?with=query").withBody("TEST").send();
 
         List<StubRequest> requests = stub.getRequests();
 
@@ -42,8 +41,7 @@ public class StubServerFunctionalTest {
 
     @Test
     public void wasCalledShouldMatchPath() {
-        HttpResponse response = new HttpRequest("GET", "http://localhost:3001/first").send();
-        response.waitForClose();
+        new HttpRequest("GET", "http://localhost:3001/first").send();
 
         assertThat(stub, wasCalled("GET", "/first"));
         assertThat(stub, not(wasCalled("GET", "/second")));
@@ -53,9 +51,43 @@ public class StubServerFunctionalTest {
     public void wasCalledShouldMatchHeader() {
         new HttpRequest("GET", "http://localhost:3001/")
                 .withHeader("X-Test", "Got it!")
-                .send().waitForClose();
+                .send();
 
         assertThat(stub, wasCalled("GET", "/").withHeader("X-Test", "Got it!"));
         assertThat(stub, not(wasCalled("GET", "/").withHeader("INVALID", "ignore")));
+    }
+
+    @Test
+    public void wasCalledShouldMatchBodyExactly() {
+        new HttpRequest("POST", "http://localhost:3001/")
+                .withBody("TEST")
+                .send();
+
+        assertThat(stub, wasCalled("POST", "/").withBody("TEST"));
+        assertThat(stub, not(wasCalled("POST", "/").withBody("ES")));
+    }
+
+    @Test
+    public void wasCalledShouldMatchBodySubstring() {
+        new HttpRequest("POST", "http://localhost:3001/")
+                .withBody("{TEST}")
+                .send();
+
+        assertThat(stub, wasCalled("POST", "/").withBodyContaining("TEST"));
+        assertThat(stub, not(wasCalled("POST", "/").withBodyContaining("es")));
+    }
+
+    @Test
+    public void wasCalledShouldMatchHeadersAndBody() {
+        new HttpRequest("POST", "http://localhost:3001/")
+                .withHeader("Content-Type", "text/plain")
+                .withHeader("Accept", "text/plain")
+                .withBody("TEST")
+                .send();
+
+        assertThat(stub, wasCalled("POST", "/")
+                            .withHeader("Content-Type", "text/plain")
+                            .withHeader("Accept", "text/plain")
+                            .withBody("TEST"));
     }
 }

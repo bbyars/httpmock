@@ -2,7 +2,7 @@ package org.httpmock;
 
 import net.sf.json.JSONObject;
 
-public class Http {
+public class HttpMock {
     public HttpResponse get(String url) {
         return new HttpRequest("GET", url)
                 .withHeader("Accept", Hypermedia.CONTENT_TYPE)

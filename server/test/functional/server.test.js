@@ -21,6 +21,18 @@ exports['Server'] = TestFixture({
         });
     }),
 
+    'hypermedia uses host header in links': verify(function (test) {
+        http.get('http://127.0.0.1:3000/', function (response) {
+            test.jsonEquals(response.body, {
+                links: [{
+                    href: 'http://127.0.0.1:3000/servers',
+                    rel: 'http://127.0.0.1:3000/relations/servers'
+                }]
+            });
+            test.done();
+        });
+    }),
+
     'POST /servers creates server at given port': verify(function (test) {
         http.post('http://localhost:3000/servers', {
             body: { port: 3001 },

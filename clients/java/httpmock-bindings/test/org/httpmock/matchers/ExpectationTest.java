@@ -74,6 +74,14 @@ public class ExpectationTest {
     }
 
     @Test
+    public void shouldNotMatchHeaderValueCaseInsensitive() {
+        Expectation expectation = new Expectation("GET", "/");
+        expectation.addHeader("key", "value");
+
+        assertFalse(expectation.matches(request("GET", "/").withHeader("key", "VALUE")));
+    }
+
+    @Test
     public void shouldNotMatchBodyIfNoBodyRequested() {
         Expectation expectation = new Expectation("PUT", "/test");
         expectation.matchBody("TEST");

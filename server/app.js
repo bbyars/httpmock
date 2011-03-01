@@ -1,9 +1,12 @@
+"use strict";
+
 require('./lib/extensions');
 
 // Needed to require express locally; it does a require('connect')
 require.paths.unshift(__dirname + '/deps/connect/lib');
 
 var CONTENT_TYPE = 'application/vnd.httpmock+json';
+require('connect/middleware/bodyDecoder').decode[CONTENT_TYPE] = JSON.parse;
 
 var http = require('http'),
     url = require('url'),
@@ -18,9 +21,6 @@ var port = process.argv[2] || 3000,
     contentHeader = {
         'Content-Type': CONTENT_TYPE
     };
-
-
-require('connect/middleware/bodyDecoder').decode[CONTENT_TYPE] = JSON.parse;
 
 var app = express.createServer(
     express.logger({format: '[ROOT]: :method :url'}),
@@ -89,14 +89,16 @@ app.get('/servers/:port', function (request, response) {
 }),
 
 app.del('/servers/:port', function (request, response) {
+console.log(require('sys').inspect(request.headers));
     var port = request.params.port;
     if (!servers[port]) {
         response.send(404);
     }
     else {
-        servers[port].close();
-        delete servers[port];
-        response.send();
+        servers[port].close(function () {
+            delete servers[port];
+            response.send();
+        });
     }
 });
 
@@ -144,59 +146,6 @@ var serverHypermedia = function (port, request) {
 };
 
 var absoluteUrl = function (endpoint, request) {
-    var host = request.headers['Host'] || 'localhost:' + port;
+    var host = request.headers.host || 'localhost:' + port;
     return 'http://{0}{1}'.format(host, endpoint);
 };
-
-/*
-Admin port only:
-GET /
-  Shows all stubbed ports, with:
-    hyperlink to delete
-        stops process
-        deletes data store
-    hyperlink to get hits
-        reads data store
-        cannot send request, because that would steal a url
-    hyperlink to set stub
-        writes data store
-    hyperlink to delete stub
-    hyperlink to proxy?
-  Hyperlink to setup port
-    forks on different port, record-mode
-  Relations
-    HTML description of relationships, describing inputs and outputs
-
-Data store is file-based
-    /{port-number}
-        /requests
-            SHA-1   {records entire HTTP request, including headers}
-            SHA-1
-            ...
-        /stubs
-            SHA-1?
-
-Example C# code:
-// calls GET /
-// setup has optional second parameter (share), which, if false, follows the 
-//   hyperlink to delete that URL if its there
-// if the URL is not there, follows hyperlink to create
-using (var remote = HttpMockServer.at("http://localhost:3000").setup("http://localhost:3001"))
-{
-    // calls GET/
-    // follows hyperlink to create stub
-    remote.stub("/endpoint?query").returns(body);
-
-    // Could be done locally at first, but would be nice to handle centrally
-    remote.proxy("/endpoint2").to("http://host/endpoint2");
-
-    test();
-
-    // Calls GET /
-    // follows hyperlink to get hits
-    // Matching could be done locally at first, with an eye on centralizing later
-    Assert.That(remote.WasCalledAt("/anotherEndpoint").WithHeader("Content-Type", "text/*")
-        .WithBodyContaining("text");
-}
-*/
-

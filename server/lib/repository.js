@@ -1,3 +1,5 @@
+'use strict';
+
 require('./extensions');
 
 exports.create = function () {

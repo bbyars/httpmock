@@ -3,20 +3,16 @@ package org.httpmock;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 
 public class HttpResponse {
     private final HttpURLConnection connection;
+    private final String body;
 
-    public HttpResponse(HttpURLConnection connection) {
+    public HttpResponse(HttpURLConnection connection, String body) {
         this.connection = connection;
-    }
-
-    public void waitForClose() {
-        getBody();
+        this.body = body;
     }
 
     public String getHeader(String headerName) {
@@ -24,21 +20,7 @@ public class HttpResponse {
     }
 
     public String getBody() {
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuffer buffer = new StringBuffer();
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line);
-            }
-            reader.close();
-
-            return buffer.toString();
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return body;
     }
 
     public JSONObject getBodyAsJSONObject() {

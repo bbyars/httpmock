@@ -10,25 +10,25 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class StubServerTest {
-    private final Http http = mock(Http.class);
+    private final HttpMock httpMock = mock(HttpMock.class);
     private final HttpResponse response = mock(HttpResponse.class);
 
     @Test
     public void getRequestsShouldGetRequestsURL() {
-        when(http.get(anyString())).thenReturn(response);
+        when(httpMock.get(anyString())).thenReturn(response);
         when(response.getBodyAsJSONArray()).thenReturn(JSONArray.fromObject("[]"));
-        StubServer server = new StubServer(http, "serverURL", "requestsURL", "stubURL");
+        StubServer server = new StubServer(httpMock, "serverURL", "requestsURL", "stubURL");
 
         server.getRequests();
 
-        verify(http).get("requestsURL");
+        verify(httpMock).get("requestsURL");
     }
 
     @Test
     public void getRequestsShouldAssert200StatusCode() {
-        when(http.get(anyString())).thenReturn(response);
+        when(httpMock.get(anyString())).thenReturn(response);
         when(response.getBodyAsJSONArray()).thenReturn(JSONArray.fromObject("[]"));        
-        StubServer server = new StubServer(http, "serverURL", "requestsURL", "stubURL");
+        StubServer server = new StubServer(httpMock, "serverURL", "requestsURL", "stubURL");
 
         server.getRequests();
 
@@ -37,9 +37,9 @@ public class StubServerTest {
 
     @Test
     public void getRequestsShouldReturnEachArrayElement() {
-        when(http.get(anyString())).thenReturn(response);
+        when(httpMock.get(anyString())).thenReturn(response);
         when(response.getBodyAsJSONArray()).thenReturn(JSONArray.fromObject("[{}, {}]"));
-        StubServer server = new StubServer(http, "serverURL", "requestsURL", "stubURL");
+        StubServer server = new StubServer(httpMock, "serverURL", "requestsURL", "stubURL");
 
         List<StubRequest> requests = server.getRequests();
 
@@ -48,18 +48,18 @@ public class StubServerTest {
 
     @Test
     public void closeShouldDeleteServerURL() {
-        when(http.delete(anyString())).thenReturn(response);
-        StubServer server = new StubServer(http, "serverURL", "requestsURL", "stubURL");
+        when(httpMock.delete(anyString())).thenReturn(response);
+        StubServer server = new StubServer(httpMock, "serverURL", "requestsURL", "stubURL");
 
         server.close();
 
-        verify(http).delete("serverURL");
+        verify(httpMock).delete("serverURL");
     }
 
     @Test
     public void closeShouldAssert204() {
-        when(http.delete(anyString())).thenReturn(response);
-        StubServer server = new StubServer(http, "serverURL", "requestsURL", "stubURL");
+        when(httpMock.delete(anyString())).thenReturn(response);
+        StubServer server = new StubServer(httpMock, "serverURL", "requestsURL", "stubURL");
 
         server.close();
 

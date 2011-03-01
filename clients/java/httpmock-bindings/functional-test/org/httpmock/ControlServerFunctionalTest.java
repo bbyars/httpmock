@@ -7,17 +7,16 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ControlServerFunctionalTest {
-    private final Http http = new Http();
-
     @Test
-    public void shouldStartAndCloseServer() {
+    public void shouldStartAndCloseServer() throws InterruptedException {
         StubServer server = ControlServer.at("http://localhost:3000").setupPort(3001);
-        HttpResponse response = http.get("http://localhost:3001");
+        HttpResponse response = new HttpRequest("GET", "http://localhost:3001").send();
         assertEquals(200, response.getStatusCode());
 
         server.close();
+        
         try {
-            http.get("http://localhost:3001");
+            new HttpRequest("GET", "http://localhost:3001").send();
             fail("should have refused connection");
         }
         catch (RuntimeException e) {

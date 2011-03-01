@@ -1,3 +1,5 @@
+'use strict';
+
 var exec  = require('child_process').exec;
 
 exports.isValidPortNumber = function (port) {

@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 
 public class HttpResponseTest {
     private final HttpURLConnection connection = mock(HttpURLConnection.class);
-    private final HttpResponse response = new HttpResponse(connection);
+    private final HttpResponse response = new HttpResponse(connection, "");
 
     @Test
     public void assertStatusShouldDoNothingIfStatusCodeMatches() throws IOException {
