@@ -39,7 +39,6 @@ public class WasCalled extends TypeSafeMatcher<StubServer> {
     public boolean matchesSafely(StubServer stub) {
         stubRequests = stub.getRequests();
 
-        System.out.println("#Requests: " + stubRequests.size());
         for (StubRequest request : stubRequests) {
             if (expectation.matches(request)) {
                 return true;

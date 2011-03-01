@@ -89,14 +89,15 @@ app.get('/servers/:port', function (request, response) {
 }),
 
 app.del('/servers/:port', function (request, response) {
-console.log(require('sys').inspect(request.headers));
-    var port = request.params.port;
-    if (!servers[port]) {
+    var port = request.params.port,
+        server = servers[port];
+
+    if (!server) {
         response.send(404);
     }
     else {
-        servers[port].close(function () {
-            delete servers[port];
+        delete servers[port];
+        server.close(function () {
             response.send();
         });
     }

@@ -53,15 +53,16 @@ exports.create = function (port, callback) {
         recorder
     );
 
+    server.on('close', function () {
+        console.log(logPrefix + 'Ciao...');
+    });
+
     server.listen(port, function () {
         console.log(logPrefix + 'Open for business...');
 
         callback({
             close: function (callback) {
-                server.on('close', function () {
-                    console.log(logPrefix + 'Ciao...');
-                    callback();
-                });
+                server.on('close', callback);
                 server.close();
             },
 

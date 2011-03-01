@@ -67,6 +67,10 @@ public class HttpRequest {
     }
 
     private String readStream(InputStream inputStream) throws IOException {
+        if (inputStream == null) {
+            return "";
+        }
+        
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         StringBuffer buffer = new StringBuffer();
         String line;

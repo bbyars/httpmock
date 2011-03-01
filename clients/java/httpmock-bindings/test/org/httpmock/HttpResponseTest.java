@@ -2,7 +2,6 @@ package org.httpmock;
 
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -14,10 +13,10 @@ import static org.mockito.Mockito.when;
 
 public class HttpResponseTest {
     private final HttpURLConnection connection = mock(HttpURLConnection.class);
-    private final HttpResponse response = new HttpResponse(connection, "");
 
     @Test
     public void assertStatusShouldDoNothingIfStatusCodeMatches() throws IOException {
+        HttpResponse response = new HttpResponse(connection, "");
         when(connection.getResponseCode()).thenReturn(200);
         response.assertStatusIs(200);
     }
@@ -27,7 +26,7 @@ public class HttpResponseTest {
         when(connection.getResponseCode()).thenReturn(500);
         when(connection.getRequestMethod()).thenReturn("GET");
         when(connection.getURL()).thenReturn(new URL("http://localhost"));
-        when(connection.getInputStream()).thenReturn(new ByteArrayInputStream("BODY".getBytes()));
+        HttpResponse response = new HttpResponse(connection, "BODY");
 
         try {
             response.assertStatusIs(200);

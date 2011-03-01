@@ -10,7 +10,13 @@ public class ControlServerFunctionalTest {
     @Test
     public void shouldStartAndCloseServer() throws InterruptedException {
         StubServer server = ControlServer.at("http://localhost:3000").setupPort(3001);
-        HttpResponse response = new HttpRequest("GET", "http://localhost:3001").send();
+
+        // Note we have to set the Connection: close header or the next request
+        // doesn't initiate a new TCP connection, which is the error we're looking for.
+        HttpResponse response = new HttpRequest("GET", "http://localhost:3001")
+                .withHeader("Connection", "close")
+                .send();
+        
         assertEquals(200, response.getStatusCode());
 
         server.close();
