@@ -1,6 +1,6 @@
 var TestFixture = require('nodeunit').testCase,
-    unitTest = require('../testExtensions').unitTest,
-    createRepository = require('../../lib/repository').create;
+    unitTest = require('testExtensions').unitTest,
+    createRepository = require('repository').create;
 
 exports['Repository'] = TestFixture({
     'should return empty array if nothing recorded': unitTest(function (test) {

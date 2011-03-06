@@ -1,6 +1,7 @@
-require('../../lib/extensions');
+require('extensions');
+
 var TestFixture = require('nodeunit').testCase,
-    unitTest = require('../testExtensions').unitTest;
+    unitTest = require('testExtensions').unitTest;
 
 exports['Object'] = TestFixture({
     'merge should combine sender and receivers properties': unitTest(function (test) {

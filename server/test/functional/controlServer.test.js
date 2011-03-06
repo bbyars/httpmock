@@ -1,9 +1,10 @@
-require('../../lib/extensions');
+require('extensions');
 
 var TestFixture = require('nodeunit').testCase,
     exec  = require('child_process').exec,
-    extensions = require('../testExtensions'),
-    http = extensions.http,
+    extensions = require('testExtensions');
+
+var http = extensions.http,
     api = extensions.api,
     verify = extensions.verify;
 

@@ -1,6 +1,10 @@
 #!/usr/local/bin/node
 
 require.paths.unshift(__dirname + '/deps/nodeunit/lib');
+require.paths.push(__dirname);
+['lib', 'deps', 'test'].forEach(function (dir) {
+    require.paths.push(__dirname + '/' + dir);
+});
 
 var testrunner = require('nodeunit').reporters.default;
 testrunner.run(['test/unit', 'test/functional']);

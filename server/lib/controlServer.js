@@ -1,22 +1,22 @@
 "use strict";
 
+require('./extensions');
+
+// Needed to require express locally; it does a require('connect')
+require.paths.unshift(__dirname + '/../deps/connect/lib');
+
+var CONTENT_TYPE = 'application/vnd.httpmock+json';
+require('connect/middleware/bodyDecoder').decode[CONTENT_TYPE] = JSON.parse;
+
+var http = require('http'),
+    url = require('url'),
+    express = require('../deps/express/lib/express'),
+    repositories = require('repository'),
+    isValidPortNumber = require('helpers').isValidPortNumber,
+    isPortInUse = require('helpers').isPortInUse,
+    server = require('stubServer');
+
 exports.listen = function (port) {
-    require('./extensions');
-
-    // Needed to require express locally; it does a require('connect')
-    require.paths.unshift(__dirname + '/../deps/connect/lib');
-
-    var CONTENT_TYPE = 'application/vnd.httpmock+json';
-    require('connect/middleware/bodyDecoder').decode[CONTENT_TYPE] = JSON.parse;
-
-    var http = require('http'),
-        url = require('url'),
-        express = require('../deps/express/lib/express'),
-        repositories = require('./repository'),
-        isValidPortNumber = require('./helpers').isValidPortNumber,
-        isPortInUse = require('./helpers').isPortInUse,
-        server = require('./stubServer');
-
     var servers = {},
         contentHeader = {
             'Content-Type': CONTENT_TYPE

@@ -1,8 +1,9 @@
 'use strict';
 
+require('extensions');
+
 var connect = require('../deps/connect/lib/connect/index');
 
-//TODO: Make these configurable with another control server endpoint?
 var defaults = {
     response: {
         statusCode: 200,
@@ -20,7 +21,7 @@ var defaults = {
 };
 
 exports.create = function (port, callback) {
-    var Repository = require('./repository'),
+    var Repository = require('repository'),
         requests = Repository.create(),
         stubs = Repository.create(),
         logPrefix = '[{0}]: '.format(port);
