@@ -23,14 +23,41 @@ var port = process.argv[2] || 3000,
     };
 
 var validateServerExists = function (request, response, next) {
-    var port = request.params.port;
+    var port = request.port = request.params.port;
 
     if (!servers[port]) {
-        response.send(404);
+        response.send({ message: 'no server exists at port ' + port }, 404);
     }
     else {
         next();
     }
+};
+
+var validatePort = function (request, response, next) {
+    var port = request.body.port;
+
+    if (!port) {
+        response.send({ message: 'port is a required field' }, 400);
+    }
+    else if (!isValidPortNumber(port)) {
+        response.send({ message: 'port must be a valid integer between 1 and 65535' }, 400);
+    }
+    else {
+        next();
+    }
+};
+
+var validatePortAvailable = function (request, response, next) {
+    var port = request.body.port;
+
+    isPortInUse(port, function (isInUse) {
+        if (isInUse) {
+            response.send({ message: 'port in use' }, 409);
+        }
+        else {
+            next();
+        }
+    });
 };
 
 var app = express.createServer(
@@ -58,64 +85,40 @@ app.get('/servers', function (request, response) {
     response.send({ servers: result }, contentHeader);
 }),
 
-app.post('/servers', function (request, response) {
-    var port = request.body.port,
-        logPrefix = '[{0}]: '.format(port),
-        body;
+app.post('/servers', validatePort, validatePortAvailable, function (request, response) {
+    var port = request.body.port;
 
-    if (!port) {
-        response.send({ message: 'port is a required field' }, 400);
-        return;
-    }
-
-    if (!isValidPortNumber(port)) {
-        response.send({ message: 'port must be a valid integer between 1 and 65535' }, 400);
-        return;
-    }
-
-    isPortInUse(port, function (isInUse) {
-        if (isInUse) {
-            response.send({ message: 'port in use' }, 409);
-            return;
-        }
-
-        server.create(port, function (server) {
-            servers[port] = server;
-            response.send(serverHypermedia(port, request),
-                Object.create(contentHeader).merge({'Location': absoluteUrl('/servers/' + port, request)}),
-                201);
-        });
+    server.create(port, function (server) {
+        servers[port] = server;
+        response.send(serverHypermedia(port, request),
+            Object.create(contentHeader).merge({'Location': absoluteUrl('/servers/' + port, request)}),
+            201);
     });
 });
 
 app.get('/servers/:port', validateServerExists, function (request, response) {
-    var port = request.params.port;
-    response.send(serverHypermedia(port, request), contentHeader);
+    response.send(serverHypermedia(request.port, request), contentHeader);
 }),
 
 app.del('/servers/:port', validateServerExists, function (request, response) {
-    var port = request.params.port,
-        server = servers[port];
+    var server = servers[request.port];
 
-    delete servers[port];
+    delete servers[request.port];
     server.close(function () {
         response.send();
     });
 });
 
 app.get('/servers/:port/requests', validateServerExists, function (request, response) {
-    var port = request.params.port,
-        path = request.query.path,
+    var path = request.query.path,
         results;
 
-    results = servers[port].loadRequests(path);
+    results = servers[request.port].loadRequests(path);
     response.send(results, contentHeader);
 });
 
 app.post('/servers/:port/stubs', validateServerExists, function (request, response) {
-    var port = request.params.port;
-
-    servers[port].addStub(request.body);
+    servers[request.port].addStub(request.body);
     response.send();
     //TODO: return 201, location = stub url
 });
