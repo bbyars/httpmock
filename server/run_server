@@ -1,5 +1,8 @@
 #!/usr/local/bin/node
 
+// Needed to require express locally; it does a require('connect')
+require.paths.unshift(__dirname + '/deps/connect/lib');
+
 require.paths.push(__dirname);
 require.paths.push(__dirname + '/lib');
 require.paths.push(__dirname + '/deps');

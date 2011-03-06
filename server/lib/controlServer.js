@@ -1,26 +1,20 @@
-"use strict";
+'use strict';
 
-require('./extensions');
-
-// Needed to require express locally; it does a require('connect')
-require.paths.unshift(__dirname + '/../deps/connect/lib');
-
-var CONTENT_TYPE = 'application/vnd.httpmock+json';
-require('connect/middleware/bodyDecoder').decode[CONTENT_TYPE] = JSON.parse;
+require('extensions');
 
 var http = require('http'),
     url = require('url'),
-    express = require('../deps/express/lib/express'),
-    repositories = require('repository'),
+    express = require('express')
     isValidPortNumber = require('helpers').isValidPortNumber,
     isPortInUse = require('helpers').isPortInUse,
     server = require('stubServer');
 
+var CONTENT_TYPE = 'application/vnd.httpmock+json';
+require('connect/middleware/bodyDecoder').decode[CONTENT_TYPE] = JSON.parse;
+
 exports.listen = function (port) {
     var servers = {},
-        contentHeader = {
-            'Content-Type': CONTENT_TYPE
-        };
+        contentHeader = {'Content-Type': CONTENT_TYPE};
 
     var validateServerExists = function (request, response, next) {
         var port = request.port = request.params.port;

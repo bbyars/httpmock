@@ -2,11 +2,9 @@ require('extensions');
 
 var TestFixture = require('nodeunit').testCase,
     exec  = require('child_process').exec,
-    extensions = require('testExtensions');
-
-var http = extensions.http,
-    api = extensions.api,
-    verify = extensions.verify;
+    http = require('testExtensions').http,
+    api = require('testExtensions').api,
+    verify = require('testExtensions').verify;
 
 exports['Stubbing'] = TestFixture({
     'POST /servers/:port/stubs sets up stub response': verify(function (test) {
