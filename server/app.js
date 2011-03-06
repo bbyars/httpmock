@@ -60,9 +60,19 @@ var validatePortAvailable = function (request, response, next) {
     });
 };
 
+var createAbsoluteUrl = function (request, response, next) {
+    var host = request.headers.host || 'localhost:' + port;
+    response.absoluteUrl = function (endpoint, serverPort) {
+        serverPort = serverPort || port;
+        return 'http://{0}{1}'.format(host, endpoint).replace(/:\d+/, ':' + serverPort)
+    };
+    next();
+};
+
 var app = express.createServer(
     express.logger({format: '[ROOT]: :method :url'}),
-    express.bodyDecoder()
+    express.bodyDecoder(),
+    createAbsoluteUrl
 );
 app.listen(port);
 console.log('HTTPMock running at http://localhost:{0}'.format(port));
@@ -71,8 +81,8 @@ app.get('/', function (request, response) {
     response.send({
         links: [
             {
-                href: absoluteUrl('/servers', request),
-                rel: absoluteUrl('/relations/servers', request)
+                href: response.absoluteUrl('/servers'),
+                rel: response.absoluteUrl('/relations/servers')
             }
         ]
     }, contentHeader);
@@ -80,7 +90,7 @@ app.get('/', function (request, response) {
 
 app.get('/servers', function (request, response) {
     var result = Object.keys(servers).reduce(function (accumulator, port) {
-        return accumulator.concat(serverHypermedia(port, request));
+        return accumulator.concat(serverHypermedia(port, response));
     }, []);
     response.send({ servers: result }, contentHeader);
 }),
@@ -90,14 +100,14 @@ app.post('/servers', validatePort, validatePortAvailable, function (request, res
 
     server.create(port, function (server) {
         servers[port] = server;
-        response.send(serverHypermedia(port, request),
-            Object.create(contentHeader).merge({'Location': absoluteUrl('/servers/' + port, request)}),
+        response.send(serverHypermedia(port, response),
+            Object.create(contentHeader).merge({'Location': response.absoluteUrl('/servers/' + port)}),
             201);
     });
 });
 
 app.get('/servers/:port', validateServerExists, function (request, response) {
-    response.send(serverHypermedia(request.port, request), contentHeader);
+    response.send(serverHypermedia(request.port, response), contentHeader);
 }),
 
 app.del('/servers/:port', validateServerExists, function (request, response) {
@@ -123,28 +133,23 @@ app.post('/servers/:port/stubs', validateServerExists, function (request, respon
     //TODO: return 201, location = stub url
 });
 
-var serverHypermedia = function (port, request) {
+var serverHypermedia = function (port, response) {
     return {
-        url: absoluteUrl('/', request).replace(/:\d+/, ':' + port),
+        url: response.absoluteUrl('/', port),
         port: parseInt(port),
         links: [
             {
-                href: absoluteUrl('/servers/{0}'.format(port), request),
-                rel: absoluteUrl('/relations/server', request)
+                href: response.absoluteUrl('/servers/{0}'.format(port)),
+                rel: response.absoluteUrl('/relations/server')
             },
             {
-                href: absoluteUrl('/servers/{0}/requests'.format(port), request),
-                rel: absoluteUrl('/relations/request', request)
+                href: response.absoluteUrl('/servers/{0}/requests'.format(port)),
+                rel: response.absoluteUrl('/relations/request')
             },
             {
-                href: absoluteUrl('/server/{0}/stubs'.format(port), request),
-                rel: absoluteUrl('/relations/stub', request)
+                href: response.absoluteUrl('/server/{0}/stubs'.format(port)),
+                rel: response.absoluteUrl('/relations/stub')
             }
         ]
     };
-};
-
-var absoluteUrl = function (endpoint, request) {
-    var host = request.headers.host || 'localhost:' + port;
-    return 'http://{0}{1}'.format(host, endpoint);
 };
