@@ -39,7 +39,6 @@ exports['Stubbing'] = TestFixture({
                 body: { path: '/' },
                 callback: function () {
                     http.get('http://localhost:3003/', function (response) {
-                        test.strictEqual
                         test.strictEqual(response.headers.connection, 'close');
                         test.strictEqual(response.statusCode, 200);
                         test.strictEqual(response.body, '');
@@ -48,5 +47,15 @@ exports['Stubbing'] = TestFixture({
                 }
             });
         });
+    }),
+
+    'POST /servers/:port/stubs returns 404 if server not created first': verify(function (test) {
+        http.post('http://localhost:3000/servers/5000/stubs', {
+            body: { path: '/' },
+            callback: function (response) {
+                test.strictEqual(response.statusCode, 404);
+                test.done();
+            }
+        })
     })
 });

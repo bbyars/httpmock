@@ -22,6 +22,17 @@ var port = process.argv[2] || 3000,
         'Content-Type': CONTENT_TYPE
     };
 
+var validateServerExists = function (request, response, next) {
+    var port = request.params.port;
+
+    if (!servers[port]) {
+        response.send(404);
+    }
+    else {
+        next();
+    }
+};
+
 var app = express.createServer(
     express.logger({format: '[ROOT]: :method :url'}),
     express.bodyDecoder()
@@ -71,59 +82,42 @@ app.post('/servers', function (request, response) {
         server.create(port, function (server) {
             servers[port] = server;
             response.send(serverHypermedia(port, request),
-                contentHeader.merge({'Location': absoluteUrl('/servers/' + port, request)}),
+                Object.create(contentHeader).merge({'Location': absoluteUrl('/servers/' + port, request)}),
                 201);
         });
     });
 });
 
-app.get('/servers/:port', function (request, response) {
+app.get('/servers/:port', validateServerExists, function (request, response) {
     var port = request.params.port;
-
-    if (servers[port]) {
-        response.send(serverHypermedia(port, request), contentHeader);
-    }
-    else {
-        response.send(404);
-    }
+    response.send(serverHypermedia(port, request), contentHeader);
 }),
 
-app.del('/servers/:port', function (request, response) {
+app.del('/servers/:port', validateServerExists, function (request, response) {
     var port = request.params.port,
         server = servers[port];
 
-    if (!server) {
-        response.send(404);
-    }
-    else {
-        delete servers[port];
-        server.close(function () {
-            response.send();
-        });
-    }
+    delete servers[port];
+    server.close(function () {
+        response.send();
+    });
 });
 
-app.get('/servers/:port/requests', function (request, response) {
+app.get('/servers/:port/requests', validateServerExists, function (request, response) {
     var port = request.params.port,
         path = request.query.path,
         results;
 
-    if (!servers[port]) {
-        response.send(404);
-    }
-    else {
-        results = servers[port].loadRequests(path);
-        response.send(results, contentHeader);
-    }
+    results = servers[port].loadRequests(path);
+    response.send(results, contentHeader);
 });
 
-app.post('/servers/:port/stubs', function (request, response) {
+app.post('/servers/:port/stubs', validateServerExists, function (request, response) {
     var port = request.params.port;
-//TODO: 404, 400, 409
 
     servers[port].addStub(request.body);
     response.send();
-//TODO: return 201, location = stub url
+    //TODO: return 201, location = stub url
 });
 
 var serverHypermedia = function (port, request) {
