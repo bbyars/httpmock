@@ -4,4 +4,7 @@
 * Add HTML pages for the different rel urls
 * Allow retrieving stubs per server, deleting some
 * Allow ordering stub calls to same path to simulate state change
+* Fix or remove merge (maybe just use Object.create?)
+* Use controllers
+* Add endpoint to set defaults for stubs?
 

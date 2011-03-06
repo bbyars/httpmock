@@ -1,0 +1,6 @@
+#!/usr/local/bin/node
+
+require.paths.unshift(__dirname + '/deps/nodeunit/lib');
+
+var testrunner = require('nodeunit').reporters.default;
+testrunner.run(['test/unit', 'test/functional']);

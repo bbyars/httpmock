@@ -1,0 +1,9 @@
+# Copies an npm package to the lib directory, so the application doesn't depend on pre-installed packages
+[ -d deps ] || mkdir deps
+for PKG in $*
+do
+    PKG_PATH=/usr/local/lib/node/.npm/$PKG/active/package
+    LOCAL_PATH=deps/$PKG
+    cp -RL $PKG_PATH $LOCAL_PATH
+    echo "$PKG_PATH => $LOCAL_PATH"
+done

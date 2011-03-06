@@ -1,0 +1,7 @@
+#!/usr/local/bin/node
+
+require.paths.push(__dirname);
+require.paths.push(__dirname + '/lib');
+require.paths.push(__dirname + '/deps');
+
+require('controlServer').listen(process.argv[2] || 3000);
