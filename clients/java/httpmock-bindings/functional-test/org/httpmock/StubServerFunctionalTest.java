@@ -26,8 +26,8 @@ public class StubServerFunctionalTest {
 
     @Test
     public void shouldReturnAllRequestsToStub() {
-        newNonPersistentRequest("GET", "http://localhost:3001/first").send();
-        newNonPersistentRequest("POST", "http://localhost:3001/second?with=query").withBody("TEST").send();
+        new HttpRequest("GET", "http://localhost:3001/first").send();
+        new HttpRequest("POST", "http://localhost:3001/second?with=query").withBody("TEST").send();
 
         List<StubRequest> requests = stub.getRequests();
 
@@ -41,7 +41,7 @@ public class StubServerFunctionalTest {
 
     @Test
     public void wasCalledShouldMatchPath() {
-        newNonPersistentRequest("GET", "http://localhost:3001/first").send();
+        new HttpRequest("GET", "http://localhost:3001/first").send();
 
         assertThat(stub, wasCalled("GET", "/first"));
         assertThat(stub, not(wasCalled("GET", "/second")));
@@ -49,7 +49,7 @@ public class StubServerFunctionalTest {
 
     @Test
     public void wasCalledShouldMatchHeader() {
-        newNonPersistentRequest("GET", "http://localhost:3001/")
+        new HttpRequest("GET", "http://localhost:3001/")
                 .withHeader("X-Test", "Got it!")
                 .send();
 
@@ -59,7 +59,7 @@ public class StubServerFunctionalTest {
 
     @Test
     public void wasCalledShouldMatchBodyExactly() {
-        newNonPersistentRequest("POST", "http://localhost:3001/")
+        new HttpRequest("POST", "http://localhost:3001/")
                 .withBody("TEST")
                 .send();
 
@@ -69,7 +69,7 @@ public class StubServerFunctionalTest {
 
     @Test
     public void wasCalledShouldMatchBodySubstring() {
-        newNonPersistentRequest("POST", "http://localhost:3001/")
+        new HttpRequest("POST", "http://localhost:3001/")
                 .withBody("{TEST}")
                 .send();
 
@@ -79,7 +79,7 @@ public class StubServerFunctionalTest {
 
     @Test
     public void wasCalledShouldMatchHeadersAndBody() {
-        newNonPersistentRequest("POST", "http://localhost:3001/")
+        new HttpRequest("POST", "http://localhost:3001/")
                 .withHeader("Content-Type", "text/plain")
                 .withHeader("Accept", "text/plain")
                 .withBody("TEST")
@@ -88,13 +88,7 @@ public class StubServerFunctionalTest {
         assertThat(stub, wasCalled("POST", "/")
                             .withHeader("Content-Type", "text/plain")
                             .withHeader("Accept", "text/plain")
-                            .withBody("TEST"));
+                            .withBodyContaining("TEST"));
     }
 
-    public HttpRequest newNonPersistentRequest(String method, String url) {
-        // Note we have to set the Connection: close header or the next request
-        // doesn't initiate a new TCP connection, allows the next test to reuse
-        // the old stub.
-        return new HttpRequest(method, url).withHeader("Connection", "close");
-    }
 }

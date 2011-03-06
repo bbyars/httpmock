@@ -123,6 +123,7 @@ app.post('/servers/:port/stubs', function (request, response) {
 
     servers[port].addStub(request.body);
     response.send();
+//TODO: return 201, location = stub url
 });
 
 var serverHypermedia = function (port, request) {

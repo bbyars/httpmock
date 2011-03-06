@@ -31,5 +31,22 @@ exports['Stubbing'] = TestFixture({
                 }
             });
         });
+    }),
+
+    'POST /servers/:port/stubs defaults response options': verify(function (test) {
+        api.createServerAtPort(3003, function () {
+            http.post('http://localhost:3000/servers/3003/stubs', {
+                body: { path: '/' },
+                callback: function () {
+                    http.get('http://localhost:3003/', function (response) {
+                        test.strictEqual
+                        test.strictEqual(response.headers.connection, 'close');
+                        test.strictEqual(response.statusCode, 200);
+                        test.strictEqual(response.body, '');
+                        test.finish(3003);
+                    });
+                }
+            });
+        });
     })
 });

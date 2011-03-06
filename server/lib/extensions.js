@@ -1,6 +1,6 @@
 'use strict';
 
-Object.prototype.merge = function(other) {
+Object.prototype.merge = function (other) {
     for (var prop in other) {
         if (other.hasOwnProperty(prop)) {
             this[prop] = other[prop];
@@ -9,7 +9,7 @@ Object.prototype.merge = function(other) {
     return this;
 };
 
-String.prototype.format = function() {
+String.prototype.format = function () {
     var formatted = this;
     for (arg in arguments) {
         formatted = formatted.replace("{" + arg + "}", arguments[arg]);

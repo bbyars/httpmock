@@ -2,6 +2,23 @@
 
 var connect = require('../deps/connect/lib/connect/index');
 
+//TODO: Make these configurable with another control server endpoint?
+var defaults = {
+    response: {
+        statusCode: 200,
+        headers: {
+            // We can't use persistent connections, because a test case
+            // may shutdown the stub, which prevents new connections for
+            // the port, but that won't prevent the system under test
+            // from reusing an existing TCP connection after the stub
+            // has shutdown, causing difficult to track down bugs when
+            // multiple tests are run.
+            'Connection': 'close'
+        },
+        body: ''
+    }
+};
+
 exports.create = function (port, callback) {
     var Repository = require('./repository'),
         requests = Repository.create(),
@@ -29,28 +46,21 @@ exports.create = function (port, callback) {
         });
     };
 
+    var stubber = function (request, response, next) {
+        var matchingStubs = stubs.load(request.url),
+            match = matchingStubs[0] || defaults,
+            stub = Object.create(defaults).merge(match).response;
+
+        response.writeHead(stub.statusCode, stub.headers);
+        response.write(stub.body);
+        response.end();
+        next();
+    };
+
     var server = connect.createServer(
         connect.logger({format: logPrefix + ':method :url'}),
-
-        function (request, response, next) {
-            var matchingStubs = stubs.load(request.url),
-                stub;
-
-            if (matchingStubs.length > 0) {
-                console.log(logPrefix + '... sending stubbed response');
-                stub = matchingStubs[0].response;
-                response.writeHead(stub.statusCode, stub.headers);
-                response.write(stub.body);
-            }
-            else {
-                response.writeHead(200);
-            }
-
-            response.end();
-            next();
-        },
-
-        recorder
+        recorder,
+        stubber
     );
 
     server.on('close', function () {

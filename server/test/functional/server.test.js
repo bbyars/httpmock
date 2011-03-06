@@ -66,6 +66,15 @@ exports['Server'] = TestFixture({
         });
     }),
 
+    'POST /servers creates stub that disallows default keepalive connections': verify(function (test) {
+        api.createServerAtPort(3001, function () {
+            http.get('http://localhost:3001/', function (response) {
+                test.strictEqual(response.headers.connection, 'close');
+                test.finish(3001);
+            });
+        });
+    }),
+
     'POST /servers returns 409 if port already in use': verify(function (test) {
         api.createServerAtPort(3000, function (response) {
             test.strictEqual(response.statusCode, 409);
