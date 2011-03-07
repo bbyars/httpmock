@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="httpmock-bindings" default="build">
+    <property name="build" location="${basedir}/out" />
+
+    <path id="classpath">
+        <fileset dir="${basedir}/lib" includes="**/*.jar"/>
+        <path location="${build}/httpmock.jar" />
+    </path>
+
+    <target name="build" depends="clean,compile.production,test"/>
+
+    <target name="clean">
+        <delete dir="${build}"/>
+        <mkdir dir="${build}"/>
+    </target>
+
+    <target name="compile.production">
+        <compile srcdir="${basedir}/src" destdir="${build}/httpmock" />
+        <jar basedir="${build}/httpmock" destfile="${build}/httpmock.jar" />
+    </target>
+
+    <target name="compile.test">
+        <compile srcdir="${basedir}/test" destdir="${build}/test" />
+        <compile srcdir="${basedir}/functional-test" destdir="${build}/functional-test" />        
+    </target>
+
+    <target name="test" depends="compile.test">
+        <mkdir dir="${build}/reports" />
+        <junit printsummary="yes" errorproperty="test.failed" failureproperty="test.failed">
+            <classpath refid="classpath" />
+            <formatter type="plain" />
+            <batchtest todir="${build}/reports">
+                <fileset dir="${build}/test" includes="**/*.class" />
+            </batchtest>
+        </junit>
+        <fail message="Tests failed..." if="test.failed" />
+    </target>
+
+    <macrodef name="compile">
+        <attribute name="srcdir" />
+        <attribute name="destdir" />
+
+        <sequential>
+            <mkdir dir="@{destdir}" />
+            <javac srcdir="@{srcdir}" destdir="@{destdir}" includeantruntime="false" classpathref="classpath" />
+        </sequential>
+    </macrodef>
+</project>
