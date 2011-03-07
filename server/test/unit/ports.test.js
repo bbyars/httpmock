@@ -2,10 +2,10 @@ var TestFixture = require('nodeunit').testCase,
     unitTest = require('testExtensions').unitTest,
     verify = require('testExtensions').verify,
     spawn = require('child_process').spawn,
-    isValidPortNumber = require('helpers').isValidPortNumber,
-    isPortInUse = require('helpers').isPortInUse;
+    isValidPortNumber = require('ports').isValidPortNumber,
+    isPortInUse = require('ports').isPortInUse;
 
-exports['Helpers'] = TestFixture({
+exports['Ports'] = TestFixture({
     'undefined is not a valid port': unitTest(function (test) {
         test.notOk(isValidPortNumber(undefined));
     }),

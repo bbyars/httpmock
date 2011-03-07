@@ -1,4 +1,4 @@
-exports.create = function () {
+create = function () {
     var requests = [];
 
     var withinHierarchy = function (ancestor, maybeDescendant) {
@@ -8,16 +8,20 @@ exports.create = function () {
         return canonicalize(maybeDescendant).indexOf(canonicalize(ancestor)) === 0;
     };
 
-    return {
-        load: function (containingPath) {
-            return requests.filter(function (value) {
-                return withinHierarchy(containingPath, value.path);
-            });
-        },
+    var load = function (containingPath) {
+        return requests.filter(function (value) {
+            return withinHierarchy(containingPath, value.path);
+        });
+    };
 
-        save: function (request) {
-            requests.push(request);
-        }
+    var save = function (request) {
+        requests.push(request);
+    };
+
+    return {
+        load: load,
+        save: save
     };
 };
 
+exports.create = create;

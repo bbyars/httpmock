@@ -2,7 +2,8 @@
 
 require('extensions');
 
-var connect = require('../deps/connect/lib/connect/index');
+var connect = require('connect'),
+    repositories = require('repository');
 
 var defaults = {
     response: {
@@ -20,10 +21,9 @@ var defaults = {
     }
 };
 
-exports.create = function (port, callback) {
-    var Repository = require('repository'),
-        requests = Repository.create(),
-        stubs = Repository.create(),
+var create = function (port, callback) {
+    var requests = repositories.create(),
+        stubs = repositories.create(),
         logPrefix = '[{0}]: '.format(port);
 
     var recorder = function (request, response, next) {
@@ -35,14 +35,12 @@ exports.create = function (port, callback) {
         });
 
         request.on('end', function () {
-            var data = {
+            requests.save({
                 path: request.url,
                 method: request.method,
                 headers: request.headers,
                 body: body
-            };
-
-            requests.save(data);
+            });
             next();
         });
     };
@@ -88,3 +86,4 @@ exports.create = function (port, callback) {
     });
 };
 
+exports.create = create;

@@ -5,14 +5,13 @@ require('extensions');
 var http = require('http'),
     url = require('url'),
     express = require('express')
-    isValidPortNumber = require('helpers').isValidPortNumber,
-    isPortInUse = require('helpers').isPortInUse,
-    server = require('stubServer');
+    server = require('stubServer'),
+    ports = require('ports');
 
 var CONTENT_TYPE = 'application/vnd.httpmock+json';
 require('connect/middleware/bodyDecoder').decode[CONTENT_TYPE] = JSON.parse;
 
-exports.listen = function (port) {
+var listen = function (port) {
     var servers = {},
         contentHeader = {'Content-Type': CONTENT_TYPE};
 
@@ -33,7 +32,7 @@ exports.listen = function (port) {
         if (!port) {
             response.send({ message: 'port is a required field' }, 400);
         }
-        else if (!isValidPortNumber(port)) {
+        else if (!ports.isValidPortNumber(port)) {
             response.send({ message: 'port must be a valid integer between 1 and 65535' }, 400);
         }
         else {
@@ -44,7 +43,7 @@ exports.listen = function (port) {
     var validatePortAvailable = function (request, response, next) {
         var port = request.body.port;
 
-        isPortInUse(port, function (isInUse) {
+        ports.isPortInUse(port, function (isInUse) {
             if (isInUse) {
                 response.send({ message: 'port in use' }, 409);
             }
@@ -124,7 +123,6 @@ exports.listen = function (port) {
     app.post('/servers/:port/stubs', validateServerExists, function (request, response) {
         servers[request.port].addStub(request.body);
         response.send();
-        //TODO: return 201, location = stub url
     });
 
     var serverHypermedia = function (port, response) {
@@ -148,3 +146,5 @@ exports.listen = function (port) {
         };
     };
 };
+
+exports.listen = listen;
