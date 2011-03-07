@@ -1,0 +1,6 @@
+echo 'Running server tests'
+(cd server && ./run_tests)
+echo
+
+echo 'Building Java bindings'
+(cd clients/java && ant)

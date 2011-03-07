@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="httpmock-bindings" default="build">
+    <property name="build" location="${basedir}/out"/>
+    <property name="reports.dir" location="${build}/reports"/>
+
+    <path id="classpath">
+        <fileset dir="${basedir}/lib" includes="**/*.jar"/>
+        <path location="${build}/httpmock.jar"/>
+    </path>
+
+    <target name="build" depends="clean,compile.production,test"/>
+
+    <target name="clean">
+        <delete dir="${build}"/>
+        <mkdir dir="${build}"/>
+    </target>
+
+    <target name="compile.production">
+        <compile srcdir="${basedir}/src" destdir="${build}/httpmock"/>
+        <jar basedir="${build}/httpmock" destfile="${build}/httpmock.jar"/>
+    </target>
+
+    <target name="compile.test">
+        <compile srcdir="${basedir}/test" destdir="${build}/test"/>
+        <compile srcdir="${basedir}/functional-test" destdir="${build}/functional-test"/>
+    </target>
+
+    <target name="test" depends="compile.test">
+        <mkdir dir="${build}/reports"/>
+        <run-junit testdir="test" failureproperty="test.failed"/>
+        <run-junit testdir="functional-test" failureproperty="test.failed"/>
+
+        <junitreport todir="${reports.dir}">
+            <fileset dir="${reports.dir}">
+                <include name="**/TEST-*.xml"/>
+            </fileset>
+            <report todir="${reports.dir}/html"/>
+        </junitreport>
+
+        <fail message="Tests failed..." if="test.failed"/>
+    </target>
+
+    <macrodef name="compile">
+        <attribute name="srcdir"/>
+        <attribute name="destdir"/>
+
+        <sequential>
+            <mkdir dir="@{destdir}"/>
+            <javac srcdir="@{srcdir}" destdir="@{destdir}" includeantruntime="false" classpathref="classpath"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="run-junit">
+        <attribute name="testdir"/>
+        <attribute name="failureproperty"/>
+
+        <sequential>
+            <mkdir dir="${build}/reports/@{testdir}"/>
+            <junit printsummary="yes" errorproperty="@{failureproperty}" failureproperty="@{failureproperty}">
+                <classpath>
+                    <path refid="classpath"/>
+                    <path location="${build}/@{testdir}"/>
+                </classpath>
+                <formatter type="xml"/>
+                <batchtest todir="${reports.dir}/@{testdir}">
+                    <fileset dir="${build}/@{testdir}" includes="**/*Test.class"/>
+                </batchtest>
+            </junit>
+        </sequential>
+    </macrodef>
+</project>
