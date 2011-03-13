@@ -8,7 +8,7 @@ var connect = require('connect'),
 var defaults = {
     response: {
         statusCode: 200,
-        headers: {
+        /*headers: {
             // We can't use persistent connections, because a test case
             // may shutdown the stub, which prevents new connections for
             // the port, but that won't prevent the system under test
@@ -16,7 +16,7 @@ var defaults = {
             // has shutdown, causing difficult to track down bugs when
             // multiple tests are run.
             'Connection': 'close'
-        },
+        },*/
         body: ''
     }
 };
@@ -75,6 +75,8 @@ var create = function (port, callback) {
 
     var stubber = function (request, response, next) {
         var stub = Object.create(defaults).merge(findFirstMatchingStub(request)).response;
+stub.headers = stub.headers || {};
+stub.headers.connection = 'close';
 
         response.writeHead(stub.statusCode, stub.headers);
         response.write(stub.body || '');

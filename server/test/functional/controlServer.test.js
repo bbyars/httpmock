@@ -53,7 +53,7 @@ exports['POST /servers'] = testCase({
                             rel: 'http://localhost:3000/relations/request'
                         },
                         {
-                            href: 'http://localhost:3000/server/3001/stubs',
+                            href: 'http://localhost:3000/servers/3001/stubs',
                             rel: 'http://localhost:3000/relations/stub'
                         }
                     ]
@@ -128,7 +128,7 @@ exports['GET /servers'] = testCase({
                                 rel: 'http://localhost:3000/relations/request'
                             },
                             {
-                                href: 'http://localhost:3000/server/3002/stubs',
+                                href: 'http://localhost:3000/servers/3002/stubs',
                                 rel: 'http://localhost:3000/relations/stub'
                             }
                         ]
@@ -165,7 +165,7 @@ exports['GET /servers:port'] = testCase({
                             rel: 'http://localhost:3000/relations/request'
                         },
                         {
-                            href: 'http://localhost:3000/server/3001/stubs',
+                            href: 'http://localhost:3000/servers/3001/stubs',
                             rel: 'http://localhost:3000/relations/stub'
                         }
                     ]

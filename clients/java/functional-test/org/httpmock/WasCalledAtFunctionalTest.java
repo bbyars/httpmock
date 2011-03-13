@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.httpmock.matchers.WasCalled.wasCalled;
 import static org.junit.Assert.assertThat;
 
-public class StubServerFunctionalTest {
+public class WasCalledAtFunctionalTest {
     private static StubServer stub;
 
     @Before

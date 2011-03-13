@@ -139,7 +139,7 @@ var listen = function (port) {
                     rel: response.absoluteUrl('/relations/request')
                 },
                 {
-                    href: response.absoluteUrl('/server/{0}/stubs'.format(port)),
+                    href: response.absoluteUrl('/servers/{0}/stubs'.format(port)),
                     rel: response.absoluteUrl('/relations/stub')
                 }
             ]

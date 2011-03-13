@@ -25,6 +25,12 @@ public class StubServer {
         return collectRequests(response.getBodyAsJSONArray());
     }
 
+    public Stubber on(String method, String url) {
+        Stubber stubber = new Stubber(httpMock, stubURL, url);
+        stubber.setRequestMethod(method);
+        return stubber;
+    }
+
     public void close() {
         HttpResponse response = httpMock.delete(serverURL);
         response.assertStatusIs(204);
