@@ -1,89 +1,101 @@
 require('extensions');
 
-var TestFixture = require('nodeunit').testCase,
-    exec  = require('child_process').exec,
+var testCase = require('nodeunit').testCase,
     http = require('testExtensions').http,
     api = require('testExtensions').api,
-    verify = require('testExtensions').verify;
+    verify = require('testExtensions').verify,
+    port = 3001,
+    stubUrl = 'http://localhost:' + port;
 
-exports['Recording'] = TestFixture({
-    'GET /servers/:port/requests returns 404 if server not created': verify(function (test) {
-        http.get('http://localhost:3000/servers/1234/requests', function (response) {
+var getRequests = function (spec, callback) {
+    if (arguments.length === 1) {
+        callback = spec;
+        spec = {};
+    }
+    var stubPort = spec.port || port;
+    var query = spec.query || '';
+    http.get('http://localhost:3000/servers/' + stubPort + '/requests' + query, callback);
+};
+
+exports['Trying to GET /servers/:port/requests'] = testCase({
+    'returns 404 if server not created': function (test) {
+        getRequests({port: 1234}, function (response) {
             test.strictEqual(response.statusCode, 404);
+            test.done();
+        });
+    }
+});
+
+exports['GET /servers/:port/requests'] = testCase({
+    setUp: function (callback) {
+        api.createServerAtPort(port, function () {
+            callback();
+        });
+    },
+
+    tearDown: function (callback) {
+        api.deleteServerAtPort(port, function () {
+            callback();
+        });
+    },
+
+    'returns empty array if no requests to given url': verify(function (test) {
+        getRequests(function (response) {
+            test.jsonEquals(response.body, []);
             test.done();
         });
     }),
 
-    'GET /servers/:port/requests returns empty array if no requests to given url': verify(function (test) {
-        api.createServerAtPort(3005, function () {
-            http.get('http://localhost:3000/servers/3005/requests', function (response) {
-                test.jsonEquals(response.body, []);
-                test.finish(3005);
-            });
+    'returns requests to server': verify(function (test) {
+        http.getResponse({
+            method: 'GET',
+            url: stubUrl + '/test',
+            headers: { 'Accept': 'text/plain' },
+            callback: function () {
+                getRequests(function (response) {
+                    test.jsonEquals(response.body, [{
+                        path: '/test',
+                        method: 'GET',
+                        headers: {
+                            accept: 'text/plain',
+                            connection: 'close'
+                        },
+                        body: ''
+                    }]);
+                    test.done();
+                });
+            }
         });
     }),
 
-    'GET /servers/:port/requests returns requests to server': verify(function (test) {
-        api.createServerAtPort(3006, function () {
-            http.getResponse({
-                method: 'GET',
-                url: 'http://localhost:3006/test',
-                headers: {
-                    'Accept': 'text/plain'
-                },
-                callback: function () {
-                    http.get('http://localhost:3000/servers/3006/requests', function (response) {
-                        test.jsonEquals(response.body, [{
-                            path: '/test',
-                            method: 'GET',
-                            headers: {
-                                accept: 'text/plain',
-                                connection: 'close'
-                            },
-                            body: ''
-                        }]);
-                        test.finish(3006);
-                    });
-                }
-            });
-        });
-    }),
-
-    'GET /servers/:port/requests?path=:filter filters requests sent back': verify(function (test) {
+    'uses querystring to filter requests sent back': verify(function (test) {
         var result;
 
-        api.createServerAtPort(3007, function () {
-            http.get('http://localhost:3007/first', function () {
-                http.get ('http://localhost:3007/second', function () {
-                    http.get('http://localhost:3007/second/again', function () {
-                        http.get('http://localhost:3000/servers/3007/requests?path=/second', function (response) {
-                            result = response.parsedBody.map(function (item) {
-                                return item.path;
-                            });
-                            test.jsonEquals(result, ['/second', '/second/again']);
-                            test.finish(3007);
+        http.get(stubUrl + '/first', function () {
+            http.get (stubUrl + '/second', function () {
+                http.get(stubUrl + '/second/again', function () {
+                    getRequests({query: '?path=/second'}, function (response) {
+                        result = response.parsedBody.map(function (item) {
+                            return item.path;
                         });
+                        test.jsonEquals(result, ['/second', '/second/again']);
+                        test.done();
                     });
                 });
             });
         });
     }),
 
-    'GET /servers/:port/requests records request body': verify(function (test) {
-        var result;
-
-        api.createServerAtPort(3008, function () {
-            http.post('http://localhost:3008/', {
-                body: {key: 0},
-                callback: function () {
-                    http.get('http://localhost:3000/servers/3008/requests', function (response) {
-                        result = response.parsedBody[0];
-                        test.strictEqual(result.body, '{"key":0}');
-                        test.finish(3008);
-                    });
-                }
-            });
+    'records request body': function (test) {
+        http.post(stubUrl + '/', {
+            body: { key: 0 },
+            callback: function () {
+                getRequests(function (response) {
+                    test.strictEqual(response.parsedBody[0].body, '{"key":0}');
+                    test.done();
+                });
+            }
         });
-    })
+    }
 });
 
