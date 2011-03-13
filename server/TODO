@@ -5,6 +5,9 @@
 * Allow retrieving stubs per server, deleting some
 * Allow ordering stub calls to same path to simulate state change
 * Fix or remove merge (maybe just use Object.create?)
+** Having to add the || '' in stubServer.js to write the body is sympomatic
 * Add endpoint to set defaults for stubs?
-* Rename helpers to port?
+* Remove verify, unit Test - use something like what Sino does
+* support stubbing by request method!!!
+* use better setup/teardowns
 

@@ -56,5 +56,61 @@ exports['Stubbing'] = TestFixture({
                 test.done();
             }
         })
+    }),
+
+    'POST /servers/:port/stubs only stubs if request matches headers': verify(function (test) {
+        api.createServerAtPort(3002, function () {
+            http.post('http://localhost:3000/servers/3002/stubs', {
+                body: {
+                    path: '/test',
+                    request: {
+                        headers: { 'Accept': 'application/xml' }
+                    },
+                    response: { statusCode: 400 }
+                },
+                callback: function () {
+                    http.get('http://localhost:3002/test', function (firstResponse) {
+                        test.strictEqual(firstResponse.statusCode, 200, 'should not have matched request');
+
+                        http.getResponse({
+                            url: 'http://localhost:3002/test',
+                            headers: { 'Accept': 'application/xml' },
+                            callback: function (secondResponse) {
+                                test.strictEqual(secondResponse.statusCode, 400, 'should have matched request');
+                                test.finish(3002);
+                            }
+                        });
+                    });
+                }
+            });
+        });
+    }),
+
+    'POST /servers/:port/stubs only stubs if request contains body': verify(function (test) {
+        api.createServerAtPort(3003, function () {
+            http.post('http://localhost:3000/servers/3003/stubs', {
+                body: {
+                    path: '/stub',
+                    request: { body : 'TEST' },
+                    response: { statusCode: 400 }
+                },
+                callback: function () {
+                    http.post('http://localhost:3003/stub', {
+                        body: 'TE__ST',
+                        callback: function (firstResponse) {
+                            test.strictEqual(firstResponse.statusCode, 200, 'should not have matched request');
+
+                            http.post('http://localhost:3003/stub', {
+                                body: 'HAS TEST WITHIN',
+                                callback: function (secondResponse) {
+                                    test.strictEqual(secondResponse.statusCode, 400, 'should have matched request');
+                                    test.finish(3003);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        });
     })
 });

@@ -2,7 +2,7 @@ var url = require('url'),
     http = require('http');
 
 // Allows async
-exports.verify = function (f) {
+var verify = function (f) {
     return function (test) {
         addCustomAsserts(test);
         f(test);
@@ -10,7 +10,7 @@ exports.verify = function (f) {
 };
 
 // No async
-exports.unitTest = function (f) {
+var unitTest = function (f) {
     return function (test) {
         addCustomAsserts(test);
         f(test);
@@ -49,12 +49,11 @@ var setDefaults = function (options) {
             'Content-type': 'application/vnd.httpmock+json',
             'Host': url.parse(options.url).host
         },
-        body: '',
-        callback: function (response) {}
+        body: ''
     }.merge(options);
 };
 
-var web = exports.http = {
+var web = {
     getResponse: function (options) {
         var spec = setDefaults(options),
             urlParts = url.parse(spec.url),
@@ -95,7 +94,7 @@ var web = exports.http = {
     }
 };
 
-var api = exports.api = {
+var api = {
     deleteServerAtPort: function(port, callback) {
         web.del('http://localhost:3000/servers/{0}'.format(port), callback);
     },
@@ -107,3 +106,8 @@ var api = exports.api = {
         });
     }
 };
+
+exports.verify = verify;
+exports.unitTest = unitTest;
+exports.http = web;
+exports.api = api;

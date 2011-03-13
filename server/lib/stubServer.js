@@ -27,11 +27,11 @@ var create = function (port, callback) {
         logPrefix = '[{0}]: '.format(port);
 
     var recorder = function (request, response, next) {
-        var body = '';
+        request.body = '';
         request.setEncoding('utf8');
 
         request.on('data', function (chunk) {
-            body += chunk;
+            request.body += chunk;
         });
 
         request.on('end', function () {
@@ -39,19 +39,42 @@ var create = function (port, callback) {
                 path: request.url,
                 method: request.method,
                 headers: request.headers,
-                body: body
+                body: request.body
             });
             next();
         });
     };
 
+    var findFirstMatchingStub = function (request) {
+        var possibleMatches = stubs.load(request.url);
+
+        return possibleMatches.filter(function (stub) {
+            return (!stub.request || requestMatches(request, stub.request));
+        })[0] || defaults;
+    };
+
+    var requestMatches = function (request, expectedRequest) {
+        return allHeadersMatch(request, expectedRequest.headers)
+            && bodyMatches(request, expectedRequest.body);
+    };
+
+    var allHeadersMatch = function (request, headers) {
+        return !headers || Object.keys(headers).every(function (header) {
+            return headers[header] === request.headers[header.toLowerCase()];
+        });
+    };
+
+    var bodyMatches = function (request, body) {
+        console.log('body = ' + body);
+        console.log('request.body = ' + request.body);
+        return !body || request.body.indexOf(body) >= 0;
+    };
+
     var stubber = function (request, response, next) {
-        var matchingStubs = stubs.load(request.url),
-            match = matchingStubs[0] || defaults,
-            stub = Object.create(defaults).merge(match).response;
+        var stub = Object.create(defaults).merge(findFirstMatchingStub(request)).response;
 
         response.writeHead(stub.statusCode, stub.headers);
-        response.write(stub.body);
+        response.write(stub.body || '');
         response.end();
         next();
     };
