@@ -1,13 +1,13 @@
 require('extensions');
 
-var TestFixture = require('nodeunit').testCase,
+var testCase = require('nodeunit').testCase,
     exec  = require('child_process').exec,
     http = require('testExtensions').http,
     api = require('testExtensions').api,
     verify = require('testExtensions').verify;
 
-exports['Server'] = TestFixture({
-    'GET / returns base hypermedia': verify(function (test) {
+exports['GET /'] = testCase({
+    'returns base hypermedia': verify(function (test) {
         http.get('http://localhost:3000/', function (response) {
             test.strictEqual(response.headers['content-type'], 'application/vnd.httpmock+json');
             test.jsonEquals(response.body, {
@@ -20,7 +20,7 @@ exports['Server'] = TestFixture({
         });
     }),
 
-    'hypermedia uses host header in links': verify(function (test) {
+    'uses host header in hypermedia links': verify(function (test) {
         http.get('http://127.0.0.1:3000/', function (response) {
             test.jsonEquals(response.body, {
                 links: [{
@@ -30,9 +30,11 @@ exports['Server'] = TestFixture({
             });
             test.done();
         });
-    }),
+    })
+});
 
-    'POST /servers creates server at given port': verify(function (test) {
+exports['POST /servers'] = testCase({
+    'creates server at given port': verify(function (test) {
         http.post('http://localhost:3000/servers', {
             body: { port: 3001 },
             callback: function (response) {
@@ -65,7 +67,7 @@ exports['Server'] = TestFixture({
         });
     }),
 
-    'POST /servers creates stub that disallows default keepalive connections': verify(function (test) {
+    'creates stub that disallows keepalive connections': verify(function (test) {
         api.createServerAtPort(3001, function () {
             http.get('http://localhost:3001/', function (response) {
                 test.strictEqual(response.headers.connection, 'close');
@@ -74,14 +76,14 @@ exports['Server'] = TestFixture({
         });
     }),
 
-    'POST /servers returns 409 if port already in use': verify(function (test) {
+    'returns 409 if port already in use': verify(function (test) {
         api.createServerAtPort(3000, function (response) {
             test.strictEqual(response.statusCode, 409);
             test.done();
         });
     }),
 
-    'POST /servers returns 400 if port missing': verify(function (test) {
+    'returns 400 if port missing': verify(function (test) {
         http.post('http://localhost:3000/servers', {
             body: { },
             callback: function (response) {
@@ -94,7 +96,7 @@ exports['Server'] = TestFixture({
         });
     }),
 
-    'POST /servers returns 400 if port is not a number': verify(function (test) {
+    'returns 400 if port is not a number': verify(function (test) {
         http.post('http://localhost:3000/servers', {
             body: { port: 'test' },
             callback: function (response) {
@@ -105,9 +107,11 @@ exports['Server'] = TestFixture({
                 test.done();
             }
         });
-    }),
+    })
+});
 
-    'GET /servers shows servers created': verify(function (test) {
+exports['GET /servers'] = testCase({
+    'shows servers created': verify(function (test) {
         api.createServerAtPort(3002, function () {
             http.get('http://localhost:3000/servers', function (response) {
                 test.jsonEquals(response.body, {
@@ -133,16 +137,18 @@ exports['Server'] = TestFixture({
                 test.finish(3002);
             });
         });
-    }),
+    })
+});
 
-    'GET /servers:port returns 404 if server not created': verify(function (test) {
+exports['GET /servers:port'] = testCase({
+    'returns 404 if server not created': verify(function (test) {
         http.get('http://localhost:3000/servers/4000', function (response) {
             test.strictEqual(response.statusCode, 404);
             test.done();
         });
     }),
 
-    'GET /servers/:port gets hypermedia for server': verify(function (test) {
+    'gets hypermedia for server': verify(function (test) {
         api.createServerAtPort(3001, function () {
             http.get('http://localhost:3000/servers/3001', function (response) {
                 test.strictEqual(response.statusCode, 200);
@@ -167,9 +173,11 @@ exports['Server'] = TestFixture({
                 test.finish(3001);
             });
         });
-    }),
+    })
+});
 
-    'DELETE /servers/:port deletes stub at given port': verify(function (test) {
+exports['DELETE /servers:port'] = testCase({
+    'deletes stub at given port': verify(function (test) {
         api.createServerAtPort(3004, function () {
             http.del('http://localhost:3000/servers/3004', function (response) {
                 test.strictEqual(response.statusCode, 204);
@@ -181,7 +189,7 @@ exports['Server'] = TestFixture({
         });
     }),
 
-    'DELETE /servers/:port returns 404 if server never created': verify(function (test) {
+    'returns 404 if server never created': verify(function (test) {
         http.del('http://localhost:3000/servers/5000', function (response) {
             test.strictEqual(response.statusCode, 404);
             test.done();
