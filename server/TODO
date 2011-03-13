@@ -10,4 +10,5 @@
 * Remove verify, unit Test - use something like what Sino does
 * support stubbing by request method!!!
 * use better setup/teardowns
+* filter out stub matching logic into module, unit test
 

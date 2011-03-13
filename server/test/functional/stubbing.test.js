@@ -112,5 +112,29 @@ exports['Stubbing'] = TestFixture({
                 }
             });
         });
+    }),
+
+    'POST /servers/:port/stubs only stubs if request method matches': verify(function (test) {
+        api.createServerAtPort(3004, function () {
+            http.post('http://localhost:3000/servers/3004/stubs', {
+                body: {
+                    path: '/stub',
+                    request: { method: 'GET' },
+                    response: { statusCode: 400 }
+                },
+                callback: function () {
+                    http.post('http://localhost:3004/stub', {
+                        callback: function (firstResponse) {
+                            test.strictEqual(firstResponse.statusCode, 200, 'should not have matched request');
+
+                            http.get('http://localhost:3004/stub', function (secondResponse) {
+                                test.strictEqual(secondResponse.statusCode, 400, 'should have matched request');
+                                test.finish(3004);
+                            });
+                        }
+                    });
+                }
+            });
+        });
     })
 });

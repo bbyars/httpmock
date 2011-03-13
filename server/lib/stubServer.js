@@ -53,21 +53,24 @@ var create = function (port, callback) {
         })[0] || defaults;
     };
 
-    var requestMatches = function (request, expectedRequest) {
-        return allHeadersMatch(request, expectedRequest.headers)
-            && bodyMatches(request, expectedRequest.body);
+    var requestMatches = function (actual, expected) {
+        return methodMatches(actual.method, expected.method)
+            && allHeadersMatch(actual.headers, expected.headers)
+            && bodyMatches(actual.body, expected.body);
     };
 
-    var allHeadersMatch = function (request, headers) {
-        return !headers || Object.keys(headers).every(function (header) {
-            return headers[header] === request.headers[header.toLowerCase()];
+    var methodMatches = function (actual, expected) {
+        return !expected || actual === expected;
+    };
+
+    var allHeadersMatch = function (actual, expected) {
+        return !expected || Object.keys(expected).every(function (header) {
+            return expected[header] === actual[header.toLowerCase()];
         });
     };
 
-    var bodyMatches = function (request, body) {
-        console.log('body = ' + body);
-        console.log('request.body = ' + request.body);
-        return !body || request.body.indexOf(body) >= 0;
+    var bodyMatches = function (actual, expected) {
+        return !expected || actual.indexOf(expected) >= 0;
     };
 
     var stubber = function (request, response, next) {
