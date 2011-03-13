@@ -11,4 +11,5 @@
 * support stubbing by request method!!!
 * use better setup/teardowns
 * filter out stub matching logic into module, unit test
+* isPortInUse gives intermittent test failures (timing issue?)
 

@@ -6,5 +6,11 @@ require.paths.push(__dirname);
     require.paths.push(__dirname + '/' + dir);
 });
 
+var tests = process.argv.slice(2);
+if (tests.length === 0) {
+    tests.push('test/unit');
+    tests.push('test/functional');
+}
+
 var testrunner = require('nodeunit').reporters.default;
-testrunner.run(['test/unit', 'test/functional']);
+testrunner.run(tests);
