@@ -1,3 +1,5 @@
+'use strict';
+
 require('extensions');
 
 var testCase = require('nodeunit').testCase,

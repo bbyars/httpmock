@@ -1,12 +1,15 @@
 Nodeunit
 ========
 
-A simple unit testing tool based on the node.js assert module.
+Simple syntax, powerful tools. Nodeunit provides easy async unit testing for
+node.js and the browser.
 
 * Simple to use
 * Just export the tests from a module
+* Works with node.js and in the browser.
 * Helps you avoid common pitfalls when testing asynchronous code
 * Easy to add test cases with setUp and tearDown functions if you wish
+* Flexible reporters for custom output, built-in support for HTML and jUnit XML
 * Allows the use of mocks and stubs
 
 __Contributors__
@@ -15,6 +18,8 @@ __Contributors__
 * [alexkwolfe](https://github.com/alexkwolfe)
 * [azatoth](https://github.com/azatoth)
 * [coffeemate](https://github.com/coffeemate)
+* [luebken](https://github.com/luebken)
+* [orlandov](https://github.com/orlandov)
 * [Sannis](https://github.com/Sannis)
 * [sstephenson](https://github.com/sstephenson)
 * [thegreatape](https://github.com/thegreatape)
@@ -25,7 +30,9 @@ __Contributors__
 Also, check out gerad's [nodeunit-dsl](https://github.com/gerad/nodeunit-dsl)
 project, which implements a 'pretty dsl on top of nodeunit'.
 
-More contributor information can be found in the CONTRIBUTORS.md file.
+More contributor information can be found in the
+[CONTRIBUTORS.md](https://github.com/caolan/nodeunit/blob/master/CONTRIBUTORS.md)
+file.
 
 Usage
 -----
@@ -231,6 +238,57 @@ bin/nodeunit.json for current available options.
 * __--help__ - show nodeunit help
 
 
+Running tests in the browser
+----------------------------
+
+Nodeunit tests can also be run inside the browser. For example usage, see
+the examples/browser folder. The basic syntax is as follows:
+
+__test.html__
+
+    <html>
+      <head>
+        <title>Example Test Suite</title>
+        <link rel="stylesheet" href="nodeunit.css" type="text/css" />
+        <script src="nodeunit.js"></script>
+        <script src="suite1.js"></script>
+        <script src="suite2.js"></script>
+      </head>
+      <body>
+        <h1 id="nodeunit-header>Example Test Suite</h1>
+        <script>
+          nodeunit.run({
+            'Suite One': suite1,
+            'Suite Two': suite2
+          });
+        </script>
+      </body>
+    </html>
+
+Here, suite1 and suite2 are just object literals containing test functions or
+groups, as would be returned if you did require('test-suite') in node.js:
+
+__suite1.js__
+
+    this.suite1 = {
+        'example test': function (test) {
+            test.ok(true, 'everything is ok');
+            test.done();
+        }
+    };
+
+If you wish to use a commonjs format for your test suites (using exports), it is
+up to you to define the commonjs tools for the browser. There are a number of
+alternatives and its important it fits with your existing code, which is
+why nodeunit does not currently provide this out of the box.
+
+In the example above, the tests will run when the page is loaded.
+
+The browser-version of nodeunit.js is created in dist/browser when you do, 'make
+browser'. You'll need [UglifyJS](https://github.com/mishoo/UglifyJS) installed in
+order for it to automatically create nodeunit.min.js.
+
+
 Adding nodeunit to Your Projects
 --------------------------------
 
@@ -286,6 +344,16 @@ Now if someone attempts to run your test suite without nodeunit installed they
 will be prompted to download the submodules for your project.
 
 
+Built-in Test Reporters
+-----------------------
+
+* __default__ - The standard reporter seen in the nodeunit screenshots
+* __minimal__ - Pretty, minimal output, shows errors and progress only
+* __html__ - Outputs a HTML report to stdout
+* __junit__ - Creates jUnit compatible XML reports, which can be used with
+  continuous integration tools such as [Hudson](http://hudson-ci.org/).
+
+
 Writing a Test Reporter
 ---------------------
 
@@ -317,7 +385,7 @@ The __assertion__ object:
 The __assertionList__ object:
 
 * An array-like object with the following new attributes:
-  * __failures__ - the number of assertions which failed
+  * __failures()__ - the number of assertions which failed
   * __duration__ - the time taken for the test to complete in msecs
 
 For a reference implementation of a test reporter, see lib/reporters/default.js in

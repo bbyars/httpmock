@@ -1,4 +1,6 @@
-create = function () {
+'use strict';
+
+var create = function () {
     var requests = [];
 
     var withinHierarchy = function (ancestor, maybeDescendant) {

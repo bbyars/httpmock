@@ -1,3 +1,5 @@
+'use strict';
+
 require('extensions');
 
 var TestFixture = require('nodeunit').testCase,

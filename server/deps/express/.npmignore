@@ -1,4 +1,7 @@
-test
-support
-examples
-docs
+.git*
+docs/
+examples/
+support/
+test/
+testing.js
+.DS_Store

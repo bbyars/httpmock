@@ -5,20 +5,13 @@
  */
 
 var fs = require('fs')
-  , sys = require('sys')
   , exec = require('child_process').exec;
 
 /**
  * Framework version.
  */
 
-var version = '1.0.3';
-
-/**
- * stdin stream.
- */
-
-var stdin;
+var version = '2.0.0beta3';
 
 /**
  * Add session support.
@@ -48,7 +41,7 @@ var usage = ''
   + '\x1b[1mOptions\x1b[0m:\n'
   + '  -s, --sessions         Add session support\n'
   + '  -t, --template ENGINE  Add template ENGINE support (jade|ejs). Defaults to jade\n'
-  + '  -c, --css ENGINE       Add stylesheet ENGINE support (less|sass). Defaults to plain css\n'
+  + '  -c, --css ENGINE       Add stylesheet ENGINE support (less|sass|stylus). Defaults to plain css\n'
   + '  -v, --version          Output framework version\n'
   + '  -h, --help             Output help information\n'
   ;
@@ -110,6 +103,10 @@ var css = [
   , '  padding: 50px;'
   , '  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;'
   , '}'
+  , ''
+  , 'a {'
+  , '  color: #00B7FF;'
+  , '}'
 ].join('\n');
 
 /**
@@ -121,6 +118,10 @@ var less = [
   , '  padding: 50px;'
   , '  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;'
   , '}'
+  , ''
+  , 'a {'
+  , '  color: #00B7FF;'
+  , '}'
 ].join('\n');
 
 /**
@@ -131,6 +132,20 @@ var sass = [
     'body'
   , '  :padding 50px'
   , '  :font 14px "Lucida Grande", Helvetica, Arial, sans-serif'
+  , 'a'
+  , '  :color #00B7FF'
+].join('\n');
+
+/**
+ * Default stylus template.
+ */
+
+var stylus = [
+    'body'
+  , '  padding 50px'
+  , '  font 14px "Lucida Grande", Helvetica, Arial, sans-serif'
+  , 'a'
+  , '  color #00B7FF'
 ].join('\n');
 
 /**
@@ -152,7 +167,7 @@ var appTest = [
   , "  'GET /': function(){"
   , "    assert.response(app,"
   , "      { url: '/' },"
-  , "      { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' }},"
+  , "      { status: 200, headers: { 'Content-Type': 'text/html' }},"
   , "      function(res){"
   , "        assert.includes(res.body, '<title>Express</title>');"
   , "      });"
@@ -179,10 +194,10 @@ var app = [
   , 'app.configure(function(){'
   , '  app.set(\'views\', __dirname + \'/views\');'
   , '  app.set(\'view engine\', \':TEMPLATE\');'
-  , '  app.use(express.bodyDecoder());'
-  , '  app.use(express.methodOverride());:SESS:CSS'
+  , '  app.use(express.bodyParser());'
+  , '  app.use(express.methodOverride());{sess}{css}'
   , '  app.use(app.router);'
-  , '  app.use(express.staticProvider(__dirname + \'/public\'));'
+  , '  app.use(express.static(__dirname + \'/public\'));'
   , '});'
   , ''
   , 'app.configure(\'development\', function(){'
@@ -197,9 +212,7 @@ var app = [
   , ''
   , 'app.get(\'/\', function(req, res){'
   , '  res.render(\'index\', {'
-  , '    locals: {'
-  , '      title: \'Express\''
-  , '    }'
+  , '    title: \'Express\''
   , '  });'
   , '});'
   , ''
@@ -207,7 +220,7 @@ var app = [
   , ''
   , 'if (!module.parent) {'
   , '  app.listen(3000);'
-  , '  console.log("Express server listening on port %d", app.address().port)'
+  , '  console.log("Express server listening on port %d", app.address().port);'
   , '}'
   , ''
 ].join('\n');
@@ -259,7 +272,7 @@ while (args.length) {
     } else {
       confirm('destination is not empty, continue? ', function(ok){
         if (ok) {
-          stdin.destroy();
+          process.stdin.destroy();
           createApplicationAt(path);
         } else {
           abort('aborting');
@@ -283,6 +296,9 @@ function createApplicationAt(path) {
     mkdir(path + '/public/images');
     mkdir(path + '/public/stylesheets', function(){
       switch (cssEngine) {
+        case 'stylus':
+          write(path + '/public/stylesheets/style.styl', stylus);
+          break;
         case 'less':
           write(path + '/public/stylesheets/style.less', less);
           break;
@@ -293,7 +309,7 @@ function createApplicationAt(path) {
           write(path + '/public/stylesheets/style.css', css);
       }
     });
-    mkdir(path + '/views/partials', function(){
+    mkdir(path + '/views', function(){
       switch (templateEngine) {
         case 'ejs':
           write(path + '/views/layout.ejs', ejsLayout);
@@ -313,15 +329,18 @@ function createApplicationAt(path) {
     switch (cssEngine) {
       case 'sass':
       case 'less':
-        app = app.replace(':CSS', '\n  app.use(express.compiler({ src: __dirname + \'/public\', enable: [\'' + cssEngine + '\'] }));');
+        app = app.replace('{css}', '\n  app.use(express.compiler({ src: __dirname + \'/public\', enable: [\'' + cssEngine + '\'] }));');
+        break;
+      case 'stylus':
+        app = app.replace('{css}', '\n  app.use(require(\'stylus\').middleware({ src: __dirname + \'/public\' }));');
         break;
       default:
-        app = app.replace(':CSS', '');
+        app = app.replace('{css}', '');
     }
 
     // Session support
-    app = app.replace(':SESS', sessions
-      ? '\n  app.use(express.cookieDecoder());\n  app.use(express.session());'
+    app = app.replace('{sess}', sessions
+      ? '\n  app.use(express.cookieParser());\n  app.use(express.session({ secret: \'your secret here\' }));'
       : '');
 
     // Template support
@@ -352,7 +371,7 @@ function createApplicationAt(path) {
 
 function emptyDirectory(path, fn) {
   fs.readdir(path, function(err, files){
-    if (err && err.errno !== process.ENOENT) throw err;
+    if (err && 'ENOENT' != err.code) throw err;
     fn(!files || !files.length);
   });
 }
@@ -366,7 +385,7 @@ function emptyDirectory(path, fn) {
 
 function write(path, str) {
   fs.writeFile(path, str);
-  console.log('   \x1b[33mcreate\x1b[0m : ' + path);
+  console.log('   \x1b[36mcreate\x1b[0m : ' + path);
 }
 
 /**
@@ -390,13 +409,18 @@ function confirm(msg, fn) {
  */
 
 function prompt(msg, fn) {
-  stdin = stdin || process.openStdin();
-  sys[msg[msg.length - 1] == ' ' ? 'print' : 'puts'](msg);
-  stdin.setEncoding('ascii');
-  stdin.addListener('data', function(data){
+  // prompt
+  if (' ' == msg[msg.length - 1]) {
+    process.stdout.write(msg);
+  } else {
+    console.log(msg);
+  }
+
+  // stdin
+  process.stdin.setEncoding('ascii');
+  process.stdin.once('data', function(data){
     fn(data);
-    stdin.removeListener('data', arguments.callee);
-  });
+  }).resume();
 }
 
 /**
@@ -409,7 +433,7 @@ function prompt(msg, fn) {
 function mkdir(path, fn) {
   exec('mkdir -p ' + path, function(err){
     if (err) throw err;
-    console.log('   \x1b[33mcreate\x1b[0m : ' + path);
+    console.log('   \x1b[36mcreate\x1b[0m : ' + path);
     fn && fn();
   });
 }

@@ -26,7 +26,7 @@ var create = function (port, callback) {
         stubs = repositories.create(),
         logPrefix = '[{0}]: '.format(port);
 
-    var recorder = function (request, response, next) {
+    var recorder = function recorder (request, response, next) {
         request.body = '';
         request.setEncoding('utf8');
 
@@ -73,15 +73,14 @@ var create = function (port, callback) {
         return !expected || actual.indexOf(expected) >= 0;
     };
 
-    var stubber = function (request, response, next) {
+    var stubber = function stubber (request, response) {
         var stub = Object.create(defaults).merge(findFirstMatchingStub(request)).response;
-stub.headers = stub.headers || {};
-stub.headers.connection = 'close';
+        stub.headers = stub.headers || {};
+        stub.headers.connection = 'close';
 
         response.writeHead(stub.statusCode, stub.headers);
         response.write(stub.body || '');
         response.end();
-        next();
     };
 
     var server = connect.createServer(

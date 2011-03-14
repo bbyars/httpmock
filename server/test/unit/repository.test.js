@@ -1,3 +1,5 @@
+'use strict';
+
 var TestFixture = require('nodeunit').testCase,
     unitTest = require('testExtensions').unitTest,
     createRepository = require('repository').create;

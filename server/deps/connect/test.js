@@ -3,13 +3,21 @@
  * Module dependencies.
  */
 
-var connect = require('./lib/connect');
+var connect = require('./');
 
-connect.createServer(
-  connect.router(function(app){
-    app.get('/user/:id/:op', function(req, res){
-      res.writeHead(200, { 'Content-Length': 5 })
-      res.end('Hello');
-    });
-  })
+connect(
+  function(req, res, next){
+    var options = {
+      path: process.env.HOME + '/downloads/vid.avi',
+      callback: function(err){
+        if (err) {
+          console.log('ERROR');
+          throw err;
+        } else {
+          console.log('done');
+        }
+      }
+    };
+    connect.static.send(req, res, next, options);
+  }
 ).listen(3000);

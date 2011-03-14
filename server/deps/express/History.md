@@ -1,4 +1,90 @@
 
+2.0.0beta3 / 2011-03-09 
+==================
+
+  * Added support for `res.contentType()` literal
+    The original `res.contentType('.json')`,
+    `res.contentType('application/json')`, and `res.contentType('json')`
+    will work now.
+  * Added `res.render()` status option support back
+  * Added charset option for `res.render()`
+  * Added `.charset` support (via connect 1.0.4)
+  * Added view resolution hints when in development and a lookup fails
+  * Added layout lookup support relative to the page view.
+    For example while rendering `./views/user/index.jade` if you create
+    `./views/user/layout.jade` it will be used in favour of the root layout.
+  * Fixed `res.redirect()`. RFC states absolute url [reported by unlink]
+  * Fixed; default `res.send()` string charset to utf8
+  * Removed `Partial` constructor (not currently used)
+
+2.0.0beta2 / 2011-03-07 
+==================
+
+  * Added res.render() `.locals` support back to aid in migration process
+  * Fixed flash example
+
+2.0.0beta / 2011-03-03 
+==================
+
+  * Added HTTPS support
+  * Added `res.cookie()` maxAge support
+  * Added `req.header()` _Referrer_ / _Referer_ special-case, either works
+  * Added mount support for `res.redirect()`, now respects the mount-point
+  * Added `union()` util, taking place of `merge(clone())` combo
+  * Added stylus support to express(1) generated app
+  * Added secret to session middleware used in examples and generated app
+  * Added `res.local(name, val)` for progressive view locals
+  * Added default param support to `req.param(name, default)`
+  * Added `app.disabled()` and `app.enabled()`
+  * Added `app.register()` support for omitting leading ".", either works
+  * Added `res.partial()`, using the same interface as `partial()` within a view. Closes #539
+  * Added `app.param()` to map route params to async/sync logic
+  * Added; aliased `app.helpers()` as `app.locals()`. Closes #481
+  * Added extname with no leading "." support to `res.contentType()`
+  * Added `cache views` setting, defaulting to enabled in "production" env
+  * Added index file partial resolution, eg: partial('user') may try _views/user/index.jade_.
+  * Added `req.accepts()` support for extensions
+  * Changed; `res.download()` and `res.sendfile()` now utilize Connect's
+    static file server `connect.static.send()`.
+  * Changed; replaced `connect.utils.mime()` with npm _mime_ module
+  * Changed; allow `req.query` to be pre-defined (via middleware or other parent
+  * Changed view partial resolution, now relative to parent view
+  * Changed view engine signature. no longer `engine.render(str, options, callback)`, now `engine.compile(str, options) -> Function`, the returned function accepts `fn(locals)`.
+  * Fixed `req.param()` bug returning Array.prototype methods. Closes #552
+  * Fixed; using `Stream#pipe()` instead of `sys.pump()` in `res.sendfile()`
+  * Fixed; using _qs_ module instead of _querystring_
+  * Fixed; strip unsafe chars from jsonp callbacks
+  * Removed "stream threshold" setting
+
+1.0.8 / 2011-03-01 
+==================
+
+  * Allow `req.query` to be pre-defined (via middleware or other parent app)
+  * "connect": ">= 0.5.0 < 1.0.0". Closes #547
+  * Removed the long deprecated __EXPRESS_ENV__ support
+
+1.0.7 / 2011-02-07 
+==================
+
+  * Fixed `render()` setting inheritance.
+    Mounted apps would not inherit "view engine"
+
+1.0.6 / 2011-02-07 
+==================
+
+  * Fixed `view engine` setting bug when period is in dirname
+
+1.0.5 / 2011-02-05 
+==================
+
+  * Added secret to generated app `session()` call
+
+1.0.4 / 2011-02-05 
+==================
+
+  * Added `qs` dependency to _package.json_
+  * Fixed namespaced `require()`s for latest connect support
+
 1.0.3 / 2011-01-13 
 ==================
 

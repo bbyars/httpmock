@@ -4,12 +4,13 @@ require('extensions');
 
 var http = require('http'),
     url = require('url'),
-    express = require('express')
+    express = require('express'),
+    connect = require('connect'),
     server = require('stubServer'),
     ports = require('ports');
 
 var CONTENT_TYPE = 'application/vnd.httpmock+json';
-require('connect/middleware/bodyDecoder').decode[CONTENT_TYPE] = JSON.parse;
+connect.bodyParser.parse[CONTENT_TYPE] = JSON.parse;
 
 var listen = function (port) {
     var servers = {},
@@ -64,7 +65,7 @@ var listen = function (port) {
 
     var app = express.createServer(
         express.logger({format: '[ROOT]: :method :url'}),
-        express.bodyDecoder(),
+        express.bodyParser(),
         createAbsoluteUrl
     );
     app.listen(port);

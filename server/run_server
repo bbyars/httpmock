@@ -7,4 +7,7 @@ require.paths.push(__dirname);
 require.paths.push(__dirname + '/lib');
 require.paths.push(__dirname + '/deps');
 
+// Add node directory for things like qs (connect depends on it)
+require.paths.push('/usr/local/lib/node');
+
 require('controlServer').listen(process.argv[2] || 3000);

@@ -9,16 +9,19 @@
  */
 
 var nodeunit = require('../nodeunit'),
+    utils = require('../utils'),
     fs = require('fs'),
     sys = require('sys'),
-    path = require('path'),
-    AssertionError = require('assert').AssertionError;
+    track = require('../track'),
+    path = require('path');
+    AssertionError = require('../assert').AssertionError;
 
 /**
  * Reporter info string
  */
 
 exports.info = "Default tests reporter";
+
 
 /**
  * Run all tests within each module, reporting the results to the command-line.
@@ -54,19 +57,37 @@ exports.run = function (files, options) {
     var paths = files.map(function (p) {
         return path.join(process.cwd(), p);
     });
+    var tracker = track.createTracker(function (tracker) {
+        if (tracker.unfinished()) {
+            sys.puts('');
+            sys.puts(error(bold(
+                'FAILURES: Undone tests (or their setups/teardowns): '
+            )));
+            var names = tracker.names();
+            for (var i = 0; i < names.length; i += 1) {
+                sys.puts('- ' + names[i]);
+            }
+            sys.puts('');
+            sys.puts('To fix this, make sure all tests call test.done()');
+            process.reallyExit(tracker.unfinished());
+        }
+    });
 
     nodeunit.runFiles(paths, {
         moduleStart: function (name) {
             sys.puts('\n' + bold(name));
         },
         testDone: function (name, assertions) {
-            if (!assertions.failures) {
+            tracker.remove(name);
+
+            if (!assertions.failures()) {
                 sys.puts('✔ ' + name);
             }
             else {
                 sys.puts(error('✖ ' + name) + '\n');
                 assertions.forEach(function (a) {
                     if (a.failed()) {
+                        a = utils.betterErrors(a);
                         if (a.error instanceof AssertionError && a.message) {
                             sys.puts(
                                 'Assertion Message: ' +
@@ -81,9 +102,9 @@ exports.run = function (files, options) {
         done: function (assertions) {
             var end = new Date().getTime();
             var duration = end - start;
-            if (assertions.failures) {
+            if (assertions.failures()) {
                 sys.puts(
-                    '\n' + bold(error('FAILURES: ')) + assertions.failures +
+                    '\n' + bold(error('FAILURES: ')) + assertions.failures() +
                     '/' + assertions.length + ' assertions failed (' +
                     assertions.duration + 'ms)'
                 );
@@ -100,8 +121,11 @@ exports.run = function (files, options) {
             // process.stdout.flush()
             // process.stdout.end()
             setTimeout(function () {
-                process.reallyExit(assertions.failures);
+                process.reallyExit(assertions.failures());
             }, 10);
+        },
+        testStart: function(name) {
+            tracker.put(name);
         }
     });
 };

@@ -9,6 +9,7 @@
  */
 
 var nodeunit = require('../nodeunit'),
+    utils = require('../utils'),
     fs = require('fs'),
     sys = require('sys'),
     path = require('path'),
@@ -28,14 +29,6 @@ exports.info = "Report tests result as HTML";
  */
 
 exports.run = function (files, options) {
-
-    if (!options) {
-        // load default options
-        var content = fs.readFileSync(
-            __dirname + '/../../bin/nodeunit.json', 'utf8'
-        );
-        options = JSON.parse(content);
-    }
 
     var start = new Date().getTime();
     var paths = files.map(function (p) {
@@ -67,13 +60,14 @@ exports.run = function (files, options) {
             sys.puts('<ol>');
         },
         testDone: function (name, assertions) {
-            if (!assertions.failures) {
+            if (!assertions.failures()) {
                 sys.puts('<li class="pass">' + name + '</li>');
             }
             else {
                 sys.puts('<li class="fail">' + name);
                 assertions.forEach(function (a) {
                     if (a.failed()) {
+                        a = utils.betterErrors(a);
                         if (a.error instanceof AssertionError && a.message) {
                             sys.puts('<div class="assertion_message">' +
                                 'Assertion Message: ' + a.message +
@@ -93,9 +87,9 @@ exports.run = function (files, options) {
         done: function (assertions) {
             var end = new Date().getTime();
             var duration = end - start;
-            if (assertions.failures) {
+            if (assertions.failures()) {
                 sys.puts(
-                    '<h3>FAILURES: '  + assertions.failures +
+                    '<h3>FAILURES: '  + assertions.failures() +
                     '/' + assertions.length + ' assertions failed (' +
                     assertions.duration + 'ms)</h3>'
                 );
@@ -110,7 +104,7 @@ exports.run = function (files, options) {
             // should be able to flush stdout here, but doesn't seem to work,
             // instead delay the exit to give enough to time flush.
             setTimeout(function () {
-                process.reallyExit(assertions.failures);
+                process.reallyExit(assertions.failures());
             }, 10);
         }
     });

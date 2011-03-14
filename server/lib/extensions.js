@@ -10,7 +10,9 @@ Object.prototype.merge = function (other) {
 };
 
 String.prototype.format = function () {
-    var formatted = this;
+    var formatted = this,
+        arg;
+
     for (arg in arguments) {
         formatted = formatted.replace("{" + arg + "}", arguments[arg]);
     }

@@ -10,16 +10,16 @@ Nodeunit contributors (sorted alphabeticaly)
 
   * HTML test reporter
 
-* **[Azatoth](https://github.com/azatoth)**
-
-  * Debian-friendly Makefile, supports both 'node' and 'nodejs' executables
-  * Sandbox utility
-  * Minimal test reporter
-
 * **[Caolan McMahon](https://github.com/caolan)**
 
   * Author and maintainer
   * Most features develpopment
+
+* **[Carl Fürstenberg](https://github.com/azatoth)**
+
+  * Debian-friendly Makefile, supports both 'node' and 'nodejs' executables
+  * Sandbox utility
+  * Minimal test reporter
 
 * **[Gerad Suyderhoud](https://github.com/gerad)**
 
@@ -30,11 +30,19 @@ Nodeunit contributors (sorted alphabeticaly)
   * Improvements to default test reporter
   * HTTP test utility
 
+* **[Matthias Lübken](https://github.com/luebken)**
+
+  * Utility functions for tracking incomplete tests on exit
+
 * **[Oleg Efimov](https://github.com/Sannis)**
 
   * Adding 'make lint' and fixing nodelint errors
   * Option parsing, --help text and config file support
   * Reporters option for command-line tool
+
+* **[Orlando Vazquez](https://github.com/orlandov)**
+
+  * Added jUnit XML reporter
 
 * **[Ryan Dahl](https://github.com/ry)**
 
