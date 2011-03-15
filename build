@@ -1,7 +1,6 @@
 echo 'Running server tests'
-# nodeunit maps files according to process.cwd;
-# meaning you can't call from this directory
-(cd server && ./run_tests)
+server/run_tests
+
 echo
 
 echo 'Building Java bindings'

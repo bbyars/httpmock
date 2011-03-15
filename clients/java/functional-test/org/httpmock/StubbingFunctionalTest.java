@@ -25,7 +25,6 @@ public class StubbingFunctionalTest {
 
         HttpResponse response = new HttpRequest("GET", "http://localhost:3001/").send();
 
-
         assertEquals(400, response.getStatusCode());
     }
 

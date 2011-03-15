@@ -78,19 +78,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="WasCalledAtFunctionalTest.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="WasCalledAtFunctionalTest.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/functional-test/org/httpmock/WasCalledAtFunctionalTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="25" column="69" selection-start="598" selection-end="598" vertical-scroll-proportion="0.0">
+            <state line="85" column="55" selection-start="2828" selection-end="3069" vertical-scroll-proportion="0.7461213">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="StubbingFunctionalTest.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="StubbingFunctionalTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/functional-test/org/httpmock/StubbingFunctionalTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="50" column="39" selection-start="1307" selection-end="1307" vertical-scroll-proportion="1.3245033">
+            <state line="49" column="0" selection-start="1306" selection-end="1306" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -181,9 +181,9 @@
         <option value="$PROJECT_DIR$/src/org/httpmock/StubServer.java" />
         <option value="$PROJECT_DIR$/src/org/httpmock/StubResponse.java" />
         <option value="$PROJECT_DIR$/src/org/httpmock/Stubber.java" />
-        <option value="$PROJECT_DIR$/functional-test/org/httpmock/StubbingFunctionalTest.java" />
         <option value="$PROJECT_DIR$/src/org/httpmock/HttpMock.java" />
         <option value="$PROJECT_DIR$/src/org/httpmock/Stub.java" />
+        <option value="$PROJECT_DIR$/functional-test/org/httpmock/StubbingFunctionalTest.java" />
       </list>
     </option>
   </component>
@@ -733,9 +733,9 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24657534" sideWeight="0.6622691" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24657534" sideWeight="0.59102905" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32849604" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32849604" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32849604" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -859,13 +859,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/functional-test/org/httpmock/WasCalledAtFunctionalTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="69" selection-start="598" selection-end="598" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/functional-test/org/httpmock/ControlServerFunctionalTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="8" column="13" selection-start="197" selection-end="197" vertical-scroll-proportion="0.0">
@@ -891,10 +884,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/functional-test/org/httpmock/StubbingFunctionalTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="39" selection-start="1307" selection-end="1307" vertical-scroll-proportion="1.3245033">
+        <state line="49" column="0" selection-start="1306" selection-end="1306" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/functional-test/org/httpmock/WasCalledAtFunctionalTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="85" column="55" selection-start="2828" selection-end="3069" vertical-scroll-proportion="0.7461213">
+          <folding />
         </state>
       </provider>
     </entry>

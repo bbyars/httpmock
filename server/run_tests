@@ -1,5 +1,8 @@
 #!/usr/local/bin/node
 
+// nodeunit's default reporter depends on process.cwd
+process.chdir(__dirname);
+
 require.paths.unshift(__dirname + '/deps/nodeunit/lib');
 require.paths.push(__dirname);
 ['lib', 'deps', 'test'].forEach(function (dir) {
