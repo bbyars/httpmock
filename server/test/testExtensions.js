@@ -3,6 +3,15 @@
 var url = require('url'),
     http = require('http');
 
+var merge = function (first, second) {
+    for (var prop in second) {
+        if (second.hasOwnProperty(prop)) {
+            first[prop] = second[prop];
+        }
+    }
+    return first;
+};
+
 // Allows async
 var verify = function (f) {
     return function (test) {
@@ -44,7 +53,7 @@ var addCustomAsserts = function (test) {
 };
 
 var setDefaults = function (options) {
-    return {
+    return merge({
         method: 'GET',
         headers: {
             'Accept': 'application/vnd.httpmock+json',
@@ -52,7 +61,7 @@ var setDefaults = function (options) {
             'Host': url.parse(options.url).host
         },
         body: ''
-    }.merge(options);
+    }, options);
 };
 
 var web = {
@@ -88,7 +97,9 @@ var web = {
     },
 
     post: function (url, options) {
-        this.getResponse(options.merge({url: url, method: 'POST'}));
+        options.url = url;
+        options.method = 'POST';
+        this.getResponse(options);
     },
 
     del: function (url, callback) {

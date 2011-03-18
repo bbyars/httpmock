@@ -4,8 +4,6 @@
 * Add HTML pages for the different rel urls
 * Allow retrieving stubs per server, deleting some
 * Allow ordering stub calls to same path to simulate state change
-* Fix or remove merge (maybe just use Object.create?)
-** Having to add the || '' in stubServer.js to write the body is sympomatic
 * Add endpoint to set defaults for stubs?
 * Remove verify, unit Test - use something like what Sino does
 * filter out stub matching logic into module, unit test

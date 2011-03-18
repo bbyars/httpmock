@@ -96,7 +96,7 @@ var listen = function (port) {
         server.create(port, function (server) {
             servers[port] = server;
             response.send(serverHypermedia(port, response),
-                {'Location': response.absoluteUrl('/servers/' + port)}.merge(contentHeader),
+                merge({'Location': response.absoluteUrl('/servers/' + port)}, contentHeader),
                 201);
         });
     });

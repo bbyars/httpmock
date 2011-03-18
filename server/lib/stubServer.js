@@ -84,7 +84,6 @@ var create = function (port, callback) {
             headers = merge(defaultStub.headers, match.headers),
             stub = merge(defaultStub, match);
 
-delete headers.merge;
         response.writeHead(stub.statusCode, headers);
         response.write(stub.body);
         response.end();
