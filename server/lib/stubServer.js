@@ -3,22 +3,21 @@
 require('extensions');
 
 var connect = require('connect'),
-    repositories = require('repository');
+    repositories = require('repository'),
+    merge = connect.utils.merge;
 
+// We can't use keepalive connections, because a test case
+// may shutdown the stub, which prevents new connections for
+// the port, but that won't prevent the system under test
+// from reusing an existing TCP connection after the stub
+// has shutdown, causing difficult to track down bugs when
+// multiple tests are run.
 var defaults = {
-    response: {
-        statusCode: 200,
-        /*headers: {
-            // We can't use persistent connections, because a test case
-            // may shutdown the stub, which prevents new connections for
-            // the port, but that won't prevent the system under test
-            // from reusing an existing TCP connection after the stub
-            // has shutdown, causing difficult to track down bugs when
-            // multiple tests are run.
-            'Connection': 'close'
-        },*/
-        body: ''
-    }
+    statusCode: 200,
+    headers: {
+        'Connection': 'close'
+    },
+    body: ''
 };
 
 var create = function (port, callback) {
@@ -46,11 +45,17 @@ var create = function (port, callback) {
     };
 
     var findFirstMatchingStub = function (request) {
-        var possibleMatches = stubs.load(request.url);
+        var possibleMatches = stubs.load(request.url),
+            stub;
 
-        return possibleMatches.filter(function (stub) {
+        stub = possibleMatches.filter(function (stub) {
             return (!stub.request || requestMatches(request, stub.request));
-        })[0] || defaults;
+        })[0];
+
+        if (!stub || !stub.response) {
+            return Object.create(defaults);
+        }
+        return stub.response;
     };
 
     var requestMatches = function (actual, expected) {
@@ -74,12 +79,14 @@ var create = function (port, callback) {
     };
 
     var stubber = function stubber (request, response) {
-        var stub = Object.create(defaults).merge(findFirstMatchingStub(request)).response;
-        stub.headers = stub.headers || {};
-        stub.headers.connection = 'close';
+        var defaultStub = Object.create(defaults),
+            match = findFirstMatchingStub(request),
+            headers = merge(defaultStub.headers, match.headers),
+            stub = merge(defaultStub, match);
 
-        response.writeHead(stub.statusCode, stub.headers);
-        response.write(stub.body || '');
+delete headers.merge;
+        response.writeHead(stub.statusCode, headers);
+        response.write(stub.body);
         response.end();
     };
 

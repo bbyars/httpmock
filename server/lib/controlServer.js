@@ -7,7 +7,8 @@ var http = require('http'),
     express = require('express'),
     connect = require('connect'),
     server = require('stubServer'),
-    ports = require('ports');
+    ports = require('ports'),
+    merge = connect.utils.merge;
 
 var CONTENT_TYPE = 'application/vnd.httpmock+json';
 connect.bodyParser.parse[CONTENT_TYPE] = JSON.parse;
@@ -95,7 +96,7 @@ var listen = function (port) {
         server.create(port, function (server) {
             servers[port] = server;
             response.send(serverHypermedia(port, response),
-                Object.create(contentHeader).merge({'Location': response.absoluteUrl('/servers/' + port)}),
+                {'Location': response.absoluteUrl('/servers/' + port)}.merge(contentHeader),
                 201);
         });
     });
