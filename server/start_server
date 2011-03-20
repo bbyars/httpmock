@@ -10,12 +10,10 @@ require.paths.push(__dirname + '/deps');
 // Add node directory for things like qs (connect depends on it)
 require.paths.push('/usr/local/lib/node');
 
-var server = require('controlServer');
-server.listen(process.argv[2] || 3000);
+var server = require('controlServer').create(process.argv[2] || 3000);
 
 require('fs').writeFileSync('httpmock.pid', process.pid.toString());
 
-process.on('TERM', function () {
+process.on('SIGTERM', function () {
     server.close();
-    console.log('Goodbye...');
 });

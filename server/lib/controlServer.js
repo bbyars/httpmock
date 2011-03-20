@@ -13,7 +13,7 @@ var http = require('http'),
 var CONTENT_TYPE = 'application/vnd.httpmock+json';
 connect.bodyParser.parse[CONTENT_TYPE] = JSON.parse;
 
-var listen = function (port) {
+var create = function (port) {
     var servers = {},
         contentHeader = {'Content-Type': CONTENT_TYPE};
 
@@ -150,9 +150,10 @@ var listen = function (port) {
 
     return {
         close: function () {
+            console.log('Goodbye...');
             app.close();
         }
     }
 };
 
-exports.listen = listen;
+exports.create = create;
