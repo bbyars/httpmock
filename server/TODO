@@ -10,7 +10,6 @@
 * isPortInUse gives intermittent test failures (timing issue?)
 * build stuff:
 ** start server as part of build
-** write out httpmock.pid file to allow killing server with shell script
 ** packages: npm, brew
 ** web page with artifacts
 ** versioning in artifacts
