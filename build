@@ -4,4 +4,4 @@ server/run_tests
 echo
 
 echo 'Building Java bindings'
-ant -f clients/java/build.xml
+ant -Dversion=$1 -f clients/java/build.xml

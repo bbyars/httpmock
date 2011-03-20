@@ -5,3 +5,5 @@ server/data/
 clients/java/httpmock-bindings/out/
 clients/java/out/
 httpmock.pid
+clients/java/MANIFEST.MF
+.DS_Store

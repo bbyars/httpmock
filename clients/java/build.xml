@@ -17,7 +17,10 @@
 
     <target name="compile.production">
         <compile srcdir="${basedir}/src" destdir="${build}/httpmock"/>
-        <jar basedir="${build}/httpmock" destfile="${build}/httpmock.jar"/>
+        <manifest file="MANIFEST.MF">
+            <attribute name="Version" value="${version}"/>
+        </manifest>
+        <jar basedir="${build}/httpmock" destfile="${build}/httpmock.jar" manifest="MANIFEST.MF"/>
     </target>
 
     <target name="compile.test">
