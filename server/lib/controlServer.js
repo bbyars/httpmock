@@ -147,6 +147,12 @@ var listen = function (port) {
             ]
         };
     };
+
+    return {
+        close: function () {
+            app.close();
+        }
+    }
 };
 
 exports.listen = listen;

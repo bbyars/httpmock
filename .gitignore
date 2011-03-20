@@ -4,3 +4,4 @@ server/.monitor
 server/data/
 clients/java/httpmock-bindings/out/
 clients/java/out/
+httpmock.pid

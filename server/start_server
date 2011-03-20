@@ -17,4 +17,5 @@ require('fs').writeFileSync('httpmock.pid', process.pid.toString());
 
 process.on('TERM', function () {
     server.close();
+    console.log('Goodbye...');
 });

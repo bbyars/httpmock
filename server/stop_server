@@ -1,0 +1,2 @@
+kill `cat httpmock.pid`
+rm httpmock.pid
