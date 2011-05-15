@@ -4,7 +4,6 @@
 * filter out stub matching logic into module, unit test
 
 == Build ==
-* Use nvm
 * add jslint
 * start server as part of build
 * packages: npm, brew
@@ -19,6 +18,7 @@
 * Allow ordering stub calls to same path to simulate state change
 * Add endpoint to set defaults for stubs?
 * Add smtp mocking, with same REST API (create servers on demand)
+    * Would be nice as a plugin, allow other protocols as plugins
 
 == Bugs ==
 * isPortInUse gives intermittent test failures (timing issue?)

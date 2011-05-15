@@ -6,15 +6,15 @@ httpmock is a library for stubbing out web services without changing the system 
 
 httpmock is composed of two parts: a server that sits in for the third party web service, and client bindings.  The server is written using [node.js](http://nodejs.org/).  The client bindings are written in whatever language you are using (Java is the only supported one at the moment).
 
-Node.js is the only dependency to get the server up and running.  Node.js will work on any unix-like platform (including cygwin).  The easiest way to install it is probably you're package manager (e.g. `brew install node`).
+Node.js is the only dependency to get the server up and running.  Node.js will work on any unix-like platform (including cygwin).  The easiest way to install it is probably you're package manager (e.g. `brew install node`).  [nvm](https://github.com/creationix/nvm) allows you to install multiple versions of node and quickly switch versions.  httpmock has been tested on v0.4.2 and v0.4.7.
 
 ## Installation and Setup
 
 Download httpmock to the server, and run the following:
 `cd server`
-`node ./run_server`
+`scripts/start_server`
 
-That will run the control server (see below) on port 3000.  You can optionally pass another command line argument to change the port.
+That will run the control server (see below) on port 3000.  You can optionally pass another command line argument to change the port.  If you run the server in a background job, `scripts/stop_server` will kill it.
 
 The client bindings will simply be a library.  For Java, add httpmock.jar to your classpath.
 
@@ -26,8 +26,8 @@ The Java API is a work in progress.  For examples, look under clients/java/funct
 
 To build everything, run `build` from a bash-like shell.  The server can be tested with the following:
 `cd server`
-`./run_server`
-`./run_tests`
+`scripts/start_server`
+`scripts/run_tests`
 
 The Java library can be built and tested (assuming the server is running) with the following:
 `cd clients/java`

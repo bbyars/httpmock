@@ -59,7 +59,7 @@ var create = function (port) {
         var host = request.headers.host || 'localhost:' + port;
         response.absoluteUrl = function (endpoint, serverPort) {
             serverPort = serverPort || port;
-            return 'http://{0}{1}'.format(host, endpoint).replace(/:\d+/, ':' + serverPort)
+            return 'http://{0}{1}'.format(host, endpoint).replace(/:\d+/, ':' + serverPort);
         };
         next();
     };
