@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+// vim: ft=javascript
+
+var basedir = __dirname.replace(/[^\/]+$/, '');
+
+// nodeunit's default reporter depends on process.cwd
+process.chdir(basedir);
+
+require.paths.unshift(basedir + '/deps/nodeunit/lib');
+require.paths.push(basedir);
+['lib', 'deps', 'test'].forEach(function (dir) {
+    require.paths.push(basedir + '/' + dir);
+});
+
+var tests = process.argv.slice(2);
+if (tests.length === 0) {
+    tests.push('test/unit');
+    tests.push('test/functional');
+}
+
+var testrunner = require('nodeunit').reporters['default'];
+testrunner.run(tests);

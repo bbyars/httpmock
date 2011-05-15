@@ -1,11 +1,14 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
+// vim: ft=javascript
+
+var basedir = __dirname.replace(/[^\/]+$/, '');
 
 // Needed to require express locally; it does a require('connect')
-require.paths.unshift(__dirname + '/deps/connect/lib');
+require.paths.unshift(basedir + '/deps/connect/lib');
 
-require.paths.push(__dirname);
-require.paths.push(__dirname + '/lib');
-require.paths.push(__dirname + '/deps');
+require.paths.push(basedir);
+require.paths.push(basedir + '/lib');
+require.paths.push(basedir + '/deps');
 
 // Add node directory for things like qs (connect depends on it)
 require.paths.push('/usr/local/lib/node');
