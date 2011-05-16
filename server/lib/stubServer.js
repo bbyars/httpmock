@@ -23,9 +23,10 @@ var defaults = {
 var create = function (port, callback) {
     var requests = repositories.create(),
         stubs = repositories.create(),
-        logPrefix = '[{0}]: '.format(port);
+        logPrefix = '[{0}]: '.format(port),
+        server;
 
-    var recorder = function recorder(request, response, next) {
+    function recorder(request, response, next) {
         request.body = '';
         request.setEncoding('utf8');
 
@@ -42,29 +43,29 @@ var create = function (port, callback) {
             });
             next();
         });
-    };
+    }
 
-    var methodMatches = function (actual, expected) {
+    function methodMatches(actual, expected) {
         return !expected || actual === expected;
-    };
+    }
 
-    var allHeadersMatch = function (actual, expected) {
+    function allHeadersMatch(actual, expected) {
         return !expected || Object.keys(expected).every(function (header) {
             return expected[header] === actual[header.toLowerCase()];
         });
-    };
+    }
 
-    var bodyMatches = function (actual, expected) {
+    function bodyMatches(actual, expected) {
         return !expected || actual.indexOf(expected) >= 0;
-    };
+    }
 
-    var requestMatches = function (actual, expected) {
+    function requestMatches(actual, expected) {
         return methodMatches(actual.method, expected.method) &&
             allHeadersMatch(actual.headers, expected.headers) &&
             bodyMatches(actual.body, expected.body);
-    };
+    }
 
-    var findFirstMatchingStub = function (request) {
+    function findFirstMatchingStub(request) {
         var possibleMatches = stubs.load(request.url),
             stub;
 
@@ -76,9 +77,9 @@ var create = function (port, callback) {
             return Object.create(defaults);
         }
         return stub.response;
-    };
+    }
 
-    var stubber = function stubber(request, response) {
+    function stubber(request, response) {
         var defaultStub = Object.create(defaults),
             match = findFirstMatchingStub(request),
             headers = merge(defaultStub.headers, match.headers),
@@ -87,9 +88,9 @@ var create = function (port, callback) {
         response.writeHead(stub.statusCode, headers);
         response.write(stub.body);
         response.end();
-    };
+    }
 
-    var server = connect.createServer(
+    server = connect.createServer(
         connect.logger({format: logPrefix + ':method :url'}),
         recorder,
         stubber

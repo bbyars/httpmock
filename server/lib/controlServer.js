@@ -15,9 +15,19 @@ connect.bodyParser.parse[CONTENT_TYPE] = JSON.parse;
 
 var create = function (port) {
     var servers = {},
-        contentHeader = {'Content-Type': CONTENT_TYPE};
+        contentHeader = {'Content-Type': CONTENT_TYPE},
+        app;
 
-    var serverHypermedia = function (port, response) {
+    function createAbsoluteUrl(request, response, next) {
+        var host = request.headers.host || 'localhost:' + port;
+        response.absoluteUrl = function (endpoint, serverPort) {
+            serverPort = serverPort || port;
+            return 'http://{0}{1}'.format(host, endpoint).replace(/:\d+/, ':' + serverPort);
+        };
+        next();
+    }
+
+    function serverHypermedia(port, response) {
         return {
             url: response.absoluteUrl('/', port),
             port: parseInt(port, 10),
@@ -36,9 +46,9 @@ var create = function (port) {
                 }
             ]
         };
-    };
+    }
 
-    var validateServerExists = function (request, response, next) {
+    function validateServerExists(request, response, next) {
         var port = request.port = request.params.port;
 
         if (!servers[port]) {
@@ -47,9 +57,9 @@ var create = function (port) {
         else {
             next();
         }
-    };
+    }
 
-    var validatePort = function (request, response, next) {
+    function validatePort(request, response, next) {
         var port = request.body.port;
 
         if (!port) {
@@ -61,9 +71,9 @@ var create = function (port) {
         else {
             next();
         }
-    };
+    }
 
-    var validatePortAvailable = function (request, response, next) {
+    function validatePortAvailable(request, response, next) {
         var port = request.body.port;
 
         ports.isPortInUse(port, function (isInUse) {
@@ -74,18 +84,9 @@ var create = function (port) {
                 next();
             }
         });
-    };
+    }
 
-    var createAbsoluteUrl = function (request, response, next) {
-        var host = request.headers.host || 'localhost:' + port;
-        response.absoluteUrl = function (endpoint, serverPort) {
-            serverPort = serverPort || port;
-            return 'http://{0}{1}'.format(host, endpoint).replace(/:\d+/, ':' + serverPort);
-        };
-        next();
-    };
-
-    var app = express.createServer(
+    app = express.createServer(
         express.logger({format: '[ROOT]: :method :url'}),
         express.bodyParser(),
         createAbsoluteUrl

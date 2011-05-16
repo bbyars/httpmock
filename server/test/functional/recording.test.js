@@ -9,15 +9,15 @@ var testCase = require('nodeunit').testCase,
     port = 3001,
     stubUrl = 'http://localhost:' + port;
 
-var getRequests = function (spec, callback) {
+function getRequests(spec, callback) {
     if (arguments.length === 1) {
         callback = spec;
         spec = {};
     }
-    var stubPort = spec.port || port;
-    var query = spec.query || '';
+    var stubPort = spec.port || port,
+        query = spec.query || '';
     http.get('http://localhost:3000/servers/' + stubPort + '/requests' + query, callback);
-};
+}
 
 exports['Trying to GET /servers/:port/requests'] = testCase({
     'returns 404 if server not created': function (test) {

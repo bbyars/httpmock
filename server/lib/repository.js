@@ -3,22 +3,22 @@
 var create = function () {
     var requests = [];
 
-    var withinHierarchy = function (ancestor, maybeDescendant) {
+    function withinHierarchy(ancestor, maybeDescendant) {
         var canonicalize = function (path) {
             return path.replace(/\/$/, '').toLowerCase() + '/';
         };
         return canonicalize(maybeDescendant).indexOf(canonicalize(ancestor)) === 0;
-    };
+    }
 
-    var load = function (containingPath) {
+    function load(containingPath) {
         return requests.filter(function (value) {
             return withinHierarchy(containingPath, value.path);
         });
-    };
+    }
 
-    var save = function (request) {
+    function save(request) {
         requests.push(request);
-    };
+    }
 
     return {
         load: load,
