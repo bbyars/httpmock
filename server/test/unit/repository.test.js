@@ -4,7 +4,7 @@ var TestFixture = require('nodeunit').testCase,
     unitTest = require('testExtensions').unitTest,
     createRepository = require('repository').create;
 
-exports['Repository'] = TestFixture({
+exports.Repository = new TestFixture({
     'should return empty array if nothing recorded': unitTest(function (test) {
         var repository = createRepository();
         test.jsonEquals(repository.load('/path'), []);

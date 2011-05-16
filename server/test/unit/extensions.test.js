@@ -5,7 +5,7 @@ require('extensions');
 var TestFixture = require('nodeunit').testCase,
     unitTest = require('testExtensions').unitTest;
 
-exports['String'] = TestFixture({
+exports.String = new TestFixture({
     'format should do nothing if no placeholders': unitTest(function (test) {
         test.strictEqual('test'.format('ignore'), 'test');
     }),

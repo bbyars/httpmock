@@ -2,10 +2,10 @@
 
 String.prototype.format = function () {
     var formatted = this,
-        arg;
+        i;
 
-    for (arg in arguments) {
-        formatted = formatted.replace("{" + arg + "}", arguments[arg]);
+    for (i = 0; i < arguments.length; i += 1) {
+        formatted = formatted.replace("{" + i + "}", arguments[i]);
     }
     return formatted;
 };

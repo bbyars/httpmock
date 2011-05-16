@@ -25,7 +25,7 @@ var create = function (port, callback) {
         stubs = repositories.create(),
         logPrefix = '[{0}]: '.format(port);
 
-    var recorder = function recorder (request, response, next) {
+    var recorder = function recorder(request, response, next) {
         request.body = '';
         request.setEncoding('utf8');
 
@@ -44,26 +44,6 @@ var create = function (port, callback) {
         });
     };
 
-    var findFirstMatchingStub = function (request) {
-        var possibleMatches = stubs.load(request.url),
-            stub;
-
-        stub = possibleMatches.filter(function (stub) {
-            return (!stub.request || requestMatches(request, stub.request));
-        })[0];
-
-        if (!stub || !stub.response) {
-            return Object.create(defaults);
-        }
-        return stub.response;
-    };
-
-    var requestMatches = function (actual, expected) {
-        return methodMatches(actual.method, expected.method)
-            && allHeadersMatch(actual.headers, expected.headers)
-            && bodyMatches(actual.body, expected.body);
-    };
-
     var methodMatches = function (actual, expected) {
         return !expected || actual === expected;
     };
@@ -78,7 +58,27 @@ var create = function (port, callback) {
         return !expected || actual.indexOf(expected) >= 0;
     };
 
-    var stubber = function stubber (request, response) {
+    var requestMatches = function (actual, expected) {
+        return methodMatches(actual.method, expected.method) &&
+            allHeadersMatch(actual.headers, expected.headers) &&
+            bodyMatches(actual.body, expected.body);
+    };
+
+    var findFirstMatchingStub = function (request) {
+        var possibleMatches = stubs.load(request.url),
+            stub;
+
+        stub = possibleMatches.filter(function (stub) {
+            return (!stub.request || requestMatches(request, stub.request));
+        })[0];
+
+        if (!stub || !stub.response) {
+            return Object.create(defaults);
+        }
+        return stub.response;
+    };
+
+    var stubber = function stubber(request, response) {
         var defaultStub = Object.create(defaults),
             match = findFirstMatchingStub(request),
             headers = merge(defaultStub.headers, match.headers),

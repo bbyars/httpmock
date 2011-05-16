@@ -4,7 +4,6 @@
 * filter out stub matching logic into module, unit test
 
 == Build ==
-* add jslint
 * start server as part of build
 * packages: npm, brew
 * web page with artifacts

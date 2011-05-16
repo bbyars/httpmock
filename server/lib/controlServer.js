@@ -17,6 +17,27 @@ var create = function (port) {
     var servers = {},
         contentHeader = {'Content-Type': CONTENT_TYPE};
 
+    var serverHypermedia = function (port, response) {
+        return {
+            url: response.absoluteUrl('/', port),
+            port: parseInt(port, 10),
+            links: [
+                {
+                    href: response.absoluteUrl('/servers/{0}'.format(port)),
+                    rel: response.absoluteUrl('/relations/server')
+                },
+                {
+                    href: response.absoluteUrl('/servers/{0}/requests'.format(port)),
+                    rel: response.absoluteUrl('/relations/request')
+                },
+                {
+                    href: response.absoluteUrl('/servers/{0}/stubs'.format(port)),
+                    rel: response.absoluteUrl('/relations/stub')
+                }
+            ]
+        };
+    };
+
     var validateServerExists = function (request, response, next) {
         var port = request.port = request.params.port;
 
@@ -88,7 +109,7 @@ var create = function (port) {
             return accumulator.concat(serverHypermedia(port, response));
         }, []);
         response.send({ servers: result }, contentHeader);
-    }),
+    });
 
     app.post('/servers', validatePort, validatePortAvailable, function (request, response) {
         var port = request.body.port;
@@ -103,7 +124,7 @@ var create = function (port) {
 
     app.get('/servers/:port', validateServerExists, function (request, response) {
         response.send(serverHypermedia(request.port, response), contentHeader);
-    }),
+    });
 
     app.del('/servers/:port', validateServerExists, function (request, response) {
         var server = servers[request.port];
@@ -127,33 +148,12 @@ var create = function (port) {
         response.send();
     });
 
-    var serverHypermedia = function (port, response) {
-        return {
-            url: response.absoluteUrl('/', port),
-            port: parseInt(port),
-            links: [
-                {
-                    href: response.absoluteUrl('/servers/{0}'.format(port)),
-                    rel: response.absoluteUrl('/relations/server')
-                },
-                {
-                    href: response.absoluteUrl('/servers/{0}/requests'.format(port)),
-                    rel: response.absoluteUrl('/relations/request')
-                },
-                {
-                    href: response.absoluteUrl('/servers/{0}/stubs'.format(port)),
-                    rel: response.absoluteUrl('/relations/stub')
-                }
-            ]
-        };
-    };
-
     return {
         close: function () {
             console.log('Goodbye...');
             app.close();
         }
-    }
+    };
 };
 
 exports.create = create;

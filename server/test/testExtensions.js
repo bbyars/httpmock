@@ -3,46 +3,6 @@
 var url = require('url'),
     http = require('http');
 
-// Allows async
-var verify = function (f) {
-    return function (test) {
-        addCustomAsserts(test);
-        f(test);
-    };
-};
-
-// No async
-var unitTest = function (f) {
-    return function (test) {
-        addCustomAsserts(test);
-        f(test);
-        test.done();
-    };
-};
-
-var addCustomAsserts = function (test) {
-    test.jsonEquals = function (actual, expected, message) {
-        var json = function (obj) {
-            return (typeof obj === 'object') ? JSON.stringify(obj) : obj;
-        };
-
-        message = message || 'JSON not equal\nExpected:\n{0}\n\nActual:\n{1}'.format(
-            json(expected), json(actual)
-        );
-        test.strictEqual(json(actual), json(expected), message);
-    };
-
-    test.notOk = function (actual, message) {
-        test.ok(!actual, message);
-    };
-
-    test.finish = function (port) {
-        api.deleteServerAtPort(port, function () {
-            test.done();
-        });
-    };
-};
-
 var setDefaults = function (options) {
     var result = {
         method: 'GET',
@@ -104,7 +64,7 @@ var web = {
 };
 
 var api = {
-    deleteServerAtPort: function(port, callback) {
+    deleteServerAtPort: function (port, callback) {
         web.del('http://localhost:3000/servers/{0}'.format(port), callback);
     },
 
@@ -114,6 +74,46 @@ var api = {
             callback: callback
         });
     }
+};
+
+var addCustomAsserts = function (test) {
+    test.jsonEquals = function (actual, expected, message) {
+        var json = function (obj) {
+            return (typeof obj === 'object') ? JSON.stringify(obj) : obj;
+        };
+
+        message = message || 'JSON not equal\nExpected:\n{0}\n\nActual:\n{1}'.format(
+            json(expected), json(actual)
+        );
+        test.strictEqual(json(actual), json(expected), message);
+    };
+
+    test.notOk = function (actual, message) {
+        test.ok(!actual, message);
+    };
+
+    test.finish = function (port) {
+        api.deleteServerAtPort(port, function () {
+            test.done();
+        });
+    };
+};
+
+// Allows async
+var verify = function (f) {
+    return function (test) {
+        addCustomAsserts(test);
+        f(test);
+    };
+};
+
+// No async
+var unitTest = function (f) {
+    return function (test) {
+        addCustomAsserts(test);
+        f(test);
+        test.done();
+    };
 };
 
 exports.verify = verify;

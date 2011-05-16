@@ -74,7 +74,7 @@ exports['GET /servers/:port/requests'] = testCase({
         var result;
 
         http.get(stubUrl + '/first', function () {
-            http.get (stubUrl + '/second', function () {
+            http.get(stubUrl + '/second', function () {
                 http.get(stubUrl + '/second/again', function () {
                     getRequests({query: '?path=/second'}, function (response) {
                         result = response.parsedBody.map(function (item) {

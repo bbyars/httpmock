@@ -4,6 +4,6 @@ test: FORCE
 	scripts/run_tests
 
 lint:
-	find . -path '/deps' -prune -o -name "*.js" -print | xargs deps/nodelint/nodelint
+	find . -path './deps' -prune -o -name "*.js" -print | xargs deps/nodelint/nodelint --config jslint.config
 
 FORCE:

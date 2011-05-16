@@ -7,7 +7,7 @@ var TestFixture = require('nodeunit').testCase,
     isValidPortNumber = require('ports').isValidPortNumber,
     isPortInUse = require('ports').isPortInUse;
 
-exports['Ports'] = TestFixture({
+exports.Ports = new TestFixture({
     'undefined is not a valid port': unitTest(function (test) {
         test.notOk(isValidPortNumber(undefined));
     }),
@@ -17,7 +17,7 @@ exports['Ports'] = TestFixture({
     }),
 
     'ports must be in the correct range': unitTest(function (test) {
-        test.notOk(isValidPortNumber(0), '0 should not be valid')
+        test.notOk(isValidPortNumber(0), '0 should not be valid');
         test.ok(isValidPortNumber(1), '1 should be valid');
         test.ok(isValidPortNumber(65535), '65535 should be valid');
         test.notOk(isValidPortNumber(65536), '65536 should not be valid');

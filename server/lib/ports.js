@@ -3,10 +3,10 @@
 var exec = require('child_process').exec;
 
 var isValidPortNumber = function (port) {
-    return typeof(port) === 'number'
-        && port.toString().indexOf('.') === -1
-        && port > 0
-        && port < 65536;
+    return typeof(port) === 'number' &&
+        port.toString().indexOf('.') === -1 &&
+        port > 0 &&
+        port < 65536;
 };
 
 var isPortInUse = function (port, callback) {
