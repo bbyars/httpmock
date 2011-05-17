@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // vim: ft=javascript
+'use strict';
 
-var basedir = __dirname.replace(/[^\/]+$/, '');
+var basedir = __dirname.replace(/\w+$/, '');
 
 // nodeunit's default reporter depends on process.cwd
 process.chdir(basedir);

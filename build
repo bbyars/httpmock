@@ -1,9 +1,0 @@
-echo 'Building server'
-cd server
-make
-
-echo
-
-cd ..
-echo 'Building Java bindings'
-ant -Dversion=$1 -f clients/java/build.xml

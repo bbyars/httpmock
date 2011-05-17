@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // vim: ft=javascript
+'use strict';
 
-var basedir = __dirname.replace(/[^\/]+$/, '');
+var basedir = __dirname.replace(/\w+$/, '');
 
 // Needed to require express locally; e.g. it does a require('connect')
 ['connect/lib', 'qs', 'mime'].forEach(function (path) {
