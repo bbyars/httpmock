@@ -4,9 +4,7 @@
 * filter out stub matching logic into module, unit test
 
 ## Build
-* start server (if not started already) as part of build
-** Use different port for tests?  Config as environment variable for test runs?
-* Use single find statement for files to make console output prettier
+* Use different port for tests?  Config as environment variable for test runs?
 * Package up server, jarfiles for release, with version
 * Add ant targets in makefile?
 * packages: npm, brew
