@@ -9,3 +9,4 @@ clients/java/MANIFEST.MF
 .DS_Store
 tags
 build/
+clients/java/.idea/workspace.xml
