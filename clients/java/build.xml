@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="httpmock-bindings" default="build">
-    <property name="build" location="${basedir}/out"/>
-    <property name="reports.dir" location="${build}/reports"/>
-    <property name="package.dir" location="$(build}/package"/>
+    <property name="build.dir" location="${basedir}/out"/>
+    <property name="reports.dir" location="${build.dir}/reports"/>
+    <property name="package.dir" location="$(build.dir}/package"/>
 
     <path id="classpath">
         <fileset dir="${basedir}/lib" includes="**/*.jar"/>
-        <path location="${build}/httpmock.jar"/>
+        <path location="${package.dir}/httpmock.jar"/>
     </path>
 
     <target name="build" depends="clean,compile.production,test"/>
 
     <target name="clean">
-        <delete dir="${build}"/>
-        <mkdir dir="${build}"/>
+        <delete dir="${build.dir}"/>
+        <mkdir dir="${build.dir}"/>
     </target>
 
     <target name="compile.production">
-        <compile srcdir="${basedir}/src" destdir="${build}/httpmock"/>
+        <compile srcdir="${basedir}/src" destdir="${build.dir}/httpmock"/>
         <manifest file="MANIFEST.MF">
             <attribute name="Version" value="${version}"/>
         </manifest>
-        <jar basedir="${build}/httpmock" destfile="${build}/httpmock.jar" manifest="MANIFEST.MF"/>
+        <jar basedir="${build.dir}/httpmock" destfile="${package.dir}/httpmock.jar" manifest="MANIFEST.MF"/>
     </target>
 
     <target name="compile.test">
-        <compile srcdir="${basedir}/test" destdir="${build}/test"/>
-        <compile srcdir="${basedir}/functional-test" destdir="${build}/functional-test"/>
+        <compile srcdir="${basedir}/test" destdir="${build.dir}/test"/>
+        <compile srcdir="${basedir}/functional-test" destdir="${build.dir}/functional-test"/>
     </target>
 
     <target name="test" depends="compile.test">
@@ -63,11 +63,11 @@
             <junit printsummary="yes" errorproperty="@{failureproperty}" failureproperty="@{failureproperty}">
                 <classpath>
                     <path refid="classpath"/>
-                    <path location="${build}/@{testdir}"/>
+                    <path location="${build.dir}/@{testdir}"/>
                 </classpath>
                 <formatter type="xml"/>
                 <batchtest todir="${reports.dir}/@{testdir}">
-                    <fileset dir="${build}/@{testdir}" includes="**/*Test.class"/>
+                    <fileset dir="${build.dir}/@{testdir}" includes="**/*Test.class"/>
                 </batchtest>
             </junit>
         </sequential>
