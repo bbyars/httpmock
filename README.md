@@ -24,14 +24,7 @@ The Java API is a work in progress.  For examples, look under clients/java/funct
 
 ## Building
 
-To build everything, run `build` from a bash-like shell.  The server can be tested with the following:
-`cd server`
-`scripts/start_server`
-`scripts/run_tests`
-
-The Java library can be built and tested (assuming the server is running) with the following:
-`cd clients/java`
-`ant`
+To build everything, run `make` from a bash-like shell.  The server can be tested with the `make test`.  The Java code can be build and tested with `make java`.  Alternatively, within the clients/java directory, you can run `ant`.
 
 ## Contributing
 

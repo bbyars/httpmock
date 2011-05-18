@@ -4,13 +4,11 @@
 * filter out stub matching logic into module, unit test
 
 ## Build
-* Package up server, jarfiles for release, with version
-* packages: npm, brew, jar, etc...
+* packages: npm, brew
 * web page with artifacts
 * versioning in artifacts
 * config file to save port for java tests (config for node tests)
 * Add test coverage
-* Allow start/stop scripts to start/stop multiple, differing by port
 
 ## Functionality
 * Accept HTML; allow QA's to manually set up tests
