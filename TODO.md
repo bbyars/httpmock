@@ -4,9 +4,6 @@
 * filter out stub matching logic into module, unit test
 
 ## Build
-* Use different port for tests?  Config as environment variable for test runs?
-* Allow parameters to makefile (version, port)
-* Set makefile to stop server on error
 * Package up server, jarfiles for release, with version
 * packages: npm, brew, jar, etc...
 * web page with artifacts

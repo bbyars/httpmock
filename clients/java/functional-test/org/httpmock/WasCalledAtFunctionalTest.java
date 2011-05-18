@@ -2,6 +2,7 @@ package org.httpmock;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
@@ -13,10 +14,20 @@ import static org.junit.Assert.assertThat;
 
 public class WasCalledAtFunctionalTest {
     private static StubServer stub;
+    private static String controlServerURL;
+
+    @BeforeClass
+    public static void configureURL() {
+        controlServerURL = System.getenv("url");
+        if (controlServerURL == null) {
+            controlServerURL = "http://localhost:3000";
+            System.out.println("url environment variable not set; defaulting to " + controlServerURL);
+        }
+    }
 
     @Before
     public void connectToServer() {
-        stub = ControlServer.at("http://localhost:3000").setupPort(3001);
+        stub = ControlServer.at(controlServerURL).setupPort(3001);
     }
 
     @After

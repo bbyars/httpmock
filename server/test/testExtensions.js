@@ -71,7 +71,6 @@ var api = {
     },
 
     createServerAtPort: function (port, callback) {
-        console.log('PORT: ' + port);
         web.post('http://localhost:{0}/servers'.format(adminPort), {
             body: { port: port },
             callback: callback
