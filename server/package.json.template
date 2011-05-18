@@ -1,0 +1,7 @@
+{
+    "name": "httpmock",
+    "description": "An application for stubbing out third-party network dependencies",
+    "version": "{VERSION}",
+    "author": "Brandon Byars <brandon.byars@gmail.com>",
+    "keywords": ["test"]
+}

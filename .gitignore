@@ -8,3 +8,4 @@ httpmock.pid
 clients/java/MANIFEST.MF
 .DS_Store
 tags
+build/

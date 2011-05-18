@@ -1,9 +1,12 @@
 PORT = 3000
-VERSION = 0.6.0
+VERSION = 0.2.0
 
-.PHONY: default start stop java test unit_test functional_test lint
+.PHONY: default clean start stop java test unit_test functional_test lint package
 
-default: test lint java stop
+default: clean test lint java stop package
+
+clean:
+	-rm -rf build
 
 start:
 	server/scripts/stop_server
@@ -26,3 +29,9 @@ functional_test: start
 
 lint:
 	find server -path 'server/deps' -prune -o \( -name "*.js" -o -name run_tests -o -name start_server \) -print | xargs server/deps/nodelint/nodelint --config server/jslint.config
+
+package:
+	mkdir -p build/package	
+	cp -R server build/package
+	cat build/package/server/package.json.template | sed 's/{VERSION}/$(VERSION)/' > build/package/server/package.json
+	rm build/package/server/package.json.template
