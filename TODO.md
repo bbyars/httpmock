@@ -7,7 +7,6 @@
 * packages: npm, brew
 * web page with artifacts
 * versioning in artifacts
-* config file to save port for java tests (config for node tests)
 * Add test coverage
 
 ## Functionality
