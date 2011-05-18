@@ -5,13 +5,15 @@
 
 ## Build
 * Use different port for tests?  Config as environment variable for test runs?
+* Allow parameters to makefile (version, port)
+* Set makefile to stop server on error
 * Package up server, jarfiles for release, with version
-* Add ant targets in makefile?
-* packages: npm, brew
+* packages: npm, brew, jar, etc...
 * web page with artifacts
 * versioning in artifacts
 * config file to save port for java tests (config for node tests)
 * Add test coverage
+* Allow start/stop scripts to start/stop multiple, differing by port
 
 ## Functionality
 * Accept HTML; allow QA's to manually set up tests
@@ -21,6 +23,7 @@
 * Add endpoint to set defaults for stubs?
 * Add smtp mocking, with same REST API (create servers on demand)
     * Would be nice as a plugin, allow other protocols as plugins
+* Content negotiation (look for right content type)
 
 ## Bugs
 * isPortInUse gives intermittent test failures (timing issue?)

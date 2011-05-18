@@ -7,6 +7,7 @@ var testCase = require('nodeunit').testCase,
     api = require('testExtensions').api,
     verify = require('testExtensions').verify,
     port = 3001,
+    adminPort = process.env.port,
     stubUrl = 'http://localhost:' + port;
 
 function getRequests(spec, callback) {
@@ -16,7 +17,7 @@ function getRequests(spec, callback) {
     }
     var stubPort = spec.port || port,
         query = spec.query || '';
-    http.get('http://localhost:3000/servers/' + stubPort + '/requests' + query, callback);
+    http.get('http://localhost:' + adminPort + '/servers/' + stubPort + '/requests' + query, callback);
 }
 
 exports['Trying to GET /servers/:port/requests'] = testCase({
@@ -30,6 +31,9 @@ exports['Trying to GET /servers/:port/requests'] = testCase({
 
 exports['GET /servers/:port/requests'] = testCase({
     setUp: function (callback) {
+        if (!adminPort) {
+            console.log('Set the port environment variable to the port the control server is running on...');
+        }
         api.createServerAtPort(port, function () {
             callback();
         });

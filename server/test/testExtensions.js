@@ -63,13 +63,16 @@ var web = {
     }
 };
 
+var adminPort = process.env.port;
+
 var api = {
     deleteServerAtPort: function (port, callback) {
-        web.del('http://localhost:3000/servers/{0}'.format(port), callback);
+        web.del('http://localhost:{0}/servers/{1}'.format(adminPort, port), callback);
     },
 
     createServerAtPort: function (port, callback) {
-        web.post('http://localhost:3000/servers', {
+        console.log('PORT: ' + port);
+        web.post('http://localhost:{0}/servers'.format(adminPort), {
             body: { port: port },
             callback: callback
         });

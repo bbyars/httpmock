@@ -3,7 +3,7 @@
 var exec = require('child_process').exec;
 
 var isValidPortNumber = function (port) {
-    return typeof(port) === 'number' &&
+    return typeof(port) !== 'undefined' &&
         port.toString().indexOf('.') === -1 &&
         port > 0 &&
         port < 65536;
