@@ -2,6 +2,7 @@
 <project name="httpmock-bindings" default="build">
     <property name="build" location="${basedir}/out"/>
     <property name="reports.dir" location="${build}/reports"/>
+    <property name="package.dir" location="$(build}/package"/>
 
     <path id="classpath">
         <fileset dir="${basedir}/lib" includes="**/*.jar"/>
@@ -29,7 +30,7 @@
     </target>
 
     <target name="test" depends="compile.test">
-        <mkdir dir="${build}/reports"/>
+        <mkdir dir="${reports.dir}"/>
         <run-junit testdir="test" failureproperty="test.failed"/>
         <run-junit testdir="functional-test" failureproperty="test.failed"/>
 
@@ -58,7 +59,7 @@
         <attribute name="failureproperty"/>
 
         <sequential>
-            <mkdir dir="${build}/reports/@{testdir}"/>
+            <mkdir dir="${reports.dir}/@{testdir}"/>
             <junit printsummary="yes" errorproperty="@{failureproperty}" failureproperty="@{failureproperty}">
                 <classpath>
                     <path refid="classpath"/>
