@@ -6,7 +6,6 @@
 ## Build
 * packages: npm, brew
 * web page with artifacts
-* versioning in artifacts
 * Add test coverage
 
 ## Functionality
