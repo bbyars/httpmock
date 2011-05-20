@@ -25,7 +25,7 @@ java: start
 test: unit_test functional_test
 
 unit_test:
-	server/scripts/run_tests test/unit
+	port=$(PORT) server/scripts/run_tests test/unit
 
 functional_test: start
 	port=$(PORT) server/scripts/run_tests test/functional

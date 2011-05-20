@@ -7,6 +7,12 @@ var url = require('url'),
     adminPort = process.env.port,
     controlServerURL = 'http://localhost:' + adminPort;
 
+if (!adminPort) {
+    throw {
+        message: 'You must set the port environment variable to the port the control server is listening on'
+    };
+}
+
 var setDefaults = function (options) {
     var result = {
         method: 'GET',
