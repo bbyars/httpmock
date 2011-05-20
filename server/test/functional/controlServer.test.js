@@ -6,11 +6,10 @@ var testCase = require('nodeunit').testCase,
     exec  = require('child_process').exec,
     http = require('testExtensions').http,
     api = require('testExtensions').api,
-    verify = require('testExtensions').verify,
     adminPort = process.env.port;
 
 exports['GET /'] = testCase({
-    'returns base hypermedia': verify(function (test) {
+    'returns base hypermedia': function (test) {
         http.get('http://localhost:{0}/'.format(adminPort), function (response) {
             test.strictEqual(response.headers['content-type'], 'application/vnd.httpmock+json');
             test.jsonEquals(response.body, {
@@ -21,9 +20,9 @@ exports['GET /'] = testCase({
             });
             test.done();
         });
-    }),
+    },
 
-    'uses host header in hypermedia links': verify(function (test) {
+    'uses host header in hypermedia links': function (test) {
         http.get('http://127.0.0.1:{0}/'.format(adminPort), function (response) {
             test.jsonEquals(response.body, {
                 links: [{
@@ -33,11 +32,11 @@ exports['GET /'] = testCase({
             });
             test.done();
         });
-    })
+    }
 });
 
 exports['POST /servers'] = testCase({
-    'creates server at given port': verify(function (test) {
+    'creates server at given port': function (test) {
         http.post('http://localhost:{0}/servers'.format(adminPort), {
             body: { port: 3001 },
             callback: function (response) {
@@ -68,25 +67,25 @@ exports['POST /servers'] = testCase({
                 });
             }
         });
-    }),
+    },
 
-    'creates stub that disallows keepalive connections': verify(function (test) {
+    'creates stub that disallows keepalive connections': function (test) {
         api.createServerAtPort(3001, function () {
             http.get('http://localhost:3001/', function (response) {
                 test.strictEqual(response.headers.connection, 'close');
                 test.finish(3001);
             });
         });
-    }),
+    },
 
-    'returns 409 if port already in use': verify(function (test) {
+    'returns 409 if port already in use': function (test) {
         api.createServerAtPort(adminPort, function (response) {
             test.strictEqual(response.statusCode, 409, response.body);
             test.done();
         });
-    }),
+    },
 
-    'returns 400 if port missing': verify(function (test) {
+    'returns 400 if port missing': function (test) {
         http.post('http://localhost:{0}/servers'.format(adminPort), {
             body: { },
             callback: function (response) {
@@ -97,9 +96,9 @@ exports['POST /servers'] = testCase({
                 test.done();
             }
         });
-    }),
+    },
 
-    'returns 400 if port is not a number': verify(function (test) {
+    'returns 400 if port is not a number': function (test) {
         http.post('http://localhost:{0}/servers'.format(adminPort), {
             body: { port: 'test' },
             callback: function (response) {
@@ -110,11 +109,11 @@ exports['POST /servers'] = testCase({
                 test.done();
             }
         });
-    })
+    }
 });
 
 exports['GET /servers'] = testCase({
-    'shows servers created': verify(function (test) {
+    'shows servers created': function (test) {
         api.createServerAtPort(3002, function () {
             http.get('http://localhost:{0}/servers'.format(adminPort), function (response) {
                 test.jsonEquals(response.body, {
@@ -140,18 +139,18 @@ exports['GET /servers'] = testCase({
                 test.finish(3002);
             });
         });
-    })
+    }
 });
 
 exports['GET /servers:port'] = testCase({
-    'returns 404 if server not created': verify(function (test) {
+    'returns 404 if server not created': function (test) {
         http.get('http://localhost:{0}/servers/4000'.format(adminPort), function (response) {
             test.strictEqual(response.statusCode, 404);
             test.done();
         });
-    }),
+    },
 
-    'gets hypermedia for server': verify(function (test) {
+    'gets hypermedia for server': function (test) {
         api.createServerAtPort(3001, function () {
             http.get('http://localhost:{0}/servers/3001'.format(adminPort), function (response) {
                 test.strictEqual(response.statusCode, 200);
@@ -176,11 +175,11 @@ exports['GET /servers:port'] = testCase({
                 test.finish(3001);
             });
         });
-    })
+    }
 });
 
 exports['DELETE /servers:port'] = testCase({
-    'deletes stub at given port': verify(function (test) {
+    'deletes stub at given port': function (test) {
         api.createServerAtPort(3004, function () {
             http.del('http://localhost:{0}/servers/3004'.format(adminPort), function (response) {
                 test.strictEqual(response.statusCode, 204);
@@ -190,13 +189,12 @@ exports['DELETE /servers:port'] = testCase({
                 });
             });
         });
-    }),
+    },
 
-    'returns 404 if server never created': verify(function (test) {
+    'returns 404 if server never created': function (test) {
         http.del('http://localhost:{0}/servers/5000'.format(adminPort), function (response) {
             test.strictEqual(response.statusCode, 404);
             test.done();
         });
-    })
+    }
 });
-

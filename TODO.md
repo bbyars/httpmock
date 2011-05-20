@@ -1,7 +1,8 @@
 ## Refactorings
-* Remove string.format for something more javascript like
 * Remove verify, unit Test - use something like what Sino does
 * filter out stub matching logic into module, unit test
+* Remove string.format for something more javascript like
+* move adminPort to testExtensions, maybe as controlServerURL
 
 ## Build
 * packages: npm, brew
@@ -9,14 +10,13 @@
 * Add test coverage
 
 ## Functionality
-* Accept HTML; allow QA's to manually set up tests
 * Add HTML pages for the different rel urls
-* Allow retrieving stubs per server, deleting some
-* Allow ordering stub calls to same path to simulate state change
-* Add endpoint to set defaults for stubs?
+* Content negotiation (look for right content type)
 * Add smtp mocking, with same REST API (create servers on demand)
     * Would be nice as a plugin, allow other protocols as plugins
-* Content negotiation (look for right content type)
+    * Add protocol to post /servers, use same REST API for each
+* Accept HTML; allow QA's to manually set up tests
+* Allow ordering stub calls to same path to simulate state change
 
 ## Bugs
 * isPortInUse gives intermittent test failures (timing issue?)

@@ -2,16 +2,17 @@
 
 require('extensions');
 
-var TestFixture = require('nodeunit').testCase,
-    unitTest = require('testExtensions').unitTest;
+var testCase = require('nodeunit').testCase;
 
-exports.String = new TestFixture({
-    'format should do nothing if no placeholders': unitTest(function (test) {
+exports.String = testCase({
+    'format should do nothing if no placeholders': function (test) {
         test.strictEqual('test'.format('ignore'), 'test');
-    }),
+        test.done();
+    },
 
-    'format should replace placeholders': unitTest(function (test) {
+    'format should replace placeholders': function (test) {
         test.strictEqual('test {0} {1}'.format('one', 'two'), 'test one two');
-    })
+        test.done();
+    }
 });
 

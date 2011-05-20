@@ -1,7 +1,10 @@
 'use strict';
 
 var url = require('url'),
-    http = require('http');
+    http = require('http'),
+    nodeunitTypes = require('../deps/nodeunit/lib/types'),
+    nodeunitTest = nodeunitTypes.test,
+    adminPort = process.env.port;
 
 var setDefaults = function (options) {
     var result = {
@@ -63,8 +66,6 @@ var web = {
     }
 };
 
-var adminPort = process.env.port;
-
 var api = {
     deleteServerAtPort: function (port, callback) {
         web.del('http://localhost:{0}/servers/{1}'.format(adminPort, port), callback);
@@ -85,8 +86,7 @@ var addCustomAsserts = function (test) {
         };
 
         message = message || 'JSON not equal\nExpected:\n{0}\n\nActual:\n{1}'.format(
-            json(expected), json(actual)
-        );
+            json(expected), json(actual));
         test.strictEqual(json(actual), json(expected), message);
     };
 
@@ -101,24 +101,11 @@ var addCustomAsserts = function (test) {
     };
 };
 
-// Allows async
-var verify = function (f) {
-    return function (test) {
-        addCustomAsserts(test);
-        f(test);
-    };
+nodeunitTypes.test = function () {
+    var test = nodeunitTest.apply(this, arguments);
+    addCustomAsserts(test);
+    return test;
 };
 
-// No async
-var unitTest = function (f) {
-    return function (test) {
-        addCustomAsserts(test);
-        f(test);
-        test.done();
-    };
-};
-
-exports.verify = verify;
-exports.unitTest = unitTest;
 exports.http = web;
 exports.api = api;

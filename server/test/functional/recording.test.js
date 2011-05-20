@@ -5,7 +5,6 @@ require('extensions');
 var testCase = require('nodeunit').testCase,
     http = require('testExtensions').http,
     api = require('testExtensions').api,
-    verify = require('testExtensions').verify,
     port = 3001,
     adminPort = process.env.port,
     stubUrl = 'http://localhost:' + port;
@@ -45,14 +44,14 @@ exports['GET /servers/:port/requests'] = testCase({
         });
     },
 
-    'returns empty array if no requests to given url': verify(function (test) {
+    'returns empty array if no requests to given url': function (test) {
         getRequests(function (response) {
             test.jsonEquals(response.body, []);
             test.done();
         });
-    }),
+    },
 
-    'returns requests to server': verify(function (test) {
+    'returns requests to server': function (test) {
         http.getResponse({
             method: 'GET',
             url: stubUrl + '/test',
@@ -72,9 +71,9 @@ exports['GET /servers/:port/requests'] = testCase({
                 });
             }
         });
-    }),
+    },
 
-    'uses querystring to filter requests sent back': verify(function (test) {
+    'uses querystring to filter requests sent back': function (test) {
         var result;
 
         http.get(stubUrl + '/first', function () {
@@ -90,7 +89,7 @@ exports['GET /servers/:port/requests'] = testCase({
                 });
             });
         });
-    }),
+    },
 
     'records request body': function (test) {
         http.post(stubUrl + '/', {
