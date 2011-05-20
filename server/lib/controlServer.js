@@ -89,8 +89,7 @@ var create = function (port) {
     app = express.createServer(
         express.logger({format: '[ROOT]: :method :url'}),
         express.bodyParser(),
-        createAbsoluteUrl
-    );
+        createAbsoluteUrl);
     app.listen(port);
     console.log('HTTPMock running at http://localhost:{0}'.format(port));
 

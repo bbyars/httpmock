@@ -6,16 +6,17 @@ var testCase = require('nodeunit').testCase,
     exec  = require('child_process').exec,
     http = require('testExtensions').http,
     api = require('testExtensions').api,
-    adminPort = process.env.port;
+    controlServerURL = require('testExtensions').controlServerURL,
+    adminPort = require('testExtensions').adminPort;
 
 exports['GET /'] = testCase({
     'returns base hypermedia': function (test) {
-        http.get('http://localhost:{0}/'.format(adminPort), function (response) {
+        http.get(controlServerURL + '/', function (response) {
             test.strictEqual(response.headers['content-type'], 'application/vnd.httpmock+json');
             test.jsonEquals(response.body, {
                 links: [{
-                    href: 'http://localhost:{0}/servers'.format(adminPort),
-                    rel: 'http://localhost:{0}/relations/servers'.format(adminPort)
+                    href: controlServerURL + '/servers',
+                    rel: controlServerURL + '/relations/servers'
                 }]
             });
             test.done();
@@ -37,26 +38,26 @@ exports['GET /'] = testCase({
 
 exports['POST /servers'] = testCase({
     'creates server at given port': function (test) {
-        http.post('http://localhost:{0}/servers'.format(adminPort), {
+        http.post('{0}/servers'.format(controlServerURL), {
             body: { port: 3001 },
             callback: function (response) {
                 test.strictEqual(response.statusCode, 201);
-                test.strictEqual(response.headers.location, 'http://localhost:{0}/servers/3001'.format(adminPort));
+                test.strictEqual(response.headers.location, '{0}/servers/3001'.format(controlServerURL));
                 test.jsonEquals(response.body, {
                     url: 'http://localhost:3001/',
                     port: 3001,
                     links: [
                         {
-                            href: 'http://localhost:{0}/servers/3001'.format(adminPort),
-                            rel: 'http://localhost:{0}/relations/server'.format(adminPort)
+                            href: '{0}/servers/3001'.format(controlServerURL),
+                            rel: '{0}/relations/server'.format(controlServerURL)
                         },
                         {
-                            href: 'http://localhost:{0}/servers/3001/requests'.format(adminPort),
-                            rel: 'http://localhost:{0}/relations/request'.format(adminPort)
+                            href: '{0}/servers/3001/requests'.format(controlServerURL),
+                            rel: '{0}/relations/request'.format(controlServerURL)
                         },
                         {
-                            href: 'http://localhost:{0}/servers/3001/stubs'.format(adminPort),
-                            rel: 'http://localhost:{0}/relations/stub'.format(adminPort)
+                            href: '{0}/servers/3001/stubs'.format(controlServerURL),
+                            rel: '{0}/relations/stub'.format(controlServerURL)
                         }
                     ]
                 });
@@ -86,7 +87,7 @@ exports['POST /servers'] = testCase({
     },
 
     'returns 400 if port missing': function (test) {
-        http.post('http://localhost:{0}/servers'.format(adminPort), {
+        http.post('{0}/servers'.format(controlServerURL), {
             body: { },
             callback: function (response) {
                 test.strictEqual(response.statusCode, 400);
@@ -99,7 +100,7 @@ exports['POST /servers'] = testCase({
     },
 
     'returns 400 if port is not a number': function (test) {
-        http.post('http://localhost:{0}/servers'.format(adminPort), {
+        http.post('{0}/servers'.format(controlServerURL), {
             body: { port: 'test' },
             callback: function (response) {
                 test.strictEqual(response.statusCode, 400);
@@ -115,23 +116,23 @@ exports['POST /servers'] = testCase({
 exports['GET /servers'] = testCase({
     'shows servers created': function (test) {
         api.createServerAtPort(3002, function () {
-            http.get('http://localhost:{0}/servers'.format(adminPort), function (response) {
+            http.get('{0}/servers'.format(controlServerURL), function (response) {
                 test.jsonEquals(response.body, {
                     servers: [{
                         url: 'http://localhost:3002/',
                         port: 3002,
                         links: [
                             {
-                                href: 'http://localhost:{0}/servers/3002'.format(adminPort),
-                                rel: 'http://localhost:{0}/relations/server'.format(adminPort)
+                                href: '{0}/servers/3002'.format(controlServerURL),
+                                rel: '{0}/relations/server'.format(controlServerURL)
                             },
                             {
-                                href: 'http://localhost:{0}/servers/3002/requests'.format(adminPort),
-                                rel: 'http://localhost:{0}/relations/request'.format(adminPort)
+                                href: '{0}/servers/3002/requests'.format(controlServerURL),
+                                rel: '{0}/relations/request'.format(controlServerURL)
                             },
                             {
-                                href: 'http://localhost:{0}/servers/3002/stubs'.format(adminPort),
-                                rel: 'http://localhost:{0}/relations/stub'.format(adminPort)
+                                href: '{0}/servers/3002/stubs'.format(controlServerURL),
+                                rel: '{0}/relations/stub'.format(controlServerURL)
                             }
                         ]
                     }]
@@ -144,7 +145,7 @@ exports['GET /servers'] = testCase({
 
 exports['GET /servers:port'] = testCase({
     'returns 404 if server not created': function (test) {
-        http.get('http://localhost:{0}/servers/4000'.format(adminPort), function (response) {
+        http.get('{0}/servers/4000'.format(controlServerURL), function (response) {
             test.strictEqual(response.statusCode, 404);
             test.done();
         });
@@ -152,23 +153,23 @@ exports['GET /servers:port'] = testCase({
 
     'gets hypermedia for server': function (test) {
         api.createServerAtPort(3001, function () {
-            http.get('http://localhost:{0}/servers/3001'.format(adminPort), function (response) {
+            http.get('{0}/servers/3001'.format(controlServerURL), function (response) {
                 test.strictEqual(response.statusCode, 200);
                 test.jsonEquals(response.body, {
                     url: 'http://localhost:3001/',
                     port: 3001,
                     links: [
                         {
-                            href: 'http://localhost:{0}/servers/3001'.format(adminPort),
-                            rel: 'http://localhost:{0}/relations/server'.format(adminPort)
+                            href: '{0}/servers/3001'.format(controlServerURL),
+                            rel: '{0}/relations/server'.format(controlServerURL)
                         },
                         {
-                            href: 'http://localhost:{0}/servers/3001/requests'.format(adminPort),
-                            rel: 'http://localhost:{0}/relations/request'.format(adminPort)
+                            href: '{0}/servers/3001/requests'.format(controlServerURL),
+                            rel: '{0}/relations/request'.format(controlServerURL)
                         },
                         {
-                            href: 'http://localhost:{0}/servers/3001/stubs'.format(adminPort),
-                            rel: 'http://localhost:{0}/relations/stub'.format(adminPort)
+                            href: '{0}/servers/3001/stubs'.format(controlServerURL),
+                            rel: '{0}/relations/stub'.format(controlServerURL)
                         }
                     ]
                 });
@@ -181,7 +182,7 @@ exports['GET /servers:port'] = testCase({
 exports['DELETE /servers:port'] = testCase({
     'deletes stub at given port': function (test) {
         api.createServerAtPort(3004, function () {
-            http.del('http://localhost:{0}/servers/3004'.format(adminPort), function (response) {
+            http.del('{0}/servers/3004'.format(controlServerURL), function (response) {
                 test.strictEqual(response.statusCode, 204);
                 exec('netstat -an | grep 3004 | grep LISTEN', function (error, stdout, stderr) {
                     test.strictEqual(stdout, '');
@@ -192,7 +193,7 @@ exports['DELETE /servers:port'] = testCase({
     },
 
     'returns 404 if server never created': function (test) {
-        http.del('http://localhost:{0}/servers/5000'.format(adminPort), function (response) {
+        http.del('{0}/servers/5000'.format(controlServerURL), function (response) {
             test.strictEqual(response.statusCode, 404);
             test.done();
         });

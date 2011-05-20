@@ -1,8 +1,6 @@
 ## Refactorings
-* Remove verify, unit Test - use something like what Sino does
 * filter out stub matching logic into module, unit test
 * Remove string.format for something more javascript like
-* move adminPort to testExtensions, maybe as controlServerURL
 
 ## Build
 * packages: npm, brew

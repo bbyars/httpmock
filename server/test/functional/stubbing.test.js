@@ -5,12 +5,12 @@ require('extensions');
 var testCase = require('nodeunit').testCase,
     http = require('testExtensions').http,
     api = require('testExtensions').api,
+    controlServerURL = require('testExtensions').controlServerURL,
     port = 3001,
-    adminPort = process.env.port,
     stubUrl = 'http://localhost:' + port;
 
 var stub = function (stub, callback) {
-    http.post('http://localhost:{0}/servers/{1}/stubs'.format(adminPort, port), {
+    http.post('{0}/servers/{1}/stubs'.format(controlServerURL, port), {
         body: stub,
         callback: callback
     });
@@ -18,7 +18,7 @@ var stub = function (stub, callback) {
 
 exports['Trying to POST /servers/:port/stubs'] = testCase({
     'returns 404 if server not created first': function (test) {
-        http.post('http://localhost:{0}/servers/5000/stubs'.format(adminPort), {
+        http.post('{0}/servers/5000/stubs'.format(controlServerURL), {
             body: { path: '/' },
             callback: function (response) {
                 test.strictEqual(response.statusCode, 404);

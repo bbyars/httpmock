@@ -4,7 +4,8 @@ var url = require('url'),
     http = require('http'),
     nodeunitTypes = require('../deps/nodeunit/lib/types'),
     nodeunitTest = nodeunitTypes.test,
-    adminPort = process.env.port;
+    adminPort = process.env.port,
+    controlServerURL = 'http://localhost:' + adminPort;
 
 var setDefaults = function (options) {
     var result = {
@@ -68,11 +69,11 @@ var web = {
 
 var api = {
     deleteServerAtPort: function (port, callback) {
-        web.del('http://localhost:{0}/servers/{1}'.format(adminPort, port), callback);
+        web.del('{0}/servers/{1}'.format(controlServerURL, port), callback);
     },
 
     createServerAtPort: function (port, callback) {
-        web.post('http://localhost:{0}/servers'.format(adminPort), {
+        web.post(controlServerURL + '/servers', {
             body: { port: port },
             callback: callback
         });
@@ -109,3 +110,5 @@ nodeunitTypes.test = function () {
 
 exports.http = web;
 exports.api = api;
+exports.controlServerURL = controlServerURL;
+exports.adminPort = adminPort;

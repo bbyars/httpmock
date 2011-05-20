@@ -93,8 +93,7 @@ var create = function (port, callback) {
     server = connect.createServer(
         connect.logger({format: logPrefix + ':method :url'}),
         recorder,
-        stubber
-    );
+        stubber);
 
     server.on('close', function () {
         console.log(logPrefix + 'Ciao...');
