@@ -1,4 +1,5 @@
 PORT = 3000
+PIDFILE = httpmock.pid
 VERSION = 0.2.0
 BUILD_DIR = $(PWD)/build
 PACKAGE_DIR = $(BUILD_DIR)/package
@@ -12,12 +13,11 @@ clean:
 	-rm -rf $(BUILD_DIR)
 
 start:
-	server/scripts/stop_server
-	server/scripts/start_server $(PORT) &
+	server/bin/httpmock restart --port $(PORT) --pidfile $(PIDFILE) &
 	sleep 1
 
 stop:
-	server/scripts/stop_server
+	server/bin/httpmock stop --pidfile $(PIDFILE)
 
 java: start
 	url=http://localhost:$(PORT) ant -Dversion=$(VERSION) -Dreports.dir=$(REPORTS_DIR)/java -Dpackage.dir=$(PACKAGE_DIR)/java -f clients/java/build.xml
@@ -25,13 +25,13 @@ java: start
 test: unit_test functional_test
 
 unit_test:
-	port=$(PORT) server/scripts/run_tests test/unit
+	port=$(PORT) server/bin/run_tests test/unit
 
 functional_test: start
-	port=$(PORT) server/scripts/run_tests test/functional
+	port=$(PORT) server/bin/run_tests test/functional
 
 lint:
-	find server -path 'server/deps' -prune -o \( -name "*.js" -o -name run_tests -o -name start_server \) -print | xargs server/deps/nodelint/nodelint --config server/jslint.config
+	find server -path 'server/deps' -prune -o \( -name "*.js" -o -name run_tests -o -name httpmock \) -print | xargs server/deps/nodelint/nodelint --config server/jslint.config
 
 package:
 	mkdir -p $(PACKAGE_DIR)
