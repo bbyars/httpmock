@@ -1,4 +1,0 @@
-if [ -e httpmock.pid ]; then
-    kill `cat httpmock.pid`
-    rm httpmock.pid
-fi
