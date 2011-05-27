@@ -12,9 +12,9 @@ Node.js is the only dependency to get the server up and running.  Node.js will w
 
 Download httpmock to the server, and run the following:
 `cd server`
-`scripts/start_server`
+`bin/httpmock start`
 
-That will run the control server (see below) on port 3000.  You can optionally pass another command line argument to change the port.  If you run the server in a background job, `scripts/stop_server` will kill it.
+That will run the control server (see below) on port 3000.  You can optionally pass a `--port` argument command line argument to change the port.  If you run the server in a background job, `bin/httpmock stop` will kill it.
 
 The client bindings will simply be a library.  For Java, add httpmock.jar to your classpath.
 
