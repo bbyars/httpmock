@@ -61,14 +61,10 @@ var cli = {
         };
 
         var parseCommand = function () {
-            var command = argv[0],
-                COMMANDS = ['start', 'stop', 'restart'];
+            var command = argv[0];
 
             if (command === undefined) {
                 error("Missing command.");
-            }
-            if (COMMANDS.indexOf(command) === -1) {
-                error("Invalid command '" + command + "'.");
             }
             return command;
         };
@@ -80,8 +76,64 @@ var cli = {
     }
 };
 
-var defaultOptions = { port: 3000, pidfile: 'httpmock.pid' };
-var commandLine = cli.parse(process.argv.slice(2), defaultOptions);
+var serverAt = function (options) {
+    return {
+        start: function () {
+            var basedir = __dirname.replace(/\w+$/, '');
 
-console.log("COMMAND: " + commandLine.command);
-console.log("OPTIONS: " + require('sys').inspect(commandLine.options));
+            // Needed to require express locally; e.g. it does a require('connect')
+            ['connect/lib', 'qs', 'mime'].forEach(function (path) {
+                require.paths.unshift(basedir + '/deps/' + path);
+            });
+
+            require.paths.push(basedir);
+            require.paths.push(basedir + '/lib');
+            require.paths.push(basedir + '/deps');
+
+            var server = require('controlServer').create(options.port);
+
+            require('fs').writeFileSync(options.pidfile, process.pid.toString());
+
+            process.on('SIGTERM', function () {
+                server.close();
+            });
+        },
+
+        stop: function () {
+            var exec = require('child_process').exec,
+                kill = '[ -e PIDFILE ] && kill `cat PIDFILE`'.replace(/PIDFILE/g, options.pidfile),
+                rm = '[ -e PIDFILE ] && rm PIDFILE'.replace(/PIDFILE/g, options.pidfile),
+                command = kill + '; ' + rm;
+
+            exec(command, function (error, stdout, stderr) {
+                if (error !== null) {
+                    console.log(stderr);
+                }
+            });
+        },
+
+        restart: function () {
+            this.stop();
+            this.start();
+        }
+    };
+};
+
+var defaultOptions = { port: 3000, pidfile: 'httpmock.pid' },
+    commandLine = cli.parse(process.argv.slice(2), defaultOptions),
+    server = serverAt(commandLine.options);
+
+switch (commandLine.command) {
+    case 'start':
+        server.start();
+        break;
+    case 'stop':
+        server.stop();
+        break;
+    case 'restart':
+        server.restart();
+        break;
+    default:
+        error("Invalid command '" + commandLine.command + "'.");
+        break;
+}
