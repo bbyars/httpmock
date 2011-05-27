@@ -1,0 +1,87 @@
+#!/usr/bin/env node
+// vim: ft=javascript
+'use strict';
+
+function usage() {
+    console.log("Usage: httpmock <command> [--port <port>] [--pidfile <pidfile>]\n");
+    console.log("where <command> is one of:");
+    console.log("\tstart, stop, restart");
+}
+
+function error(message) {
+    console.log(message + "\n");
+    usage();
+    process.exit(1);
+}
+
+var cli = {
+    parse: function (argv, defaultOptions) {
+        var parseOption = function (key, value) {
+            var OPTION_PREFIX = /^--/,
+                optionName;
+
+            if (key.match(OPTION_PREFIX) === null) {
+                error("Invalid option '" + key + "'.");
+            }
+            optionName = key.replace(OPTION_PREFIX, '');
+
+            if (!defaultOptions.hasOwnProperty(optionName)) {
+                error("Option '" + optionName + "' not recognized.");
+            }
+            if (value === undefined) {
+                error("No argument provided for option '" + optionName + "'.");
+            }
+
+            return {
+                key: optionName,
+                value: value
+            };
+        };
+
+        var parseOptions = function () {
+            var options = {},
+                option,
+                key,
+                i;
+
+            // Add custom options
+            for (i = 1; i < argv.length; i += 2) {
+                option = parseOption(argv[i], argv[i+1]);
+                options[option.key] = option.value;
+            }
+
+            // add default options
+            for (key in defaultOptions) {
+                if (defaultOptions.hasOwnProperty(key) && !options.hasOwnProperty(key)) {
+                    options[key] = defaultOptions[key];
+                }
+            }
+
+            return options;
+        };
+
+        var parseCommand = function () {
+            var command = argv[0],
+                COMMANDS = ['start', 'stop', 'restart'];
+
+            if (command === undefined) {
+                error("Missing command.");
+            }
+            if (COMMANDS.indexOf(command) === -1) {
+                error("Invalid command '" + command + "'.");
+            }
+            return command;
+        };
+
+        return {
+            command: parseCommand(),
+            options: parseOptions()
+        };
+    }
+};
+
+var defaultOptions = { port: 3000, pidfile: 'httpmock.pid' };
+var commandLine = cli.parse(process.argv.slice(2), defaultOptions);
+
+console.log("COMMAND: " + commandLine.command);
+console.log("OPTIONS: " + require('sys').inspect(commandLine.options));
