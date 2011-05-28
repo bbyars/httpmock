@@ -1,30 +1,29 @@
 'use strict';
 
-
-var parse = function(argv, defaultOptions) {
-    var parseOption = function (key, value) {
+var parse = function (argv, defaultOptions) {
+    function parseOption(key, value) {
         var OPTION_PREFIX = /^--/,
         optionName;
 
         if (key.match(OPTION_PREFIX) === null) {
-            error("Invalid option '" + key + "'.");
+            throw new Error("Invalid option '" + key + "'.");
         }
         optionName = key.replace(OPTION_PREFIX, '');
 
         if (!defaultOptions.hasOwnProperty(optionName)) {
-            error("Option '" + optionName + "' not recognized.");
+            throw new Error("Option '" + optionName + "' not recognized.");
         }
         if (value === undefined) {
-            error("No argument provided for option '" + optionName + "'.");
+            throw new Error("No argument provided for option '" + optionName + "'.");
         }
 
         return {
             key: optionName,
             value: value
         };
-    };
+    }
 
-    var parseOptions = function () {
+    function parseOptions() {
         var options = {},
         option,
         key,
@@ -32,7 +31,7 @@ var parse = function(argv, defaultOptions) {
 
         // Add custom options
         for (i = 1; i < argv.length; i += 2) {
-            option = parseOption(argv[i], argv[i+1]);
+            option = parseOption(argv[i], argv[i + 1]);
             options[option.key] = option.value;
         }
 
@@ -44,16 +43,16 @@ var parse = function(argv, defaultOptions) {
         }
 
         return options;
-    };
+    }
 
-    var parseCommand = function () {
+    function parseCommand() {
         var command = argv[0];
 
         if (command === undefined) {
-            error("Missing command.");
+            throw new Error("Missing command.");
         }
         return command;
-    };
+    }
 
     return {
         command: parseCommand(),

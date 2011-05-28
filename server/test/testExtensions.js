@@ -1,5 +1,7 @@
 'use strict';
 
+require('../lib/extensions');
+
 var url = require('url'),
     http = require('http'),
     nodeunitTypes = require('../deps/nodeunit/lib/types'),

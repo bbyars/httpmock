@@ -57,12 +57,13 @@ require.paths.push(basedir);
 require.paths.push(basedir + '/lib');
 require.paths.push(basedir + '/deps');
 
-var cli = require('cli'),
-    defaultOptions = { port: 3000, pidfile: 'httpmock.pid' },
-    commandLine = cli.parse(process.argv.slice(2), defaultOptions),
-    server = serverAt(commandLine.options);
+try {
+    var cli = require('cli'),
+        defaultOptions = { port: 3000, pidfile: 'httpmock.pid' },
+        commandLine = cli.parse(process.argv.slice(2), defaultOptions),
+        server = serverAt(commandLine.options);
 
-switch (commandLine.command) {
+    switch (commandLine.command) {
     case 'start':
         server.start();
         break;
@@ -75,4 +76,8 @@ switch (commandLine.command) {
     default:
         error("Invalid command '" + commandLine.command + "'.");
         break;
+    }
+}
+catch (err) {
+    error(error.message);
 }
