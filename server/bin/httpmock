@@ -79,5 +79,5 @@ try {
     }
 }
 catch (err) {
-    error(error.message);
+    error(err.message);
 }
