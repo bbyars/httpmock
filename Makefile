@@ -41,3 +41,6 @@ package:
 	-rm -rf $(PACKAGE_DIR)/server/tags
 	-rm $(PACKAGE_DIR)/server/*.pid
 	-rm $(PACKAGE_DIR)/server/nodemon-ignore
+
+publish: default
+	npm publish $(PACKAGE_DIR)/server/
