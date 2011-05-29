@@ -3,7 +3,7 @@
 * Remove string.format for something more javascript like
 
 ## Build
-* web page with artifacts
+* Pretty up github release page
 * Add test coverage
 
 ## Functionality
