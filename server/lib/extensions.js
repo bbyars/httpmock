@@ -10,3 +10,14 @@ String.prototype.format = function () {
     return formatted;
 };
 
+String.prototype.interpolate = function (replacements) {
+    return this.replace(/\{(\w+)\}/g, function (match, capture) {
+        if (replacements[capture]) {
+            return replacements[capture];
+        }
+        else {
+            return match;
+        }
+    });
+};
+
