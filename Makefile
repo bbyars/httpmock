@@ -38,3 +38,6 @@ package:
 	cp -R server $(PACKAGE_DIR)
 	cat $(PACKAGE_DIR)/server/package.json.template | sed 's/{VERSION}/$(VERSION)/' > $(PACKAGE_DIR)/server/package.json
 	rm $(PACKAGE_DIR)/server/package.json.template
+	-rm -rf $(PACKAGE_DIR)/server/tags
+	-rm $(PACKAGE_DIR)/server/*.pid
+	-rm $(PACKAGE_DIR)/server/nodemon-ignore
