@@ -3,10 +3,8 @@
 * Remove string.format for something more javascript like
 
 ## Build
-* packages: npm, brew
 * web page with artifacts
 * Add test coverage
-* Don't include tags in build
 
 ## Functionality
 * Add HTML pages for the different rel urls
