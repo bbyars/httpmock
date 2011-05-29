@@ -1,13 +1,12 @@
 ## Refactorings
 * filter out stub matching logic into module, unit test
 * Remove string.format for something more javascript like
-* Move cli object in bin/httpmock to lib (we need to require from that dir anyhow)
-** Add tests
 
 ## Build
 * packages: npm, brew
 * web page with artifacts
 * Add test coverage
+* Don't include tags in build
 
 ## Functionality
 * Add HTML pages for the different rel urls

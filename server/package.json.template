@@ -5,13 +5,13 @@
     "keywords": ["testing", "REST"],
     "homepage": "https://github.com/bbyars/httpmock",
     "author": "Brandon Byars <brandon.byars@gmail.com> (http://brandonbyars.com)",
-    "files": ["lib", "scripts", "test"],
+    "files": ["lib", "bin", "test"],
     "repository": "git://github.com/bbyars/httpmock.git",
     "dependencies": {
-        "connect": "~1.0.1",
-        "express": "~2.0.0",
-        "mime": "~0.0.1",
-        "qs": "~0.0.6"
+        "connect": "1.0.6",
+        "express": "2.0.0beta3",
+        "mime": "1.2.2",
+        "qs": "0.1.0"
     },
     "devDependencies": {
         "nodelint": "~0.4.0",
@@ -19,25 +19,19 @@
     },
     "engines" : {
         "node" : ">=0.4.0 <0.5.0"
-    }
-/*
+    },
     "scripts": {
-        "start": "..",
-        "stop": "..",
-        "restart": "..",
-        "pretest": "startup",
-        "test": "..",
-        "posttest": "shutdown"
-    }
+        "start": "bin/httpmock start",
+        "stop": "bin/httpmock stop",
+        "restart": "bin/httpmock restart",
+        "pretest": "bin/httpmock start",
+        "test": "bin/run_tests",
+        "posttest": "bin/httpmock stop"
+    },
     "directories": {
         "lib": "./lib",
-        "bin": "./bin",
-        "man": "./man",
-        "doc": "./doc",
-        "example": "./example"
-    }
-    "bin": {},
-    "man": "./man/httpmock.1"
-*/
-    }
+        "bin": "./bin"
+    },
+    "bin": "bin/httpmock",
+    "preferGlobal": true
 }
