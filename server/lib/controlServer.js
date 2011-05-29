@@ -18,26 +18,6 @@ var create = function (port) {
         contentHeader = {'Content-Type': CONTENT_TYPE},
         app;
 
-    // express.bodyParser() stopped working for me.
-    // git bisect showed that it doesn't work in source history either,
-    // pointing to environmental issues, but I couldn't figure out what
-    // changed (same version of node, express, connect, etc)...
-    function bodyParser(request, response, next) {
-        request.rawBody = '';
-        request.setEncoding('utf8');
-
-        request.on('data', function (chunk) {
-            request.rawBody += chunk;
-        });
-
-        request.on('end', function () {
-            if (request.rawBody !== '') {
-                request.body = JSON.parse(request.rawBody);
-            }
-            next();
-        });
-    }
-
     function createAbsoluteUrl(request, response, next) {
         var host = request.headers.host || 'localhost:' + port;
         response.absoluteUrl = function (endpoint, serverPort) {
@@ -107,8 +87,8 @@ var create = function (port) {
     }
 
     app = express.createServer(
-        express.logger({format: '[ROOT]: :method :url'}),
-        bodyParser,
+        connect.logger({format: '[ROOT]: :method :url'}),
+        connect.bodyParser(),
         createAbsoluteUrl);
     app.listen(port);
     console.log('HTTPMock running at http://localhost:{0}'.format(port));

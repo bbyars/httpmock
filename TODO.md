@@ -1,7 +1,6 @@
 ## Refactorings
 * filter out stub matching logic into module, unit test
 * Remove string.format for something more javascript like
-* Use connect's bodyParser rather than re-implementing
 
 ## Build
 * packages: npm, brew
