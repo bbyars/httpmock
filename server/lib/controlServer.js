@@ -6,12 +6,20 @@ var http = require('http'),
     url = require('url'),
     express = require('express'),
     connect = require('connect'),
-    server = require('stubServer'),
+    fs = require('fs'),
     ports = require('ports'),
-    merge = connect.utils.merge;
+    merge = connect.utils.merge,
+    protocols = {};
 
 var CONTENT_TYPE = 'application/vnd.httpmock+json';
 connect.bodyParser.parse[CONTENT_TYPE] = JSON.parse;
+
+// add supported protocols
+var protocolNames = fs.readdirSync(__dirname + '/protocols');
+for (var i = 0; i < protocolNames.length; i += 1) {
+    var protocolName = protocolNames[i];
+    protocols[protocolName] = require('{0}/protocols/{1}/index'.format(__dirname, protocolName));
+}
 
 var create = function (port) {
     var servers = {},
@@ -112,7 +120,11 @@ var create = function (port) {
     });
 
     app.post('/servers', validatePort, validatePortAvailable, function (request, response) {
-        var port = request.body.port;
+        var port = request.body.port,
+            protocol = request.body.protocol || 'http',
+            server = protocols[protocol];
+
+//TODO: Handle unsupported protocol
 
         server.create(port, function (server) {
             servers[port] = server;
@@ -144,6 +156,7 @@ var create = function (port) {
     });
 
     app.post('/servers/:port/stubs', validateServerExists, function (request, response) {
+//TODO: Handle protocol not supporting stubs
         servers[request.port].addStub(request.body);
         response.send();
     });

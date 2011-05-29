@@ -27,6 +27,14 @@ Install with `npm install -g httpmock`.  Then run the `httpmock` command as desc
 
 The Java API is a work in progress.  For examples, look under clients/java/functional-test/org/httpmock/WasCalledAtFunctionalTest.java to see example verifications and clients/java/functional-test/org/httpmock/StubbingFunctionalTest.java for stubbing examples.
 
+## Adding protocols
+
+httpmock supports stubbing and recording HTTP out of the box.  Additional protocols can be supported by adding a directory under the lib/protocols directory of the server.  httpmock will load the index.js file in that directory, which should export a `load` function that takes no arguments and returns an object with a `create` method that creates on object with the following properties:
+* `close`: shut the server down
+* `loadRequests(path)`: loads all requests made to the server
+* `addStub(request)`: if defined, adds a stub to the server.  If not defined, stubbing is assumed not to work for this protocol
+* (future: need HTML rel pages to document API)
+
 ## Building
 
 To build everything, run `make` from a bash-like shell.  The server can be tested with the `make test`.  The Java code can be build and tested with `make java`.  Alternatively, within the clients/java directory, you can run `ant`.
