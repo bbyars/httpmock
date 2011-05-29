@@ -10,15 +10,18 @@ Node.js is the only dependency to get the server up and running.  Node.js will w
 
 ## Installation and Setup
 
+### From git
+Clone the repository.  `make start` will run the server on port 3000.  `make` will build everything, and put all artifacts under build/package, including the JAVA library.
+
 ### From source
-Download httpmock and run `server/bin/httpmock start`
+Download the <a href="http://bbyars.github.com/httpmock/artifacts/v0.2.0/httpmock.tar.gz">httpmock server</a> and untar it where you want to.  `cd` into that directory, and run `bin/httpmock start`.
 
-That will run the control server (see below) on port 3000.  You can optionally pass a `--port` argument command line argument to change the port and a `--pidfile` argument to use a non-default pidfile (useful if you're running multiple instances).  If you run the server in a background job, `server/bin/httpmock stop` will kill it.
+That will run the control server (see below) on port 3000.  You can optionally pass a `--port` argument command line argument to change the port and a `--pidfile` argument to use a non-default pidfile (useful if you're running multiple instances).  If you run the server in a background job, `bin/httpmock stop` will kill it.
 
-The client bindings will simply be a library.  For Java, add httpmock.jar to your classpath.
+The client bindings will simply be a library.  For Java, add <a href="http://bbyars.github.com/httpmock/artifacts/v0.2.0/httpmock.jar">httpmock.jar</a> to your classpath.
 
 ### From npm
-Install with `npm install -g httpmock`.  Then run the `httpmock` command as described above.  You will still need to download the client bindings separately.
+Install with `npm install -g httpmock`.  Then run the `httpmock` command as described above.  See above to download the client bindings separately.
 
 ## API
 
