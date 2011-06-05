@@ -1,33 +1,10 @@
 'use strict';
 
-require('testExtensions');
-
 var testCase = require('nodeunit').testCase,
     createRepository = require('repository').create,
-    stubs = require('protocols/http/stubbing');
-
-function mock() {
-    var wasCalled = false,
-        actualArguments = [];
-
-    var stubFunction = function () {
-        wasCalled = true;
-        actualArguments = Array.prototype.slice.call(arguments);
-    };
-
-    stubFunction.wasCalled = function () {
-        return wasCalled;
-    };
-
-    stubFunction.wasCalledWith = function () {
-        var args = Array.prototype.slice.call(arguments);
-
-        return wasCalled &&
-            JSON.stringify(actualArguments) === JSON.stringify(args);
-    };
-
-    return stubFunction;
-}
+    stubs = require('protocols/http/stubbing'),
+    mock = require('testExtensions').mock,
+    withArgs = require('testExtensions').withArgs;
 
 exports['HTTP Stubbing'] = testCase({
     setUp: function (callback) {
@@ -37,17 +14,50 @@ exports['HTTP Stubbing'] = testCase({
             write: mock(),
             end: mock()
         };
+        this.stubber = stubs.create();
         callback();
     },
 
     'should have reasonable defaults': function (test) {
-        var stubber = stubs.create();
+        this.stubber.middleware(this.request, this.response);
 
-        stubber.middleware(this.request, this.response);
-
-        test.ok(this.response.writeHead.wasCalledWith(200, { 'Connection': 'close' }));
-        test.ok(this.response.write.wasCalledWith(''));
-        test.ok(this.response.end.wasCalled());
+        test.wasCalled(this.response.writeHead, withArgs(200, { 'Connection': 'close' }));
+        test.wasCalled(this.response.write, withArgs(''));
+        test.wasCalled(this.response.end);
         test.done();
-    }
+    }/*,
+
+    'should return stub if path matches': function (test) {
+        this.request.url = '/test';
+        this.stubber.addStub({
+            path: '/test',
+            response: {
+                statusCode: 400,
+                headers: { 'Content-Type': 'text/plain' },
+                body: 'Testing 1..2..3..'
+            }
+        });
+
+        this.stubber.middleware(this.request, this.response);
+
+        test.ok(this.response.writeHead.wasCalledWith(400, {
+            'Connection': 'close',
+            'Content-Type': 'text/plain'
+        }));
+        test.ok(this.response.write.wasCalledWith('Testing 1..2..3..'));
+        test.done();
+    },
+
+    'should not return stub if path does not match': function (test) {
+        this.request.url = '/';
+        this.stubber.addStub({
+            path: '/test',
+            response: { body: 'Testing 1..2..3..' }
+        });
+
+        this.stubber.middleware(this.request, this.response);
+
+        test.ok(this.response.write.wasCalledWith(''));
+        test.done();
+    }*/
 });

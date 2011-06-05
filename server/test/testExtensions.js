@@ -88,6 +88,54 @@ var api = {
     }
 };
 
+function mock() {
+    var wasCalled = false,
+        actualArguments = [],
+        message = '';
+
+    var stubFunction = function () {
+        wasCalled = true;
+        actualArguments = Array.prototype.slice.call(arguments);
+    };
+
+    var setMessage = function (expected, actual) {
+        message = '\nExpected call with ' + expected;
+        if (wasCalled) {
+            message += '\nActual called with ' + actual;
+        }
+        else {
+            message += '\nNever called';
+        }
+    };
+
+    stubFunction.wasCalled = function () {
+        return wasCalled;
+    };
+
+    stubFunction.wasCalledWith = function () {
+        var args = Array.prototype.slice.call(arguments),
+            expected = JSON.stringify(args),
+            actual = JSON.stringify(actualArguments);
+
+        setMessage(expected, actual);
+        return wasCalled &&
+            JSON.stringify(actualArguments) === JSON.stringify(args);
+    };
+
+    stubFunction.message = function () {
+        return message;
+    };
+
+    return stubFunction;
+}
+
+function withArgs() {
+    var expected = Array.prototype.slice.call(arguments);
+    return function (test, mock) {
+        test.ok(mock.wasCalledWith.apply(null, expected), mock.message());
+    };
+}
+
 var addCustomAsserts = function (test) {
     test.jsonEquals = function (actual, expected, message) {
         var json = function (obj) {
@@ -108,6 +156,16 @@ var addCustomAsserts = function (test) {
             test.done();
         });
     };
+
+    test.wasCalled = function (mock) {
+        if (arguments.length === 1) {
+            test.ok(mock.wasCalled(), 'Expected mock call, none received.');
+        }
+        else {
+            // assume withArgs result
+            arguments[1](test, mock);
+        }
+    };
 };
 
 nodeunitTypes.test = function () {
@@ -120,3 +178,5 @@ exports.http = web;
 exports.api = api;
 exports.controlServerURL = controlServerURL;
 exports.adminPort = adminPort;
+exports.mock = mock;
+exports.withArgs = withArgs;
