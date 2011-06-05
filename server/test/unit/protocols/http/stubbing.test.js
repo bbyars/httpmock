@@ -25,7 +25,7 @@ exports['HTTP Stubbing'] = testCase({
         test.wasCalled(this.response.write, withArgs(''));
         test.wasCalled(this.response.end);
         test.done();
-    }/*,
+    },
 
     'should return stub if path matches': function (test) {
         this.request.url = '/test';
@@ -40,16 +40,16 @@ exports['HTTP Stubbing'] = testCase({
 
         this.stubber.middleware(this.request, this.response);
 
-        test.ok(this.response.writeHead.wasCalledWith(400, {
+        test.wasCalled(this.response.writeHead, withArgs(400, {
             'Connection': 'close',
             'Content-Type': 'text/plain'
         }));
-        test.ok(this.response.write.wasCalledWith('Testing 1..2..3..'));
+        test.wasCalled(this.response.write, withArgs('Testing 1..2..3..'));
         test.done();
     },
 
     'should not return stub if path does not match': function (test) {
-        this.request.url = '/';
+        this.request.url = '/different';
         this.stubber.addStub({
             path: '/test',
             response: { body: 'Testing 1..2..3..' }
@@ -57,7 +57,7 @@ exports['HTTP Stubbing'] = testCase({
 
         this.stubber.middleware(this.request, this.response);
 
-        test.ok(this.response.write.wasCalledWith(''));
+        test.wasCalled(this.response.write, withArgs(''));
         test.done();
-    }*/
+    }
 });
