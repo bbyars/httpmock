@@ -25,10 +25,10 @@ java: start
 test: unit_test functional_test
 
 unit_test:
-	port=$(PORT) server/bin/run_tests test/unit
+	port=$(PORT) server/bin/run_tests unit
 
 functional_test: start
-	port=$(PORT) server/bin/run_tests test/functional
+	port=$(PORT) server/bin/run_tests functional
 
 lint:
 	find server -path 'server/deps' -prune -o \( -name "*.js" -o -name run_tests -o -name httpmock \) -print | xargs server/deps/nodelint/nodelint --config server/jslint.config

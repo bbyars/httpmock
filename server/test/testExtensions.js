@@ -93,12 +93,12 @@ function mock() {
         actualArguments = [],
         message = '';
 
-    var stubFunction = function () {
+    function stubFunction() {
         wasCalled = true;
         actualArguments = Array.prototype.slice.call(arguments);
-    };
+    }
 
-    var setMessage = function (expected, actual) {
+    function setMessage(expected, actual) {
         message = '\nExpected call with ' + expected;
         if (wasCalled) {
             message += '\nActual called with ' + actual;
@@ -106,7 +106,7 @@ function mock() {
         else {
             message += '\nNever called';
         }
-    };
+    }
 
     stubFunction.wasCalled = function () {
         return wasCalled;

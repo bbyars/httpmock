@@ -1,11 +1,7 @@
 ## Refactorings
-* filter out stub matching logic into module, unit test
 * Remove string.format for something more javascript like
 * Pass console.log around, allows using different logger
 * Move the (path || '/') logic to repository
-* Fix run_tests to run protocol tests in nested directories
-    * Allow passing 'unit' on command line and have it run all unit tests
-* Add mocking to testExtensions with a way of viewing actual arguments
 
 ## Build
 * Pretty up github release page

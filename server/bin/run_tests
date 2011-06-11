@@ -2,7 +2,8 @@
 // vim: ft=javascript
 'use strict';
 
-var basedir = __dirname.replace(/\w+$/, '');
+var basedir = __dirname.replace(/\w+$/, ''),
+    fs = require('fs');
 
 // nodeunit's default reporter depends on process.cwd
 process.chdir(basedir);
@@ -13,10 +14,33 @@ require.paths.push(basedir);
     require.paths.push(basedir + '/' + dir);
 });
 
+function addDirectories(prefix, directory, collection) {
+    var root = prefix + directory,
+        files = fs.readdirSync(root),
+        file,
+        i;
+
+    collection.push(root);
+    for (i = 0; i < files.length; i += 1) {
+        file = root + '/' + files[i];
+        if (fs.statSync(file).isDirectory()) {
+            addDirectories(root + '/', files[i], collection);
+        }
+    }
+}
+
 var tests = process.argv.slice(2);
 if (tests.length === 0) {
-    tests.push('test/unit');
-    tests.push('test/functional');
+    addDirectories('./', 'test/unit', tests);
+    addDirectories('./', 'test/functional', tests);
+}
+else if (tests[0] === 'unit') {
+    tests.pop();
+    addDirectories('./', 'test/unit', tests);
+}
+else if (tests[0] === 'functional') {
+    tests.pop();
+    addDirectories('./', 'test/functional', tests);
 }
 
 var testrunner = require('nodeunit').reporters['default'];
