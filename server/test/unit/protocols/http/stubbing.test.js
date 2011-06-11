@@ -6,6 +6,10 @@ var testCase = require('nodeunit').testCase,
     mock = require('testExtensions').mock,
     withArgs = require('testExtensions').withArgs;
 
+function wasStubResponse(response) {
+    return response.statesCode === 400;
+}
+
 exports['HTTP Stubbing'] = testCase({
     setUp: function (callback) {
         this.request = {};
@@ -58,6 +62,209 @@ exports['HTTP Stubbing'] = testCase({
         this.stubber.middleware(this.request, this.response);
 
         test.wasCalled(this.response.write, withArgs(''));
+        test.done();
+    },
+
+    'should not return stub if request method differs': function (test) {
+        this.request.url = '/test';
+        this.request.method = 'DELETE';
+        this.stubber.addStub({
+            path: '/test',
+            request: {
+                method: 'GET'
+            },
+            response: {
+                statusCode: 400,
+                headers: { 'Content-Type': 'text/plain' },
+                body: 'Testing 1..2..3..'
+            }
+        });
+
+        this.stubber.middleware(this.request, this.response);
+
+        test.wasCalled(this.response.write, withArgs(''));
+        test.done();
+    },
+
+    'should return stub if request method same': function (test) {
+        this.request.url = '/test';
+        this.request.method = 'GET';
+        this.stubber.addStub({
+            path: '/test',
+            request: {
+                method: 'GET'
+            },
+            response: {
+                statusCode: 400,
+                headers: { 'Content-Type': 'text/plain' },
+                body: 'Testing 1..2..3..'
+            }
+        });
+
+        this.stubber.middleware(this.request, this.response);
+
+        test.wasCalled(this.response.write, withArgs('Testing 1..2..3..'));
+        test.done();
+    },
+
+    'should not return stub if header not present': function (test) {
+        this.request.url = '/test';
+        this.request.method = 'GET';
+        this.request.headers = {
+            'Content-type': 'text/plain'
+        };
+        this.stubber.addStub({
+            path: '/test',
+            request: {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'text/plain',
+                    'X-Test': 'yes'
+                }
+            },
+            response: {
+                statusCode: 400,
+                headers: { 'Content-Type': 'text/plain' },
+                body: 'Testing 1..2..3..'
+            }
+        });
+
+        this.stubber.middleware(this.request, this.response);
+
+        test.wasCalled(this.response.write, withArgs(''));
+        test.done();
+    },
+
+    'should not return stub if header does not match': function (test) {
+        this.request.url = '/test';
+        this.request.method = 'GET';
+        this.request.headers = {
+            'Content-type': 'text/plain',
+            'X-Test': 'no'
+        };
+        this.stubber.addStub({
+            path: '/test',
+            request: {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'text/plain',
+                    'X-Test': 'yes'
+                }
+            },
+            response: {
+                statusCode: 400,
+                headers: { 'Content-Type': 'text/plain' },
+                body: 'Testing 1..2..3..'
+            }
+        });
+
+        this.stubber.middleware(this.request, this.response);
+
+        test.wasCalled(this.response.write, withArgs(''));
+        test.done();
+    },
+
+    'should return stub if header name different case': function (test) {
+        this.request.url = '/test';
+        this.request.method = 'GET';
+        this.request.headers = {
+            'content-type': 'text/plain',
+            'x-test': 'yes'
+        };
+        this.stubber.addStub({
+            path: '/test',
+            request: {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'text/plain',
+                    'X-Test': 'yes'
+                }
+            },
+            response: {
+                statusCode: 400,
+                headers: { 'Content-Type': 'text/plain' },
+                body: 'Testing 1..2..3..'
+            }
+        });
+
+        this.stubber.middleware(this.request, this.response);
+
+        test.wasCalled(this.response.write, withArgs('Testing 1..2..3..'));
+        test.done();
+    },
+
+    'should not return stub if header value different case': function (test) {
+        this.request.url = '/test';
+        this.request.method = 'GET';
+        this.request.headers = {
+            'content-type': 'text/plain',
+            'x-test': 'YES'
+        };
+        this.stubber.addStub({
+            path: '/test',
+            request: {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'text/plain',
+                    'X-Test': 'yes'
+                }
+            },
+            response: {
+                statusCode: 400,
+                headers: { 'Content-Type': 'text/plain' },
+                body: 'Testing 1..2..3..'
+            }
+        });
+
+        this.stubber.middleware(this.request, this.response);
+
+        test.wasCalled(this.response.write, withArgs(''));
+        test.done();
+    },
+
+    'should not return stub if body does not match': function (test) {
+        this.request.url = '/test';
+        this.request.method = 'GET';
+        this.request.body = 'body';
+        this.stubber.addStub({
+            path: '/test',
+            request: {
+                method: 'GET',
+                body: 'test'
+            },
+            response: {
+                statusCode: 400,
+                headers: { 'Content-Type': 'text/plain' },
+                body: 'Testing 1..2..3..'
+            }
+        });
+
+        this.stubber.middleware(this.request, this.response);
+
+        test.wasCalled(this.response.write, withArgs(''));
+        test.done();
+    },
+
+    'should return stub if body partially matches': function (test) {
+        this.request.url = '/test';
+        this.request.method = 'GET';
+        this.request.body = 'this is a test.';
+        this.stubber.addStub({
+            path: '/test',
+            request: {
+                method: 'GET',
+                body: 'test'
+            },
+            response: {
+                statusCode: 400,
+                headers: { 'Content-Type': 'text/plain' },
+                body: 'Testing 1..2..3..'
+            }
+        });
+
+        this.stubber.middleware(this.request, this.response);
+
+        test.wasCalled(this.response.write, withArgs('Testing 1..2..3..'));
         test.done();
     }
 });
