@@ -98,6 +98,7 @@ var create = function (port) {
         connect.logger({format: '[ROOT]: :method :url'}),
         connect.bodyParser(),
         createAbsoluteUrl);
+    app.set('view engine', 'ejs');
     app.listen(port);
     console.log('HTTPMock running at http://localhost:{0}'.format(port));
 

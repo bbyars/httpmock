@@ -22,14 +22,6 @@ var path = require('path')
   , res = http.ServerResponse.prototype;
 
 /**
- * Memory cache.
- *
- * @type Object
- */
-
-var cache = {};
-
-/**
  * Expose constructors.
  */
 
@@ -42,35 +34,132 @@ exports = module.exports = View;
 exports.register = View.register;
 
 /**
+ * Lookup and compile `view` with cache support by supplying
+ * both the `cache` object and `cid` string,
+ * followed by `options` passed to `exports.lookup()`.
+ *
+ * @param {String} view
+ * @param {Object} cache
+ * @param {Object} cid
+ * @param {Object} options
+ * @return {View}
+ * @api private
+ */
+
+exports.compile = function(view, cache, cid, options){
+  if (cache && cid && cache[cid]) return cache[cid];
+
+  // lookup
+  view = exports.lookup(view, options);
+
+  // hints
+  if (!view.exists) {
+    if (options.hint) hintAtViewPaths(view.original, options);
+    var err = new Error('failed to locate view "' + view.original.view + '"');
+    err.view = view.original;
+    throw err;
+  }    
+
+  // compile
+  view.fn = view.templateEngine.compile(view.contents, options);
+  cache[cid] = view;
+  
+  return view;
+};
+
+/**
+ * Lookup `view`, returning an instanceof `View`.
+ *
+ * Options:
+ *
+ *   - `root` root directory path
+ *   - `defaultEngine` default template engine
+ *   - `parentView` parent `View` object
+ *   - `cache` cache object
+ *   - `cacheid` optional cache id
+ *
+ * Lookup:
+ *
+ *   - partial `_<name>` 
+ *   - any `<name>/index` 
+ *   - non-layout `../<name>/index` 
+ *   - any `<root>/<name>` 
+ *   - partial `<root>/_<name>` 
+ *
+ * @param {String} view
+ * @param {Object} options
+ * @return {View}
+ * @api private
+ */
+
+exports.lookup = function(view, options){
+  var orig = view = new View(view, options);
+
+  // Try _ prefix ex: ./views/_<name>.jade
+  if (partial) {
+    view = new View(orig.prefixPath, options);
+    if (!view.exists) view = orig;
+  }
+
+  // Try index ex: ./views/user/index.jade
+  if (!view.exists) view = new View(orig.indexPath, options);
+
+  // Try ../<name>/index ex: ../user/index.jade
+  // when calling partial('user') within the same dir
+  if (!view.exists && !options.isLayout) view = new View(orig.upIndexPath, options);
+
+  // Try root ex: <root>/user.jade
+  if (!view.exists) view = new View(orig.rootPath, options);
+
+  // Try root _ prefix ex: <root>/_user.jade
+  if (!view.exists && partial) view = new View(view.prefixPath, options);
+
+  view.original = orig;
+  return view;
+};
+
+/**
  * Partial render helper.
  *
  * @api private
  */
 
-function renderPartial(res, view, options, locals, parent){
-  // Inherit parent view extension when not present
-  if (parent && !~view.indexOf('.')) {
-    view += parent.extension;
-  }
+function renderPartial(res, view, options, parentLocals, parent){
+  var collection, object, locals;
 
-  // Allow collection to be passed as second param
   if (options) {
-    if ('length' in options) {
-      options = { collection: options };
-    } else if (!options.collection && !options.locals && !options.object) {
-      options = { object: options };
+    // collection
+    if (options.collection) {
+      collection = options.collection;
+      delete options.collection;
+    } else if ('length' in options) {
+      collection = options;
+      options = {};
+    }
+
+    // locals
+    if (options.locals) {
+      locals = options.locals;
+      delete options.locals;
+    }
+
+    // object
+    if ('Object' != options.constructor.name) {
+      object = options;
+      options = {};
+    } else if (undefined != options.object) {
+      object = options.object;
+      delete options.object;
     }
   } else {
     options = {};
   }
 
   // Inherit locals from parent
-  union(options, locals);
+  union(options, parentLocals);
   
   // Merge locals
-  if (options.locals) {
-    merge(options, options.locals);
-  }
+  if (locals) merge(options, locals);
 
   // Partials dont need layouts
   options.renderPartial = true;
@@ -81,33 +170,54 @@ function renderPartial(res, view, options, locals, parent){
 
   // Render partial
   function render(){
-    if (options.object) {
+    if (object) {
       if ('string' == typeof name) {
-        options[name] = options.object;
+        options[name] = object;
       } else if (name === global) {
-        merge(options, options.object);
+        merge(options, object);
       } else {
-        options.scope = options.object;
+        options.scope = object;
       }
     }
-    return res.render(view, options, null, parent);
+    return res.render(view, options, null, parent, true);
   }
 
   // Collection support
-  var collection = options.collection;
   if (collection) {
     var len = collection.length
-      , buf = '';
-    delete options.collection;
+      , buf = ''
+      , keys
+      , key
+      , val;
+
     options.collectionLength = len;
-    for (var i = 0; i < len; ++i) {
-      var val = collection[i];
-      options.firstInCollection = i === 0;
-      options.indexInCollection = i;
-      options.lastInCollection = i === len - 1;
-      options.object = val;
-      buf += render();
+
+    if ('number' == typeof len || Array.isArray(collection)) {
+      for (var i = 0; i < len; ++i) {
+        val = collection[i];
+        options.firstInCollection = i == 0;
+        options.indexInCollection = i;
+        options.lastInCollection = i == len - 1;
+        object = val;
+        buf += render();
+      }      
+    } else {
+      keys = Object.keys(collection);
+      len = keys.length;
+      options.collectionLength = len;
+      options.collectionKeys = keys;
+      for (var i = 0; i < len; ++i) {
+        key = keys[i];
+        val = collection[key];
+        options.keyInCollection = key;
+        options.firstInCollection = i == 0;
+        options.indexInCollection = i;
+        options.lastInCollection = i == len - 1;
+        object = val;
+        buf += render();
+      }
     }
+
     return buf;
   } else {
     return render();
@@ -115,7 +225,9 @@ function renderPartial(res, view, options, locals, parent){
 };
 
 /**
- * Render `view` partial with the given `options`.
+ * Render `view` partial with the given `options`. Optionally a 
+ * callback `fn(err, str)` may be passed instead of writing to
+ * the socket.
  *
  * Options:
  *
@@ -130,26 +242,48 @@ function renderPartial(res, view, options, locals, parent){
  *     For example _video.html_ will have a object _video_ available to it.
  *
  * @param  {String} view
- * @param  {Object|Array} options, collection, or object
+ * @param  {Object|Array|Function} options, collection, callback, or object
+ * @param  {Function} fn
  * @return {String}
  * @api public
  */
 
-res.partial = function(view, options){
+res.partial = function(view, options, fn){
   var app = this.app
     , options = options || {}
+    , viewEngine = app.set('view engine')
     , parent = {};
+
+  // accept callback as second argument
+  if ('function' == typeof options) {
+    fn = options;
+    options = {};
+  }
 
   // root "views" option
   parent.dirname = app.set('views') || process.cwd() + '/views';
 
   // utilize "view engine" option
-  if (app.set('view engine')) {
-    parent.extension = '.' + app.set('view engine');
+  if (viewEngine) parent.engine = viewEngine;
+
+  // render the partial
+  try {
+    var str = renderPartial(this, view, options, null, parent);
+  } catch (err) {
+    if (fn) {
+      fn(err);
+    } else {
+      this.req.next(err);
+    }
+    return;
   }
 
-  var str = renderPartial(this, view, options, null, parent);
-  this.send(str);
+  // callback or transfer
+  if (fn) {
+    fn(null, str);
+  } else {
+    this.send(str);
+  }
 };
 
 /**
@@ -169,25 +303,50 @@ res.partial = function(view, options){
  * @api public
  */
 
-res.render = function(view, opts, fn, parent){
+res.render = function(view, opts, fn, parent, sub){
   // support callback function as second arg
-  if (typeof opts === 'function') {
+  if ('function' == typeof opts) {
     fn = opts, opts = null;
   }
-  
+
+  try {
+    return this._render(view, opts, fn, parent, sub);
+  } catch (err) {
+    // callback given
+    if (fn) {
+      fn(err);
+    // unwind to root call to prevent
+    // several next(err) calls
+    } else if (sub) {
+      throw err;
+    // root template, next(err)
+    } else {
+      this.req.next(err);
+    }
+  }
+};
+
+// private render()
+
+res._render = function(view, opts, fn, parent, sub){
   var options = {}
     , self = this
     , app = this.app
-    , helpers = app.viewHelpers
+    , helpers = app._locals
     , dynamicHelpers = app.dynamicViewHelpers
     , viewOptions = app.set('view options')
-    , cacheTemplates = app.set('cache views');
+    , root = app.set('views') || process.cwd() + '/views';
+
+  // cache id
+  var cid = app.enabled('view cache')
+    ? view + (parent ? ':' + parent.path : '')
+    : false;
 
   // merge "view options"
   if (viewOptions) merge(options, viewOptions);
 
-  // merge res.locals
-  if (this.locals) merge(options, this.locals);
+  // merge res._locals
+  if (this._locals) merge(options, this._locals);
 
   // merge render() options
   if (opts) merge(options, opts);
@@ -198,10 +357,10 @@ res.render = function(view, opts, fn, parent){
   // status support
   if (options.status) this.statusCode = options.status;
 
-  // Defaults
-  var self = this
-    , root = app.set('views') || process.cwd() + '/views'
-    , partial = options.renderPartial
+  // capture attempts
+  options.attempts = [];
+
+  var partial = options.renderPartial
     , layout = options.layout;
 
   // Layout support
@@ -223,27 +382,6 @@ res.render = function(view, opts, fn, parent){
 
   // charset option
   if (options.charset) this.charset = options.charset;
-
-  // Populate view
-  var orig = view = new View(view, options);
-
-  // Try _ prefix ex: ./views/_user.jade
-  if (!view.exists) view = new View(orig.prefixPath, options);
-  
-  // Try index ex: ./views/user/index.jade
-  if (!view.exists) view = new View(orig.indexPath, options);
-
-  // Try ../name ../user from within ./user
-  if (!view.exists && !options.isLayout) view = new View(orig.upIndexPath, options);
-
-  // Try layout relative to the "views" dir 
-  if (!view.exists && options.isLayout) view = new View(orig.rootPath, options);
-
-  // Does not exist
-  if (!view.exists) {
-    if (app.enabled('hints')) hintAtViewPaths(orig, options);
-    throw new Error('failed to locate view "' + orig.view + '"');
-  }
 
   // Dynamic helper support
   if (false !== options.dynamicHelpers) {
@@ -270,39 +408,37 @@ res.render = function(view, opts, fn, parent){
     return renderPartial(self, path, opts, options, view);
   };
 
-  function error(err) {
-    if (fn) {
-      fn(err);
-    } else {
-      self.req.next(err);
-    }
-  }
+  // View lookup
+  options.hint = app.enabled('hints');
+  view = exports.compile(view, app.cache, cid, options);
+  options.filename = view.path;
 
-  // Attempt render
-  try {
-    var engine = view.templateEngine
-      , template = cacheTemplates
-        ? cache[view.path] || (cache[view.path] = engine.compile(view.contents, options))
-        : engine.compile(view.contents, options)
-      , str = template.call(options.scope, options);
-  } catch (err) {
-    return error(err);
-  }
+  // layout helper
+  options.layout = function(path){
+    layout = path;
+  };
 
-  // Layout support
+  // render
+  var str = view.fn.call(options.scope, options);
+
+  // layout expected
   if (layout) {
     options.isLayout = true;
     options.layout = false;
     options.body = str;
-    self.render(layout, options, fn, view);
+    this.render(layout, options, fn, view, true);
+  // partial return
   } else if (partial) {
     return str;
+  // render complete, and 
+  // callback given
   } else if (fn) {
     fn(null, str);
+  // respond
   } else {
     this.send(str);
   }
-};
+}
 
 /**
  * Hint at view path resolution, outputting the
@@ -314,10 +450,8 @@ res.render = function(view, opts, fn, parent){
 function hintAtViewPaths(view, options) {
   console.error();
   console.error('failed to locate view "' + view.view + '", tried:');
-  console.error('  - ' + new View(view.path, options).path);
-  console.error('  - ' + new View(view.prefixPath, options).path);
-  console.error('  - ' + new View(view.indexPath, options).path);
-  if (!options.isLayout) console.error('  - ' + new View(view.upIndexPath, options).path);
-  if (options.isLayout) console.error('  - ' + new View(view.rootPath, options).path);
+  options.attempts.forEach(function(path){
+    console.error('  - %s', path);
+  });
   console.error();
 }

@@ -11,7 +11,8 @@
 
 var connect = require('connect')
   , HTTPSServer = require('./https')
-  , HTTPServer = require('./http');
+  , HTTPServer = require('./http')
+  , Route = require('./router/route')
 
 /**
  * Re-export connect auto-loaders.
@@ -27,7 +28,7 @@ var exports = module.exports = connect.middleware;
  * Framework version.
  */
 
-exports.version = '2.0.0beta3';
+exports.version = '2.3.11';
 
 /**
  * Shortcut for `new Server(...)`.
@@ -46,16 +47,19 @@ exports.createServer = function(options){
 };
 
 /**
- * Expose `HTTPServer`.
+ * Expose constructors.
  */
 
 exports.HTTPServer = HTTPServer;
+exports.HTTPSServer = HTTPSServer;
+exports.Route = Route;
 
 /**
  * View extensions.
  */
 
-require('./view');
+exports.View =
+exports.view = require('./view');
 
 /**
  * Response extensions.
@@ -68,3 +72,8 @@ require('./response');
  */
 
 require('./request');
+
+// Error handler title
+
+exports.errorHandler.title = 'Express';
+

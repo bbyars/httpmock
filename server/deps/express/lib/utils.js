@@ -6,64 +6,6 @@
  */
 
 /**
- * Module dependencies.
- */
-
-var path = require('path')
-  , basename = path.basename
-  , dirname = path.dirname
-  , extname = path.extname;
-
-/**
- * Memory cache.
- */
-
-var cache = {
-    basename: {}
-  , dirname: {}
-  , extname: {}
-};
-
-/**
- * Cached basename.
- *
- * @param {String} path
- * @return {String}
- * @api private
- */
-
-exports.basename = function(path){
-  return cache.basename[path]
-    || (cache.basename[path] = basename(path));
-};
-
-/**
- * Cached dirname.
- *
- * @param {String} path
- * @return {String}
- * @api private
- */
-
-exports.dirname = function(path){
-  return cache.dirname[path]
-    || (cache.dirname[path] = dirname(path));
-};
-
-/**
- * Cached extname.
- *
- * @param {String} path
- * @return {String}
- * @api private
- */
-
-exports.extname = function(path){
-  return cache.extname[path]
-    || (cache.extname[path] = extname(path));
-};
-
-/**
  * Merge object `b` with `a` giving precedence to
  * values in object `a`.
  *
@@ -86,6 +28,27 @@ exports.union = function(a, b){
     }
   }
   return a;
+};
+
+/**
+ * Flatten the given `arr`.
+ *
+ * @param {Array} arr
+ * @return {Array}
+ * @api private
+ */
+
+exports.flatten = function(arr, ret){
+  var ret = ret || []
+    , len = arr.length;
+  for (var i = 0; i < len; ++i) {
+    if (Array.isArray(arr[i])) {
+      exports.flatten(arr[i], ret);
+    } else {
+      ret.push(arr[i]);
+    }
+  }
+  return ret;
 };
 
 /**
@@ -117,7 +80,7 @@ exports.miniMarkdown = function(str){
  * @api private
  */
 
-exports.htmlEscape = function(html) {
+exports.escape = function(html) {
   return String(html)
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
@@ -156,4 +119,21 @@ exports.parseRange = function(size, str){
     return { start: start, end: end };
   });
   return valid ? arr : undefined;
+};
+
+/**
+ * Fast alternative to `Array.prototype.slice.call()`.
+ *
+ * @param {Arguments} args
+ * @param {Number} n
+ * @return {Array}
+ * @api public
+ */
+
+exports.toArray = function(args, i){
+  var arr = []
+    , len = args.length
+    , i = i || 0;
+  for (; i < len; ++i) arr.push(args[i]);
+  return arr;
 };

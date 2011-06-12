@@ -9,24 +9,24 @@
  * Module dependencies.
  */
 
-var utils = require('../utils')
-  , extname = utils.extname
-  , dirname = utils.dirname
-  , basename = utils.basename
+var path = require('path')
+  , extname = path.extname
+  , dirname = path.dirname
+  , basename = path.basename
   , fs = require('fs')
   , stat = fs.statSync;
 
 /**
- * Memory cache.
+ * Expose `View`.
+ */
+
+exports = module.exports = View;
+
+/**
+ * Require cache.
  */
 
 var cache = {};
-
-/**
- * Existance cache.
- */
-
-var exists = {};
 
 /**
  * Initialize a new `View` with the given `view` path and `options`.
@@ -36,9 +36,8 @@ var exists = {};
  * @api private
  */
 
-var View = exports = module.exports = function View(view, options) {
+function View(view, options) {
   options = options || {};
-  // TODO: more caching
   this.view = view;
   this.root = options.root;
   this.relative = false !== options.relative;
@@ -47,8 +46,13 @@ var View = exports = module.exports = function View(view, options) {
   this.basename = basename(view);
   this.engine = this.resolveEngine();
   this.extension = '.' + this.engine;
+  this.name = this.basename.replace(this.extension, '');
   this.path = this.resolvePath();
   this.dirname = dirname(this.path);
+  if (options.attempts) {
+    if (!~options.attempts.indexOf(this.path))
+      options.attempts.push(this.path);
+  }
 };
 
 /**
@@ -59,16 +63,11 @@ var View = exports = module.exports = function View(view, options) {
  */
 
 View.prototype.__defineGetter__('exists', function(){
-  var path = this.path;
-  if (null != exists[path]) {
-    return exists[path];
-  } else {
-    try {
-      stat(path);
-      return exists[path] = true;
-    } catch (err) {
-      return exists[path] = false;
-    }
+  try {
+    stat(this.path);
+    return true;
+  } catch (err) {
+    return false;
   }
 });
 
@@ -160,14 +159,14 @@ View.prototype.__defineGetter__('indexPath', function(){
 });
 
 /**
- * Return ../index path alternative.
+ * Return ../<name>/index path alternative.
  *
  * @return {String}
  * @api public
  */
 
 View.prototype.__defineGetter__('upIndexPath', function(){
-  return this.dirname + '/index' + this.extension;
+  return this.dirname + '/../' + this.name + '/index' + this.extension;
 });
 
 /**

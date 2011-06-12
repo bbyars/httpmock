@@ -1,42 +1,25 @@
 
-DOCS = docs/index.md \
-	   docs/screencasts.md \
-	   docs/executable.md \
-	   docs/contrib.md \
-	   docs/guide.md \
-	   docs/migrate.md \
-	   docs/applications.md
-
-MANPAGES =$(DOCS:.md=.1)
+DOCS = $(shell find docs/*.md)
 HTMLDOCS =$(DOCS:.md=.html)
+TESTS = $(shell find test/*.test.js)
 
 test:
-	@NODE_ENV=test ./support/expresso/bin/expresso \
+	@NODE_ENV=test ./node_modules/.bin/expresso \
 		-I lib \
-		-I support \
-		-I support/connect/lib \
-		-I support/haml/lib \
-		-I support/jade/lib \
-		-I support/ejs/lib \
 		$(TESTFLAGS) \
-		test/*.test.js
+		$(TESTS)
 
 test-cov:
 	@TESTFLAGS=--cov $(MAKE) test
 
-docs: $(MANPAGES) $(HTMLDOCS)
+docs: $(HTMLDOCS)
 	@ echo "... generating TOC"
 	@./support/toc.js docs/guide.html
 
-%.1: %.md
-	@echo "... $< -> $@"
-	@ronn -r --pipe $< > $@
-
 %.html: %.md
 	@echo "... $< -> $@"
-	@ronn -5 --pipe --fragment $< \
+	@markdown $< \
 	  | cat docs/layout/head.html - docs/layout/foot.html \
-	  | sed 's/NAME/Express/g' \
 	  > $@
 
 site:

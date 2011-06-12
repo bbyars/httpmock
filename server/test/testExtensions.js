@@ -52,7 +52,7 @@ var web = {
             });
 
             response.on('end', function () {
-                if (response.headers['content-type'] === 'application/vnd.httpmock+json') {
+                if (response.headers['content-type'] === 'application/vnd.httpmock+json; charset=utf-8') {
                     response.parsedBody = JSON.parse(response.body);
                 }
                 spec.callback(response);

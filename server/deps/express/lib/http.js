@@ -11,11 +11,25 @@
 
 var qs = require('qs')
   , connect = require('connect')
-  , router = connect.router
-  , methods = router.methods.concat(['del', 'all'])
+  , router = require('./router')
+  , Router = require('./router')
   , view = require('./view')
+  , toArray = require('./utils').toArray
+  , methods = router.methods.concat('del', 'all')
   , url = require('url')
   , utils = connect.utils;
+
+/**
+ * Expose `HTTPServer`.
+ */
+
+exports = module.exports = HTTPServer;
+
+/**
+ * Server proto.
+ */
+
+var app = HTTPServer.prototype;
 
 /**
  * Initialize a new `HTTPServer` with optional `middleware`.
@@ -24,7 +38,7 @@ var qs = require('qs')
  * @api public
  */
 
-var Server = exports = module.exports = function HTTPServer(middleware){
+function HTTPServer(middleware){
   connect.HTTPServer.call(this, []);
   this.init(middleware);
 };
@@ -33,7 +47,7 @@ var Server = exports = module.exports = function HTTPServer(middleware){
  * Inherit from `connect.HTTPServer`.
  */
 
-Server.prototype.__proto__ = connect.HTTPServer.prototype;
+app.__proto__ = connect.HTTPServer.prototype;
 
 /**
  * Initialize the server.
@@ -42,19 +56,17 @@ Server.prototype.__proto__ = connect.HTTPServer.prototype;
  * @api private
  */
 
-Server.prototype.init = function(middleware){
+app.init = function(middleware){
   var self = this;
+  this.cache = {};
   this.settings = {};
   this.redirects = {};
   this.isCallbacks = {};
-  this.viewHelpers = {};
+  this._locals = {};
   this.dynamicViewHelpers = {};
   this.errorHandlers = [];
 
-  // default "home" to / 
   this.set('home', '/');
-
-  // set "env" to NODE_ENV, defaulting to "development"
   this.set('env', process.env.NODE_ENV || 'development');
 
   // expose objects to each other
@@ -76,11 +88,17 @@ Server.prototype.init = function(middleware){
   // apply middleware
   if (middleware) middleware.forEach(self.use.bind(self));
 
-  // use router, expose as app.get(), etc
-  var fn = router(function(app){ self.routes = app; });
+  // router
+  this.routes = new Router(this);
   this.__defineGetter__('router', function(){
     this.__usedRouter = true;
-    return fn;
+    return self.routes.middleware;
+  });
+
+  // default locals
+  this.locals({
+      settings: this.settings
+    , app: this
   });
 
   // default development configuration
@@ -90,19 +108,76 @@ Server.prototype.init = function(middleware){
 
   // default production configuration
   this.configure('production', function(){
-    this.enable('cache views');
+    this.enable('view cache');
   });
 
   // register error handlers on "listening"
   // so that they disregard definition position.
   this.on('listening', this.registerErrorHandlers.bind(this));
+
+  // route manipulation methods
+  methods.forEach(function(method){
+    self.lookup[method] = function(path){
+      return self.routes.lookup(method, path);
+    };
+
+    self.match[method] = function(path){
+      return self.routes.match(method, path);
+    };
+
+    self.remove[method] = function(path){
+      return self.routes.lookup(method, path).remove();
+    };
+  });
+
+  // del -> delete
+  self.lookup.del = self.lookup.delete;
+  self.match.del = self.match.delete;
+  self.remove.del = self.remove.delete;
+};
+
+/**
+ * Remove routes matching the given `path`.
+ *
+ * @param {Route} path
+ * @return {Boolean}
+ * @api public
+ */
+
+app.remove = function(path){
+  return this.routes.lookup('all', path).remove();
+};
+
+/**
+ * Lookup routes defined with a path
+ * equivalent to `path`.
+ *
+ * @param {Stirng} path
+ * @return {Array}
+ * @api public
+ */
+
+app.lookup = function(path){
+  return this.routes.lookup('all', path);
+};
+
+/**
+ * Lookup routes matching the given `url`.
+ *
+ * @param {Stirng} url
+ * @return {Array}
+ * @api public
+ */
+
+app.match = function(url){
+  return this.routes.match('all', url);
 };
 
 /**
  * When using the vhost() middleware register error handlers.
  */
 
-Server.prototype.onvhost = function(){
+app.onvhost = function(){
   this.registerErrorHandlers();
 };
 
@@ -113,7 +188,7 @@ Server.prototype.onvhost = function(){
  * @api public
  */
 
-Server.prototype.registerErrorHandlers = function(){
+app.registerErrorHandlers = function(){
   this.errorHandlers.forEach(function(fn){
     this.use(function(err, req, res, next){
       fn.apply(this, arguments);
@@ -132,26 +207,37 @@ Server.prototype.registerErrorHandlers = function(){
  * @api public
  */
 
-Server.prototype.use = function(route, middleware){
-  var app, home;
+app.use = function(route, middleware){
+  var app, home, handle;
 
   if ('string' != typeof route) {
     middleware = route, route = '/';
   }
 
+  // express app
+  if (middleware.handle && middleware.set) app = middleware;
+
+  // restore .app property on req and res
+  if (app) {
+    app.route = route;
+    middleware = function(req, res, next) {
+      var orig = req.app;
+      app.handle(req, res, function(err){
+        req.app = res.app = orig;
+        next(err);
+      });
+    };
+  }
+
   connect.HTTPServer.prototype.use.call(this, route, middleware);
 
-  // mounted an app
-  if (middleware.handle) {
-    app = middleware;
-    // express app
-    if (app.set) {
-      home = app.set('home');
-      if ('/' == home) home = '';
-      app.set('home', app.route + home);
-      app.parent = this;
-    }
-    // mounted hook
+  // mounted an app, invoke the hook
+  // and adjust some settings
+  if (app) {
+    home = app.set('home');
+    if ('/' == home) home = '';
+    app.set('home', app.route + home);
+    app.parent = this;
     if (app.__mounted) app.__mounted.call(app, this);
   }
 
@@ -179,7 +265,7 @@ Server.prototype.use = function(route, middleware){
  * @api public
  */
 
-Server.prototype.mounted = function(fn){
+app.mounted = function(fn){
   this.__mounted = fn;
   return this;
 };
@@ -191,7 +277,7 @@ Server.prototype.mounted = function(fn){
  * @api public
  */
 
-Server.prototype.register = function(){
+app.register = function(){
   view.register.apply(this, arguments);
   return this;
 };
@@ -205,9 +291,9 @@ Server.prototype.register = function(){
  * @api public
  */
 
-Server.prototype.helpers = 
-Server.prototype.locals = function(obj){
-  utils.merge(this.viewHelpers, obj);
+app.helpers =
+app.locals = function(obj){
+  utils.merge(this._locals, obj);
   return this;
 };
 
@@ -220,7 +306,7 @@ Server.prototype.locals = function(obj){
  * @api public
  */
 
-Server.prototype.dynamicHelpers = function(obj){
+app.dynamicHelpers = function(obj){
   utils.merge(this.dynamicViewHelpers, obj);
   return this;
 };
@@ -229,54 +315,44 @@ Server.prototype.dynamicHelpers = function(obj){
  * Map the given param placeholder `name`(s) to the given callback `fn`.
  *
  * Param mapping is used to provide pre-conditions to routes
- * which us normalized placeholders. For example ":user_id" may
- * attempt to load the user from the database, where as ":num" may 
- * pass the value through `parseInt(num, 10)`.
+ * which us normalized placeholders. This callback has the same
+ * signature as regular middleware, for example below when ":userId"
+ * is used this function will be invoked in an attempt to load the user.
  *
- * When the callback function accepts only a single argument, the
- * value of placeholder is passed:
+ *      app.param('userId', function(req, res, next, id){
+ *        User.find(id, function(err, user){
+ *          if (err) {
+ *            next(err);
+ *          } else if (user) {
+ *            req.user = user;
+ *            next();
+ *          } else {
+ *            next(new Error('failed to load user'));
+ *          }
+ *        });
+ *      });
  *
- *    app.param('page', function(n){ return parseInt(n, 10); });
- *
- * After which "/users/:page" would automatically provide us with
- * an integer for `req.params.page`. If desired we could use the callback 
- * signature shown below, and immediately `next(new Error('invalid page'))`
- * when `parseInt` fails.
- *
- * Alternatively the callback may accept the request, response, next, and
- * the value, acting like middlware:
- *
- *     app.param('userId', function(req, res, next, id){
- *       User.find(id, function(err, user){
- *         if (err) {
- *           next(err);
- *         } else if (user) {
- *           req.user = user;
- *           next();
- *         } else {
- *           next(new Error('failed to load user'));
- *         }
- *       });
- *     });
- *
- * Now every time ":userId" is present, the associated user object
- * will be loaded and assigned before the route handler is invoked.
- *
- * @param {String|Array} name
+ * @param {String|Array|Function} name
  * @param {Function} fn
  * @return {Server} for chaining
  * @api public
  */
 
-Server.prototype.param = function(name, fn){
+app.param = function(name, fn){
+  // array
   if (Array.isArray(name)) {
     name.forEach(function(name){
       this.param(name, fn);
     }, this);
+  // param logic
+  } else if ('function' == typeof name) {
+    this.routes.param(name);
+  // single
   } else {
     if (':' == name[0]) name = name.substr(1);
     this.routes.param(name, fn);
   }
+
   return this;
 };
 
@@ -289,7 +365,7 @@ Server.prototype.param = function(name, fn){
  * @api public
  */
 
-Server.prototype.error = function(fn){
+app.error = function(fn){
   this.errorHandlers.push(fn);
   return this;
 };
@@ -303,7 +379,7 @@ Server.prototype.error = function(fn){
  * @api public
  */
 
-Server.prototype.is = function(type, fn){
+app.is = function(type, fn){
   if (!fn) return this.isCallbacks[type];
   this.isCallbacks[type] = fn;
   return this;
@@ -319,7 +395,7 @@ Server.prototype.is = function(type, fn){
  * @api public
  */
 
-Server.prototype.set = function(setting, val){
+app.set = function(setting, val){
   if (val === undefined) {
     if (this.settings.hasOwnProperty(setting)) {
       return this.settings[setting];
@@ -340,7 +416,7 @@ Server.prototype.set = function(setting, val){
  * @api public
  */
 
-Server.prototype.enabled = function(setting){
+app.enabled = function(setting){
   return !!this.set(setting);
 };
 
@@ -352,7 +428,7 @@ Server.prototype.enabled = function(setting){
  * @api public
  */
 
-Server.prototype.disabled = function(setting){
+app.disabled = function(setting){
   return !this.set(setting);
 };
 
@@ -364,7 +440,7 @@ Server.prototype.disabled = function(setting){
  * @api public
  */
 
-Server.prototype.enable = function(setting){
+app.enable = function(setting){
   return this.set(setting, true);
 };
 
@@ -376,7 +452,7 @@ Server.prototype.enable = function(setting){
  * @api public
  */
 
-Server.prototype.disable = function(setting){
+app.disable = function(setting){
   return this.set(setting, false);
 };
 
@@ -389,7 +465,7 @@ Server.prototype.disable = function(setting){
  * @api public
  */
 
-Server.prototype.redirect = function(key, url){
+app.redirect = function(key, url){
   this.redirects[key] = url;
   return this;
 };
@@ -403,51 +479,46 @@ Server.prototype.redirect = function(key, url){
  * @api public
  */
 
-Server.prototype.configure = function(env, fn){
-  if ('function' == typeof env) {
-    fn = env, env = 'all';
-  }
-  if ('all' == env || env == this.settings.env) {
-    fn.call(this);
-  }
+app.configure = function(env, fn){
+  if ('function' == typeof env) fn = env, env = 'all';
+  if ('all' == env || env == this.settings.env) fn.call(this);
   return this;
 };
 
-// Generate routing methods
+/**
+ * Delegate `.VERB(...)` calls to `.route(VERB, ...)`.
+ */
 
-function generateMethod(method){
-  Server.prototype[method] = function(path, fn){
-    var self = this;
+methods.forEach(function(method){
+  app[method] = function(path){
+    if (1 == arguments.length) return this.routes.lookup(method, path);
+    var args = [method].concat(toArray(arguments));
+    if (!this.__usedRouter) this.use(this.router);
+    return this.routes._route.apply(this.routes, args);
+  }
+});
 
-    // Ensure router is mounted
-    if (!this.__usedRouter) {
-      this.use(this.router);
-    }
+/**
+ * Special-cased "all" method, applying the given route `path`,
+ * middleware, and callback to _every_ HTTP method.
+ *
+ * @param {String} path
+ * @param {Function} ...
+ * @return {Server} for chaining
+ * @api public
+ */
 
-    // Route specific middleware support
-    if (arguments.length > 2) {
-      var args = Array.prototype.slice.call(arguments, 1);
-      fn = args.pop();
-      (function stack(middleware){
-        middleware.forEach(function(fn){
-          if (Array.isArray(fn)) {
-            stack(fn);
-          } else {
-            self[method](path, fn);
-          }
-        });
-      })(args);
-    }
+app.all = function(path){
+  var args = arguments;
+  if (1 == args.length) return this.routes.lookup('all', path);
+  methods.forEach(function(method){
+    if ('all' == method) return;
+    app[method].apply(this, args);
+  }, this);
+  return this;
+};
 
-    // Generate the route
-    this.routes[method](path, fn);
-    return this;
-  };
-  return arguments.callee;
-}
+// del -> delete alias
 
-methods.forEach(generateMethod);
+app.del = app.delete;
 
-// Alias delete as "del"
-
-Server.prototype.del = Server.prototype.delete;

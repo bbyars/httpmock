@@ -1,4 +1,168 @@
 
+2.3.11 / 2011-06-04 
+==================
+
+  * Added `npm test`
+  * Removed generation of dummy test file from `express(1)`
+  * Fixed; `express(1)` adds express as a dep
+  * Fixed; prune on `prepublish`
+
+2.3.10 / 2011-05-27 
+==================
+
+  * Added `req.route`, exposing the current route
+  * Added _package.json_ generation support to `express(1)`
+  * Fixed call to `app.param()` function for optional params. Closes #682
+
+2.3.9 / 2011-05-25 
+==================
+
+  * Fixed bug-ish with `../' in `res.partial()` calls
+
+2.3.8 / 2011-05-24
+==================
+
+  * Fixed `app.options()`
+
+2.3.7 / 2011-05-23
+==================
+
+  * Added route `Collection`, ex: `app.get('/user/:id').remove();`
+  * Added support for `app.param(fn)` to define param logic
+  * Removed `app.param()` support for callback with return value
+  * Removed module.parent check from express(1) generated app. Closes #670
+  * Refactored router. Closes #639
+
+2.3.6 / 2011-05-20 
+==================
+
+  * Changed; using devDependencies instead of git submodules
+  * Fixed redis session example
+  * Fixed markdown example
+  * Fixed view caching, should not be enabled in development
+
+2.3.5 / 2011-05-20 
+==================
+
+  * Added export `.view` as alias for `.View`
+
+2.3.4 / 2011-05-08 
+==================
+
+  * Added `./examples/say`
+  * Fixed `res.sendfile()` bug preventing the transfer of files with spaces
+
+2.3.3 / 2011-05-03 
+==================
+
+  * Added "case sensitive routes" option.
+  * Changed; split methods supported per rfc [slaskis]
+  * Fixed route-specific middleware when using the same callback function several times
+
+2.3.2 / 2011-04-27 
+==================
+
+  * Fixed view hints
+
+2.3.1 / 2011-04-26 
+==================
+
+  * Added `app.match()` as `app.match.all()`
+  * Added `app.lookup()` as `app.lookup.all()`
+  * Added `app.remove()` for `app.remove.all()`
+  * Added `app.remove.VERB()`
+  * Fixed template caching collision issue. Closes #644
+  * Moved router over from connect and started refactor
+
+2.3.0 / 2011-04-25 
+==================
+
+  * Added options support to `res.clearCookie()`
+  * Added `res.helpers()` as alias of `res.locals()`
+  * Added; json defaults to UTF-8 with `res.send()`. Closes #632. [Daniel   * Dependency `connect >= 1.4.0`
+  * Changed; auto set Content-Type in res.attachement [Aaron Heckmann]
+  * Renamed "cache views" to "view cache". Closes #628
+  * Fixed caching of views when using several apps. Closes #637
+  * Fixed gotcha invoking `app.param()` callbacks once per route middleware. 
+Closes #638
+  * Fixed partial lookup precedence. Closes #631
+Shaw]
+
+2.2.2 / 2011-04-12 
+==================
+
+  * Added second callback support for `res.download()` connection errors
+  * Fixed `filename` option passing to template engine
+
+2.2.1 / 2011-04-04 
+==================
+
+  * Added `layout(path)` helper to change the layout within a view. Closes #610
+  * Fixed `partial()` collection object support.
+    Previously only anything with `.length` would work.
+    When `.length` is present one must still be aware of holes,
+    however now `{ collection: {foo: 'bar'}}` is valid, exposes
+    `keyInCollection` and `keysInCollection`.
+
+  * Performance improved with better view caching
+  * Removed `request` and `response` locals
+  * Changed; errorHandler page title is now `Express` instead of `Connect`
+
+2.2.0 / 2011-03-30 
+==================
+
+  * Added `app.lookup.VERB()`, ex `app.lookup.put('/user/:id')`. Closes #606
+  * Added `app.match.VERB()`, ex `app.match.put('/user/12')`. Closes #606
+  * Added `app.VERB(path)` as alias of `app.lookup.VERB()`.
+  * Dependency `connect >= 1.2.0`
+
+2.1.1 / 2011-03-29 
+==================
+
+  * Added; expose `err.view` object when failing to locate a view
+  * Fixed `res.partial()` call `next(err)` when no callback is given [reported by aheckmann]
+  * Fixed; `res.send(undefined)` responds with 204 [aheckmann]
+
+2.1.0 / 2011-03-24 
+==================
+
+  * Added `<root>/_?<name>` partial lookup support. Closes #447
+  * Added `request`, `response`, and `app` local variables
+  * Added `settings` local variable, containing the app's settings
+  * Added `req.flash()` exception if `req.session` is not available
+  * Added `res.send(bool)` support (json response)
+  * Fixed stylus example for latest version
+  * Fixed; wrap try/catch around `res.render()`
+
+2.0.0 / 2011-03-17 
+==================
+
+  * Fixed up index view path alternative.
+  * Changed; `res.locals()` without object returns the locals
+
+2.0.0rc3 / 2011-03-17 
+==================
+
+  * Added `res.locals(obj)` to compliment `res.local(key, val)`
+  * Added `res.partial()` callback support
+  * Fixed recursive error reporting issue in `res.render()`
+
+2.0.0rc2 / 2011-03-17 
+==================
+
+  * Changed; `partial()` "locals" are now optional
+  * Fixed `SlowBuffer` support. Closes #584 [reported by tyrda01]
+  * Fixed .filename view engine option [reported by drudge]
+  * Fixed blog example
+  * Fixed `{req,res}.app` reference when mounting [Ben Weaver]
+
+2.0.0rc / 2011-03-14 
+==================
+
+  * Fixed; expose `HTTPSServer` constructor
+  * Fixed express(1) default test charset. Closes #579 [reported by secoif]
+  * Fixed; default charset to utf-8 instead of utf8 for lame IE [reported by NickP]
+
 2.0.0beta3 / 2011-03-09 
 ==================
 

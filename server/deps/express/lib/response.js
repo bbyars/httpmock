@@ -17,8 +17,9 @@ var fs = require('fs')
   , parseRange = require('./utils').parseRange
   , res = http.ServerResponse.prototype
   , send = connect.static.send
-  , join = require('path').join
-  , mime = require('mime');
+  , mime = require('mime')
+  , basename = path.basename
+  , join = path.join;
 
 /**
  * Send a response with the given `body` and optional `headers` and `status` code.
@@ -51,7 +52,7 @@ res.send = function(body, headers, status){
   status = status || this.statusCode;
 
   // allow 0 args as 204
-  if (!arguments.length) body = status = 204;
+  if (!arguments.length || undefined === body) body = status = 204;
 
   // determine content type
   switch (typeof body) {
@@ -63,21 +64,24 @@ res.send = function(body, headers, status){
       break;
     case 'string':
       if (!this.header('Content-Type')) {
-        this.charset = this.charset || 'utf8';
+        this.charset = this.charset || 'utf-8';
         this.contentType('.html');
       }
       break;
+    case 'boolean':
     case 'object':
-      if (body instanceof Buffer) {
+      if (Buffer.isBuffer(body)) {
         if (!this.header('Content-Type')) {
           this.contentType('.bin');
         }
       } else {
         if (!this.header('Content-Type')) {
+          this.charset = this.charset || 'utf-8';
           this.contentType('.json');
         }
         body = JSON.stringify(body);
         if (this.req.query.callback && this.app.set('jsonp callback')) {
+          this.charset = this.charset || 'utf-8';
           this.header('Content-Type', 'text/javascript');
           body = this.req.query.callback.replace(/[^\w$.]/g, '') + '(' + body + ');';
         }
@@ -87,7 +91,7 @@ res.send = function(body, headers, status){
 
   // populate Content-Length
   if (!this.header('Content-Length')) {
-    this.header('Content-Length', body instanceof Buffer
+    this.header('Content-Length', Buffer.isBuffer(body)
       ? body.length
       : Buffer.byteLength(body));
   }
@@ -102,7 +106,7 @@ res.send = function(body, headers, status){
   }
 
   // strip irrelevant headers
-  if (204 === status) {
+  if (204 == status) {
     this.removeHeader('Content-Type');
     this.removeHeader('Content-Length');
   }
@@ -129,6 +133,7 @@ res.send = function(body, headers, status){
  */
 
 res.sendfile = function(path, options, fn){
+  var next = this.req.next;
   options = options || {};
 
   // support function as second arg
@@ -137,9 +142,9 @@ res.sendfile = function(path, options, fn){
     options = {};
   }
 
-  options.path = path;
+  options.path = encodeURIComponent(path);
   options.callback = fn;
-  send(this.req, this, this.req.next, options);
+  send(this.req, this, next, options);
 };
 
 /**
@@ -174,40 +179,50 @@ res.contentType = function(type){
  */
 
 res.attachment = function(filename){
+  if (filename) this.contentType(filename);
   this.header('Content-Disposition', filename
-    ? 'attachment; filename="' + path.basename(filename) + '"'
+    ? 'attachment; filename="' + basename(filename) + '"'
     : 'attachment');
   return this;
 };
 
 /**
  * Transfer the file at the given `path`, with optional 
- * `filename` as an attachment and optional callback `fn(err)`.
+ * `filename` as an attachment and optional callback `fn(err)`,
+ * and optional `fn2(err)` which is invoked when an error has
+ * occurred after headers have been sent.
  *
  * @param {String} path
  * @param {String|Function} filename or fn
  * @param {Function} fn
- * @return {Type}
+ * @param {Function} fn2
  * @api public
  */
 
-res.download = function(path, filename, fn){
+res.download = function(path, filename, fn, fn2){
   var self = this;
 
   // support callback as second arg
   if ('function' == typeof filename) {
+    fn2 = fn;
     fn = filename;
     filename = null;
   }
 
   // transfer the file
   this.attachment(filename || path).sendfile(path, function(err){
-    if (err) self.removeHeader('Content-Disposition');
-    if (fn) return fn(err);
+    var sentHeader = self._header;
     if (err) {
-      self.req.next('ENOENT' == err.code
-        ? null
-        : err);
+      if (!sentHeader) self.removeHeader('Content-Disposition');
+      if (sentHeader) {
+        fn2 && fn2(err);
+      } else if (fn) {
+        fn(err);
+      } else {
+        self.req.next(err);
+      }
+    } else if (fn) {
+      fn();
     }
   });
 };
@@ -234,11 +249,15 @@ res.header = function(name, val){
  * Clear cookie `name`.
  *
  * @param {String} name
+ * @param {Object} options
  * @api public
  */
 
-res.clearCookie = function(name){
-  this.cookie(name, '', { expires: new Date(1) });
+res.clearCookie = function(name, options){
+  var opts = { expires: new Date(1) };
+  this.cookie(name, '', options
+    ? utils.merge(options, opts)
+    : opts);
 };
 
 /**
@@ -347,7 +366,7 @@ res.redirect = function(url, status){
 
     // Absolute
     var host = req.headers.host
-      , tls = req.connection.constructor.name == 'CleartextStream';
+      , tls = req.connection.encrypted;
     url = 'http' + (tls ? 's' : '') + '://' + host + url;
   }
   
@@ -378,8 +397,28 @@ res.redirect = function(url, status){
  */
 
 res.local = function(name, val){
-  this.locals = this.locals || {};
+  this._locals = this._locals || {};
   return undefined === val
-    ? this.locals[name]
-    : this.locals[name] = val;
+    ? this._locals[name]
+    : this._locals[name] = val;
+};
+
+/**
+ * Assign several locals with the given `obj`,
+ * or return the locals.
+ *
+ * @param {Object} obj
+ * @return {Object|Undefined}
+ * @api public
+ */
+
+res.locals =
+res.helpers = function(obj){
+  if (obj) {
+    for (var key in obj) {
+      this.local(key, obj[key]);
+    }
+  } else {
+    return this._locals;
+  }
 };

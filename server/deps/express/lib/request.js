@@ -140,7 +140,7 @@ req.accepts = function(type){
 
 req.param = function(name, defaultValue){
   // route params like /user/:id
-  if (this.params.hasOwnProperty(name) && undefined !== this.params[name]) {
+  if (this.params && this.params.hasOwnProperty(name) && undefined !== this.params[name]) {
     return this.params[name]; 
   }
   // query string params
@@ -190,13 +190,14 @@ req.param = function(name, defaultValue){
  */
 
 req.flash = function(type, msg){
+  if (this.session === undefined) throw Error('req.flash() requires sessions');
   var msgs = this.session.flash = this.session.flash || {};
   if (type && msg) {
     var i = 2
       , args = arguments
       , formatters = this.app.flashFormatters || {};
     formatters.__proto__ = flashFormatters;
-    msg = utils.miniMarkdown(utils.htmlEscape(msg));
+    msg = utils.miniMarkdown(utils.escape(msg));
     msg = msg.replace(/%([a-zA-Z])/g, function(_, format){
       var formatter = formatters[format];
       if (formatter) return formatter(args[i++]);
@@ -268,7 +269,7 @@ req.is = function(type){
     if ('*' == type[0] && type[1] == contentType[1]) return true;
     if ('*' == type[1] && type[0] == contentType[0]) return true;
   }
-  return ~contentType.indexOf(type);
+  return !! ~contentType.indexOf(type);
 };
 
 // Callback for isXMLHttpRequest / xhr

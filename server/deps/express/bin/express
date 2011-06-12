@@ -11,7 +11,7 @@ var fs = require('fs')
  * Framework version.
  */
 
-var version = '2.0.0beta3';
+var version = '2.3.11';
 
 /**
  * Add session support.
@@ -36,14 +36,15 @@ var templateEngine = 'jade';
  */
 
 var usage = ''
-  + '\x1b[1mUsage\x1b[0m: express [options] [PATH]\n'
   + '\n'
-  + '\x1b[1mOptions\x1b[0m:\n'
-  + '  -s, --sessions         Add session support\n'
-  + '  -t, --template ENGINE  Add template ENGINE support (jade|ejs). Defaults to jade\n'
-  + '  -c, --css ENGINE       Add stylesheet ENGINE support (less|sass|stylus). Defaults to plain css\n'
-  + '  -v, --version          Output framework version\n'
-  + '  -h, --help             Output help information\n'
+  + '  Usage: express [options] [path]\n'
+  + '\n'
+  + '  Options:\n'
+  + '    -s, --sessions           add session support\n'
+  + '    -t, --template <engine>  add template <engine> support (jade|ejs). default=jade\n'
+  + '    -c, --css <engine>       add stylesheet <engine> support (less|sass|stylus). default=plain css\n'
+  + '    -v, --version            output framework version\n'
+  + '    -h, --help               output help information\n'
   ;
 
 /**
@@ -149,33 +150,6 @@ var stylus = [
 ].join('\n');
 
 /**
- * App test template.
- */
-
-var appTest = [
-    ""
-  , "// Run $ expresso"
-  , ""
-  , "/**"
-  , " * Module dependencies."
-  , " */"
-  , ""
-  , "var app = require('../app')"
-  , "  , assert = require('assert');"
-  , "",
-  , "module.exports = {"
-  , "  'GET /': function(){"
-  , "    assert.response(app,"
-  , "      { url: '/' },"
-  , "      { status: 200, headers: { 'Content-Type': 'text/html' }},"
-  , "      function(res){"
-  , "        assert.includes(res.body, '<title>Express</title>');"
-  , "      });"
-  , "  }"
-  , "};"
-].join('\n');
-
-/**
  * App template.
  */
 
@@ -216,12 +190,8 @@ var app = [
   , '  });'
   , '});'
   , ''
-  , '// Only listen on $ node app.js'
-  , ''
-  , 'if (!module.parent) {'
-  , '  app.listen(3000);'
-  , '  console.log("Express server listening on port %d", app.address().port);'
-  , '}'
+  , 'app.listen(3000);'
+  , 'console.log("Express server listening on port %d", app.address().port);'
   , ''
 ].join('\n');
 
@@ -321,9 +291,6 @@ function createApplicationAt(path) {
           break;
       }
     });
-    mkdir(path + '/test', function(){
-      write(path + '/test/app.test.js', appTest);
-    });
 
     // CSS Engine support
     switch (cssEngine) {
@@ -346,19 +313,21 @@ function createApplicationAt(path) {
     // Template support
     app = app.replace(':TEMPLATE', templateEngine);
 
-    write(path + '/app.js', app);
+    // package.json
+    var json = '{\n';
+    json += '    "name": "application-name"\n';
+    json += '  , "version": "0.0.1"\n';
+    json += '  , "private": true\n';
+    json += '  , "dependencies": {\n';
+    json += '      "express": "' + version + '"\n';
+    if (cssEngine) json += '    , "' + cssEngine + '": ">= 0.0.1"\n';
+    if (templateEngine) json += '    , "' + templateEngine + '": ">= 0.0.1"\n';
+    json += '  }\n';
+    json += '}';
 
-    // Suggestions
-    process.on('exit', function(){
-      if (cssEngine) {
-        console.log('   - make sure you have installed %s: \x1b[33m$ npm install %s\x1b[0m'
-          , cssEngine
-          , cssEngine);
-      }
-      console.log('   - make sure you have installed %s: \x1b[33m$ npm install %s\x1b[0m'
-        , templateEngine
-        , templateEngine);
-    });
+
+    write(path + '/package.json', json);
+    write(path + '/app.js', app);
   });
 }
 
