@@ -12,7 +12,7 @@ var testCase = require('nodeunit').testCase,
 exports['GET /'] = testCase({
     'returns base hypermedia': function (test) {
         http.get(controlServerURL + '/', function (response) {
-            test.strictEqual(response.headers['content-type'], 'application/vnd.httpmock+json; charset=utf-8');
+            test.strictEqual(response.headers['content-type'].indexOf('application/vnd.httpmock+json'), 0);
             test.jsonEquals(response.body, {
                 links: [{
                     href: controlServerURL + '/servers',

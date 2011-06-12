@@ -38,7 +38,8 @@ var web = {
             urlParts = url.parse(spec.url),
             path = urlParts.pathname + (urlParts.search || ''),
             client = http.createClient(urlParts.port, urlParts.hostname),
-            request = client.request(spec.method, path, spec.headers);
+            request = client.request(spec.method, path, spec.headers),
+            contentType;
 
         request.write(JSON.stringify(spec.body));
         request.end();
@@ -52,7 +53,8 @@ var web = {
             });
 
             response.on('end', function () {
-                if (response.headers['content-type'] === 'application/vnd.httpmock+json; charset=utf-8') {
+                contentType = response.headers['content-type'];
+                if (contentType && contentType.indexOf('application/vnd.httpmock+json') === 0) {
                     response.parsedBody = JSON.parse(response.body);
                 }
                 spec.callback(response);
@@ -165,6 +167,11 @@ var addCustomAsserts = function (test) {
             // assume withArgs result
             arguments[1](test, mock);
         }
+    };
+
+    test.matches = function (actual, expectedRegex, message) {
+        message = message || 'Expected {0} to match {1}.'.format(actual, expectedRegex);
+        test.ok(expectedRegex.test(actual), message);
     };
 };
 
