@@ -141,7 +141,13 @@ function withArgs() {
 var addCustomAsserts = function (test) {
     test.jsonEquals = function (actual, expected, message) {
         var json = function (obj) {
-            return (typeof obj === 'object') ? JSON.stringify(obj) : obj;
+            if (typeof obj === 'string') {
+                // Normalize whitespace
+                return JSON.stringify(JSON.parse(obj));
+            }
+            else {
+                return JSON.stringify(obj);
+            }
         };
 
         message = message || 'JSON not equal\nExpected:\n{0}\n\nActual:\n{1}'.format(

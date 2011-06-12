@@ -8,7 +8,6 @@ var http = require('http'),
     connect = require('connect'),
     fs = require('fs'),
     ports = require('ports'),
-    merge = connect.utils.merge,
     protocols = {};
 
 var CONTENT_TYPE = 'application/vnd.httpmock+json';
@@ -23,7 +22,6 @@ for (var i = 0; i < protocolNames.length; i += 1) {
 
 var create = function (port) {
     var servers = {},
-        contentHeader = {'Content-Type': CONTENT_TYPE},
         app;
 
     function createAbsoluteUrl(request, response, next) {
@@ -103,6 +101,7 @@ var create = function (port) {
     console.log('HTTPMock running at http://localhost:{0}'.format(port));
 
     app.get('/', function (request, response) {
+        response.setHeader('Content-type', CONTENT_TYPE);
         response.send({
             links: [
                 {
@@ -110,14 +109,15 @@ var create = function (port) {
                     rel: response.absoluteUrl('/relations/servers')
                 }
             ]
-        }, contentHeader);
+        });
     });
 
     app.get('/servers', function (request, response) {
         var result = Object.keys(servers).reduce(function (accumulator, port) {
             return accumulator.concat(serverHypermedia(port, response));
         }, []);
-        response.send({ servers: result }, contentHeader);
+        response.setHeader('Content-type', CONTENT_TYPE);
+        response.send({ servers: result });
     });
 
     app.post('/servers', validatePort, validatePortAvailable, function (request, response) {
@@ -129,14 +129,16 @@ var create = function (port) {
 
         server.create(port, function (server) {
             servers[port] = server;
-            response.send(serverHypermedia(port, response),
-                merge({'Location': response.absoluteUrl('/servers/' + port)}, contentHeader),
-                201);
+            response.setHeader('Content-type', CONTENT_TYPE);
+            response.setHeader('Location', response.absoluteUrl('/servers/' + port));
+            response.statusCode = 201;
+            response.send(serverHypermedia(port, response));
         });
     });
 
     app.get('/servers/:port', validateServerExists, function (request, response) {
-        response.send(serverHypermedia(request.port, response), contentHeader);
+        response.setHeader('Content-type', CONTENT_TYPE);
+        response.send(serverHypermedia(request.port, response));
     });
 
     app.del('/servers/:port', validateServerExists, function (request, response) {
@@ -153,7 +155,8 @@ var create = function (port) {
             results;
 
         results = servers[request.port].loadRequests(path);
-        response.send(results, contentHeader);
+        response.setHeader('Content-type', CONTENT_TYPE);
+        response.send(results);
     });
 
     app.post('/servers/:port/stubs', validateServerExists, function (request, response) {
