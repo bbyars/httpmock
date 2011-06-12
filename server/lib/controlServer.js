@@ -33,6 +33,28 @@ var create = function (port) {
         next();
     }
 
+//TODO: Add tests!
+    function connegRouter(request, response, next) {
+        var contentTypes = request.headers.accept;
+
+        if (contentTypes.indexOf(CONTENT_TYPE) >= 0) {
+            response.setHeader('Content-type', CONTENT_TYPE);
+            response.render = function (view, options) {
+                response.send(options.model);
+            };
+            next();
+        }
+        else if (contentTypes.indexOf('text/html') >= 0) {
+            response.setHeader('Content-type', 'text/html');
+            next();
+        }
+        else {
+            response.setHeader('Accept', CONTENT_TYPE + ', text/html');
+            response.statusCode = 406;
+            response.send('Not acceptable.');
+        }
+    }
+
     function serverHypermedia(port, response) {
         return {
             url: response.absoluteUrl('/', port),
@@ -95,28 +117,28 @@ var create = function (port) {
     app = express.createServer(
         connect.logger({format: '[ROOT]: :method :url'}),
         connect.bodyParser(),
+        connegRouter,
         createAbsoluteUrl);
     app.set('view engine', 'ejs');
     app.listen(port);
     console.log('HTTPMock running at http://localhost:{0}'.format(port));
 
     app.get('/', function (request, response) {
-        response.setHeader('Content-type', CONTENT_TYPE);
-        response.send({
+        var hypermedia = {
             links: [
                 {
                     href: response.absoluteUrl('/servers'),
                     rel: response.absoluteUrl('/relations/servers')
                 }
             ]
-        });
+        };
+        response.send(hypermedia);
     });
 
     app.get('/servers', function (request, response) {
         var result = Object.keys(servers).reduce(function (accumulator, port) {
             return accumulator.concat(serverHypermedia(port, response));
         }, []);
-        response.setHeader('Content-type', CONTENT_TYPE);
         response.send({ servers: result });
     });
 
@@ -129,7 +151,6 @@ var create = function (port) {
 
         server.create(port, function (server) {
             servers[port] = server;
-            response.setHeader('Content-type', CONTENT_TYPE);
             response.setHeader('Location', response.absoluteUrl('/servers/' + port));
             response.statusCode = 201;
             response.send(serverHypermedia(port, response));
@@ -137,7 +158,6 @@ var create = function (port) {
     });
 
     app.get('/servers/:port', validateServerExists, function (request, response) {
-        response.setHeader('Content-type', CONTENT_TYPE);
         response.send(serverHypermedia(request.port, response));
     });
 
@@ -155,7 +175,6 @@ var create = function (port) {
             results;
 
         results = servers[request.port].loadRequests(path);
-        response.setHeader('Content-type', CONTENT_TYPE);
         response.send(results);
     });
 
