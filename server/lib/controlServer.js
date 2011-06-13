@@ -5,7 +5,6 @@ require('extensions');
 var http = require('http'),
     url = require('url'),
     express = require('express'),
-    connect = require('connect'),
     fs = require('fs'),
     ports = require('ports'),
     protocols = {},
@@ -14,7 +13,7 @@ var http = require('http'),
     staticFiles = fs.readdirSync(publicDir);
 
 var CONTENT_TYPE = 'application/vnd.httpmock+json';
-connect.bodyParser.parse[CONTENT_TYPE] = JSON.parse;
+express.bodyParser.parse[CONTENT_TYPE] = JSON.parse;
 
 // add supported protocols
 var protocolNames = fs.readdirSync(__dirname + '/protocols');
@@ -127,8 +126,8 @@ var create = function (port) {
     }
 
     app = express.createServer(
-        connect.logger({format: '[ROOT]: :method :url'}),
-        connect.bodyParser(),
+        express.logger({format: '[ROOT]: :method :url'}),
+        express.bodyParser(),
         //connect.static(basedir + 'public'),
         connegRouter,
         createAbsoluteUrl);
