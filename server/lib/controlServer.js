@@ -2,9 +2,7 @@
 
 require('extensions');
 
-var http = require('http'),
-    url = require('url'),
-    express = require('express'),
+var express = require('express'),
     fs = require('fs'),
     ports = require('ports'),
     protocols = {},
