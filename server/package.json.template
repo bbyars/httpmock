@@ -1,17 +1,14 @@
 {
     "name": "httpmock",
     "version": "{VERSION}",
-    "description": "An framework for stubbing out third-party network dependencies",
-    "keywords": ["testing", "REST"],
+    "description": "An application for stubbing out third-party network dependencies",
+    "keywords": ["testing", "rest"],
     "homepage": "https://github.com/bbyars/httpmock",
     "author": "Brandon Byars <brandon.byars@gmail.com> (http://brandonbyars.com)",
-    "files": ["lib", "bin", "test"],
+    "files": ["lib", "bin"],
     "repository": "git://github.com/bbyars/httpmock.git",
     "dependencies": {
-        "connect": "1.0.6",
-        "express": "2.0.0beta3",
-        "mime": "1.2.2",
-        "qs": "0.1.0"
+        "express": "2.3.11",
     },
     "devDependencies": {
         "nodelint": "~0.4.0",
@@ -23,10 +20,7 @@
     "scripts": {
         "start": "bin/httpmock start",
         "stop": "bin/httpmock stop",
-        "restart": "bin/httpmock restart",
-        "pretest": "bin/httpmock start",
-        "test": "bin/run_tests",
-        "posttest": "bin/httpmock stop"
+        "restart": "bin/httpmock restart"
     },
     "directories": {
         "lib": "./lib",
