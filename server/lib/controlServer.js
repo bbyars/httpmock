@@ -8,7 +8,10 @@ var http = require('http'),
     connect = require('connect'),
     fs = require('fs'),
     ports = require('ports'),
-    protocols = {};
+    protocols = {},
+    basedir = __dirname.replace(/\w+$/, ''),
+    publicDir = basedir + 'public',
+    staticFiles = fs.readdirSync(publicDir);
 
 var CONTENT_TYPE = 'application/vnd.httpmock+json';
 connect.bodyParser.parse[CONTENT_TYPE] = JSON.parse;
@@ -34,10 +37,19 @@ var create = function (port) {
     }
 
 //TODO: Add tests!
+    function isStaticFile(url) {
+        return staticFiles.some(function (file) {
+            return url.indexOf(file) === 0;
+        });
+    }
+
     function connegRouter(request, response, next) {
         var contentTypes = request.headers.accept;
 
-        if (contentTypes.indexOf(CONTENT_TYPE) >= 0) {
+        if (isStaticFile(request.url)) {
+            next();
+        }
+        else if (contentTypes.indexOf(CONTENT_TYPE) >= 0) {
             response.setHeader('Content-type', CONTENT_TYPE);
             response.render = function (view, options) {
                 response.send(options.model);
@@ -117,9 +129,10 @@ var create = function (port) {
     app = express.createServer(
         connect.logger({format: '[ROOT]: :method :url'}),
         connect.bodyParser(),
+        //connect.static(basedir + 'public'),
         connegRouter,
         createAbsoluteUrl);
-    app.set('view engine', 'ejs');
+    app.set('view engine', 'jade');
     app.listen(port);
     console.log('HTTPMock running at http://localhost:{0}'.format(port));
 
@@ -132,7 +145,7 @@ var create = function (port) {
                 }
             ]
         };
-        response.send(hypermedia);
+        response.render('index', { model: hypermedia });
     });
 
     app.get('/servers', function (request, response) {
